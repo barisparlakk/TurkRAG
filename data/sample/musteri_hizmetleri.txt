@@ -1,0 +1,34 @@
+MÜŞTERİ HİZMETLERİ SIKÇA SORULAN SORULAR (SSS)
+Son güncelleme: Mart 2024
+
+S: Ürünleri nasıl iade edebilirim?
+C: Satın aldığınız ürünleri, teslim tarihinden itibaren 30 gün içinde iade edebilirsiniz. İade işlemi için ürünün orijinal ambalajında, kullanılmamış ve fatura ile birlikte iade edilmesi gerekmektedir. İade talebinizi müşteri hizmetleri e-posta adresimize (iade@techvizyon.com.tr) bildirmeniz yeterlidir; size 1 iş günü içinde dönüş yapılır.
+
+S: Müşteri hizmetlerine nasıl ulaşabilirim?
+C: Müşteri hizmetlerimize aşağıdaki kanallar aracılığıyla ulaşabilirsiniz:
+- Telefon: 0850 123 45 67 (Hafta içi 09:00-18:00)
+- E-posta: destek@techvizyon.com.tr (24 saat içinde yanıt)
+- Canlı destek: Web sitemizin sağ alt köşesindeki sohbet balonu (Hafta içi 09:00-20:00)
+- Destek portalı: destek.techvizyon.com.tr (7/24 bilet sistemi)
+
+S: Fatura bilgilerimi nasıl güncelleyebilirim?
+C: Fatura bilgilerinizi güncellemek için müşteri panelinize (panel.techvizyon.com.tr) giriş yaparak "Hesabım > Fatura Bilgileri" bölümüne gidiniz. Kurumsal fatura bilgileri değişikliklerinde vergi dairesi belgesi talep edilmektedir.
+
+S: Yazılımımın lisansı ne zaman yenilenmeli?
+C: Lisans yenileme tarihinizi müşteri panelinizden veya size gönderilen yıllık hatırlatma e-postasından takip edebilirsiniz. Lisans süresi dolmadan 30 gün önce otomatik hatırlatma gönderilir. Süresi dolan lisanslar, 15 günlük kullanım süresinin ardından otomatik olarak askıya alınır.
+
+S: Teknik destek için hangi bilgileri hazırlamam gerekir?
+C: Teknik destek talebinde bulunurken şu bilgileri hazırlamanız süreci hızlandıracaktır:
+- Müşteri numaranız (faturanızda veya müşteri panelinizde yer alır)
+- Kullandığınız ürün adı ve versiyonu
+- Sorunun ne zaman başladığı
+- Hata mesajının ekran görüntüsü (varsa)
+
+S: Grup lisansı nasıl satın alabilirim?
+C: 5 veya daha fazla kullanıcı için %15 indirimli grup lisansları sunulmaktadır. 20 kullanıcı ve üzeri için özel fiyatlandırma uygulanmaktadır. Teklif almak için satis@techvizyon.com.tr adresine e-posta gönderebilir ya da satış ekibimizi (0850 123 45 67 dahili 2) arayabilirsiniz.
+
+S: Veri gizliliğim nasıl korunuyor?
+C: Sistemimizde işlenen tüm kişisel veriler KVKK (6698 sayılı Kişisel Verilerin Korunması Kanunu) kapsamında korunmaktadır. Verileriniz yurt içi sunucularda saklanmakta; üçüncü taraflarla açık rızanız olmadan paylaşılmamaktadır. Veri silme veya taşıma talebiniz için kvkk@techvizyon.com.tr adresine başvurabilirsiniz.
+
+S: Deneme sürümü mevcut mu?
+C: Tüm ürünlerimiz için 14 günlük ücretsiz deneme sürümü sunulmaktadır. Deneme süresi boyunca kredi kartı bilgisi gerekmemektedir. Deneme sürümünü başlatmak için web sitemizden kayıt yaptırmanız yeterlidir.

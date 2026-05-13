@@ -1,0 +1,36 @@
+ÜRÜN KATALOĞU 2024
+TechVizyon Yazılım Çözümleri A.Ş.
+
+1. KURUMSAL YAZILIM PAKETLERI
+
+TechVizyon ERP Pro
+Küçük ve orta ölçekli işletmeler için tasarlanmış entegre iş yönetim sistemi. Finans, stok, satış ve insan kaynakları modüllerini tek çatı altında sunar. Aylık lisans bedeli 2.500 TL + KDV'den başlamaktadır.
+
+TechVizyon CRM Suite
+Müşteri ilişkileri yönetimi için geliştirilmiş bulut tabanlı platform. Satış hunisi yönetimi, müşteri segmentasyonu, e-posta pazarlama entegrasyonu ve gerçek zamanlı raporlama özellikleri içerir. Başlangıç paketi 1.200 TL/ay + KDV.
+
+TechVizyon Analitik Dashboard
+İş zekâsı ve veri görselleştirme çözümü. Farklı veri kaynaklarından (Excel, SQL, REST API) beslenebilir. Özelleştirilebilir panolar ve otomatik rapor üretimi sunar. Fiyat: kullanıcı başına 400 TL/ay + KDV.
+
+2. DANIŞMANLIK HİZMETLERİ
+
+Dijital Dönüşüm Danışmanlığı
+Şirketinizin dijital olgunluk seviyesini analiz eder, öncelikli dönüşüm alanlarını belirleriz. Proje süresi 4-12 hafta arasında değişmektedir. Fiyatlandırma proje kapsamına göre teklif bazlıdır.
+
+Yazılım Geliştirme ve Entegrasyon
+Mevcut sistemlerinize özel yazılım geliştirme ve üçüncü taraf entegrasyonlar. Agile metodoloji ile çalışılmaktadır. Günlük oran: kıdemli geliştirici 3.000 TL/gün + KDV.
+
+Siber Güvenlik Denetimi
+ISO 27001 ve KVKK uyum değerlendirmesi, sızma testi ve güvenlik açığı analizi. Standart denetim raporu 3-5 iş gününde teslim edilir.
+
+3. EĞİTİM PAKETLERİ
+
+Kurumsal Yazılım Eğitimleri
+TechVizyon ürünlerine yönelik birebir veya grup eğitimleri. Eğitimler online veya yerinde gerçekleştirilebilir. Grup eğitimi (maks. 10 kişi): 5.000 TL + KDV / tam gün.
+
+Veri Analitiği Bootcamp
+3 günlük yoğun eğitim programı. Python, SQL ve Power BI araçlarıyla iş verisi analizi öğretilmektedir. Katılımcı başına 2.000 TL + KDV.
+
+4. DESTEK VE BAKIM SÖZLEŞMELERİ
+
+Tüm ürünler için yıllık bakım sözleşmesi mevcuttur. Standart destek: hafta içi 09:00-18:00 e-posta ve telefon desteği. Premium destek: 7/24 telefon desteği + 4 saatlik müdahale garantisi. Bakım sözleşmesi fiyatları, lisans bedelinin %20'si oranında hesaplanmaktadır.
