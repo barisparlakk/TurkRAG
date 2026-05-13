@@ -8,6 +8,13 @@ const IconSend = () => (
   </svg>
 )
 
+const IconUser = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+    <circle cx="12" cy="7" r="4"/>
+  </svg>
+)
+
 const IconBot = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="8" r="4"/>
@@ -17,6 +24,14 @@ const IconBot = () => (
     <line x1="14.5" y1="6.5" x2="16" y2="5"/>
   </svg>
 )
+
+function stripThink(text) {
+  // Remove complete <think>...</think> blocks (including multiline)
+  let out = text.replace(/<think>[\s\S]*?<\/think>/g, '')
+  // Remove still-open <think> block that hasn't closed yet (streaming)
+  out = out.replace(/<think>[\s\S]*$/, '')
+  return out.trimStart()
+}
 
 /* ── Single message ────────────────────────────────────── */
 function Message({ msg }) {
@@ -62,13 +77,13 @@ function Message({ msg }) {
           wordBreak: 'break-word',
           minHeight: msg.streaming && !msg.content ? 38 : undefined,
         }}>
-          {msg.content || (msg.streaming ? null : '')}
-          {msg.streaming && !msg.content && (
+          {stripThink(msg.content) || (msg.streaming ? null : '')}
+          {msg.streaming && !stripThink(msg.content) && (
             <div className="typing-dots">
               <span/><span/><span/>
             </div>
           )}
-          {msg.streaming && msg.content && (
+          {msg.streaming && stripThink(msg.content) && (
             <span style={{
               display: 'inline-block', width: 2, height: '1em',
               background: 'var(--accent)', marginLeft: 3, verticalAlign: 'text-bottom',
@@ -125,9 +140,9 @@ function Message({ msg }) {
           background: 'var(--surface-3)',
           borderRadius: 10, border: '1px solid var(--border)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: 'var(--text-2)', fontSize: '12px', fontWeight: 700,
+          color: 'var(--text-2)',
         }}>
-          S
+          <IconUser />
         </div>
       )}
     </div>
