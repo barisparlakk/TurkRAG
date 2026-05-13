@@ -287,15 +287,16 @@ export default function App() {
           </div>
         </header>
 
-        {/* Page content */}
+        {/* Page content — both always mounted to preserve chat history */}
         <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          {tab === 'chat' ? (
+          <div style={{ display: tab === 'chat' ? 'flex' : 'none', flex: 1, overflow: 'hidden', flexDirection: 'column' }}>
             <ChatWindow />
-          ) : (
-            <div style={{ flex: 1, overflowY: 'auto', padding: '24px', maxWidth: 760, width: '100%', margin: '0 auto' }}>
+          </div>
+          <div style={{ display: tab === 'documents' ? 'flex' : 'none', flex: 1, overflowY: 'auto', flexDirection: 'column' }}>
+            <div style={{ padding: '24px', maxWidth: 760, width: '100%', margin: '0 auto' }}>
               <DocumentUpload />
             </div>
-          )}
+          </div>
         </div>
       </main>
     </div>
