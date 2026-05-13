@@ -1,204 +1,303 @@
 import React, { useState, useEffect } from 'react'
 import { ChatWindow } from './components/ChatWindow.jsx'
 import { DocumentUpload } from './components/DocumentUpload.jsx'
-import { TenantBadge } from './components/TenantBadge.jsx'
-import { api, setToken, getToken } from './api/client.js'
+import { api, setToken } from './api/client.js'
 
-export default function App() {
-  const [tab, setTab] = useState('chat')
-  const [tenantSlug, setTenantSlug] = useState('')
-  const [tenantId, setTenantId] = useState('')
+const IconChat = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+)
+
+const IconDocs = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+    <polyline points="14 2 14 8 20 8"/>
+    <line x1="16" y1="13" x2="8" y2="13"/>
+    <line x1="16" y1="17" x2="8" y2="17"/>
+    <polyline points="10 9 9 9 8 9"/>
+  </svg>
+)
+
+const IconLogout = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+    <polyline points="16 17 21 12 16 7"/>
+    <line x1="21" y1="12" x2="9" y2="12"/>
+  </svg>
+)
+
+/* ── Logo ──────────────────────────────────────────────── */
+function Logo() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '24px 20px 20px' }}>
+      <div style={{
+        width: 34, height: 34, borderRadius: 10,
+        background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        boxShadow: '0 0 16px rgba(99,102,241,0.4)',
+        flexShrink: 0,
+      }}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </div>
+      <div>
+        <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-1)', letterSpacing: '-0.01em' }}>TurkRAG</div>
+        <div style={{ fontSize: '10px', color: 'var(--text-3)', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Belge Asistanı</div>
+      </div>
+    </div>
+  )
+}
+
+/* ── Nav item ──────────────────────────────────────────── */
+function NavItem({ icon, label, active, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className="btn"
+      style={{
+        width: '100%', justifyContent: 'flex-start',
+        padding: '9px 14px', gap: '10px',
+        borderRadius: 'var(--radius-md)',
+        background: active ? 'var(--accent-muted)' : 'transparent',
+        color: active ? 'var(--accent-hover)' : 'var(--text-2)',
+        fontSize: '13.5px', fontWeight: active ? 600 : 400,
+        borderLeft: active ? '2px solid var(--accent)' : '2px solid transparent',
+        transition: 'all 0.15s',
+      }}
+      onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = 'var(--surface-3)' }}
+      onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent' }}
+    >
+      {icon}
+      {label}
+    </button>
+  )
+}
+
+/* ── Login ─────────────────────────────────────────────── */
+function LoginPage({ onLogin }) {
   const [loginSlug, setLoginSlug] = useState('')
   const [loginError, setLoginError] = useState('')
   const [tenants, setTenants] = useState([])
-  const [loadingTenants, setLoadingTenants] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  // Load tenant list from API for the login picker
   useEffect(() => {
-    setLoadingTenants(true)
-    // Use an admin token from localStorage if available, else try without auth
-    api.listTenants()
-      .then(setTenants)
-      .catch(() => setTenants([]))
-      .finally(() => setLoadingTenants(false))
+    api.listTenants().then(setTenants).catch(() => setTenants([]))
   }, [])
 
   const handleLogin = async (e) => {
     e.preventDefault()
-    setLoginError('')
     const slug = loginSlug.trim()
-    if (!slug) {
-      setLoginError('Lütfen bir çalışma alanı slug giriniz')
-      return
-    }
-
+    if (!slug) { setLoginError('Lütfen bir çalışma alanı seçiniz'); return }
+    setLoading(true); setLoginError('')
     try {
-      // Resolve slug → UUID via public endpoint, then issue a JWT
       const tenant = await api.getTenantBySlug(slug)
       const data = await api.getToken(tenant.id, 'demo-user', 'member')
       setToken(data.access_token)
-      setTenantId(tenant.id)
-      setTenantSlug(slug)
+      onLogin({ slug, id: tenant.id })
     } catch (err) {
       setLoginError(`Giriş başarısız: ${err.message}`)
+    } finally {
+      setLoading(false)
     }
   }
 
-  // Show login screen if no tenant selected
-  if (!tenantSlug) {
-    return (
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(99,102,241,0.18) 0%, var(--bg) 70%)',
+      padding: '24px',
+    }}>
+      {/* Subtle grid pattern */}
       <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(135deg, #e8f4fd 0%, #f5f5f5 100%)',
+        position: 'fixed', inset: 0, opacity: 0.03, pointerEvents: 'none',
+        backgroundImage: 'linear-gradient(var(--text-1) 1px, transparent 1px), linear-gradient(90deg, var(--text-1) 1px, transparent 1px)',
+        backgroundSize: '40px 40px',
+      }} />
+
+      <div className="fade-up" style={{
+        width: '100%', maxWidth: '400px',
+        background: 'var(--surface-1)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius-xl)',
+        padding: '40px 36px',
+        boxShadow: '0 0 0 1px var(--border-soft), var(--shadow-lg)',
+        position: 'relative', zIndex: 1,
       }}>
-        <div style={{
-          background: '#fff',
-          borderRadius: '16px',
-          padding: '40px 36px',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.10)',
-          width: '360px',
-          maxWidth: '90vw',
-        }}>
-          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-            <div style={{ fontSize: '36px', marginBottom: '8px' }}>🇹🇷</div>
-            <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#1a1a1a' }}>TurkRAG</h1>
-            <p style={{ fontSize: '13px', color: '#888', marginTop: '4px' }}>
-              Türkçe Kurumsal Belge Asistanı
-            </p>
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <div style={{
+            width: 56, height: 56, margin: '0 auto 16px',
+            borderRadius: 16,
+            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 0 32px rgba(99,102,241,0.35)',
+          }}>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
           </div>
-
-          <form onSubmit={handleLogin}>
-            <label style={{ fontSize: '13px', color: '#555', fontWeight: 500 }}>
-              Çalışma Alanı
-            </label>
-            {tenants.length > 0 ? (
-              <select
-                value={loginSlug}
-                onChange={(e) => setLoginSlug(e.target.value)}
-                style={{
-                  display: 'block',
-                  width: '100%',
-                  padding: '10px 12px',
-                  marginTop: '6px',
-                  marginBottom: '16px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  outline: 'none',
-                }}
-              >
-                <option value="">— Seçiniz —</option>
-                {tenants.map((t) => (
-                  <option key={t.id} value={t.slug}>{t.name} ({t.slug})</option>
-                ))}
-              </select>
-            ) : (
-              <input
-                type="text"
-                value={loginSlug}
-                onChange={(e) => setLoginSlug(e.target.value)}
-                placeholder="ornek: acme-sirket"
-                style={{
-                  display: 'block',
-                  width: '100%',
-                  padding: '10px 12px',
-                  marginTop: '6px',
-                  marginBottom: '16px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  outline: 'none',
-                }}
-              />
-            )}
-
-            {loginError && (
-              <div style={{ color: '#b91c1c', fontSize: '13px', marginBottom: '12px', padding: '8px', background: '#fde8e8', borderRadius: '6px' }}>
-                {loginError}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              style={{
-                width: '100%',
-                padding: '11px',
-                background: '#1a73e8',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '15px',
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              Giriş Yap
-            </button>
-          </form>
+          <h1 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--text-1)', letterSpacing: '-0.02em' }}>
+            TurkRAG
+          </h1>
+          <p style={{ fontSize: '13px', color: 'var(--text-2)', marginTop: '6px' }}>
+            Türkçe Kurumsal Belge Asistanı
+          </p>
         </div>
+
+        <form onSubmit={handleLogin}>
+          <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-2)', letterSpacing: '0.04em', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+            Çalışma Alanı
+          </label>
+          {tenants.length > 0 ? (
+            <select
+              value={loginSlug}
+              onChange={(e) => setLoginSlug(e.target.value)}
+              className="input-field"
+              style={{ marginBottom: '20px', appearance: 'none' }}
+            >
+              <option value="">— Çalışma alanı seçin —</option>
+              {tenants.map((t) => (
+                <option key={t.id} value={t.slug}>{t.name} · {t.slug}</option>
+              ))}
+            </select>
+          ) : (
+            <input
+              type="text"
+              value={loginSlug}
+              onChange={(e) => setLoginSlug(e.target.value)}
+              placeholder="ornek: acme-sirket"
+              className="input-field"
+              style={{ marginBottom: '20px' }}
+            />
+          )}
+
+          {loginError && (
+            <div style={{
+              background: 'var(--error-muted)', border: '1px solid rgba(239,68,68,0.2)',
+              color: 'var(--error)', fontSize: '13px',
+              borderRadius: 'var(--radius-md)', padding: '10px 12px',
+              marginBottom: '16px',
+            }}>
+              {loginError}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn btn-primary"
+            style={{ width: '100%', padding: '12px', fontSize: '14px', borderRadius: 'var(--radius-md)' }}
+          >
+            {loading ? (
+              <span style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.7s linear infinite' }} />
+            ) : 'Giriş Yap →'}
+          </button>
+        </form>
+
+        <p style={{ textAlign: 'center', fontSize: '11px', color: 'var(--text-3)', marginTop: '24px' }}>
+          KVKK uyumlu · Tamamen şirket içi
+        </p>
       </div>
-    )
+    </div>
+  )
+}
+
+/* ── Main app layout ───────────────────────────────────── */
+export default function App() {
+  const [tenant, setTenant] = useState(null)
+  const [tab, setTab] = useState('chat')
+
+  if (!tenant) {
+    return <LoginPage onLogin={setTenant} />
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#f5f5f5' }}>
-      {/* Header */}
-      <div style={{
-        background: '#fff',
-        borderBottom: '1px solid #e0e0e0',
-        padding: '10px 20px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
-        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+      {/* Sidebar */}
+      <aside style={{
+        width: 'var(--sidebar-w)', flexShrink: 0,
+        background: 'var(--surface-1)',
+        borderRight: '1px solid var(--border)',
+        display: 'flex', flexDirection: 'column',
       }}>
-        <span style={{ fontSize: '20px' }}>🇹🇷</span>
-        <span style={{ fontWeight: 700, fontSize: '17px', color: '#1a1a1a' }}>TurkRAG</span>
-        <TenantBadge tenantSlug={tenantSlug} />
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
-          {['chat', 'documents'].map((t) => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              style={{
-                padding: '6px 16px',
-                border: 'none',
-                borderRadius: '20px',
-                cursor: 'pointer',
-                fontSize: '13px',
-                fontWeight: 600,
-                background: tab === t ? '#1a73e8' : 'transparent',
-                color: tab === t ? '#fff' : '#555',
-                transition: 'all 0.15s',
-              }}
-            >
-              {t === 'chat' ? '💬 Sohbet' : '📂 Belgeler'}
-            </button>
-          ))}
+        <Logo />
+
+        {/* Divider */}
+        <div style={{ height: 1, background: 'var(--border)', margin: '0 16px 16px' }} />
+
+        {/* Nav */}
+        <nav style={{ padding: '0 10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <div style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-3)', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '4px 6px 8px' }}>
+            Ana Menü
+          </div>
+          <NavItem icon={<IconChat />} label="Sohbet" active={tab === 'chat'} onClick={() => setTab('chat')} />
+          <NavItem icon={<IconDocs />} label="Belgeler" active={tab === 'documents'} onClick={() => setTab('documents')} />
+        </nav>
+
+        {/* Spacer */}
+        <div style={{ flex: 1 }} />
+
+        {/* Tenant info + logout */}
+        <div style={{ padding: '12px 14px 20px', borderTop: '1px solid var(--border)' }}>
+          <div style={{
+            background: 'var(--surface-2)', border: '1px solid var(--border)',
+            borderRadius: 'var(--radius-md)', padding: '10px 12px',
+            marginBottom: '10px',
+          }}>
+            <div style={{ fontSize: '10px', color: 'var(--text-3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>
+              Çalışma Alanı
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--success)', boxShadow: '0 0 6px var(--success)', flexShrink: 0 }} />
+              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-1)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {tenant.slug}
+              </span>
+            </div>
+          </div>
           <button
-            onClick={() => { setToken(''); setTenantSlug(''); setTenantId('') }}
-            style={{ padding: '6px 12px', border: 'none', borderRadius: '20px', cursor: 'pointer', fontSize: '13px', color: '#888', background: 'transparent' }}
+            onClick={() => { setToken(''); setTenant(null) }}
+            className="btn btn-ghost"
+            style={{ width: '100%', justifyContent: 'flex-start', gap: '8px', fontSize: '13px', color: 'var(--text-3)' }}
           >
-            Çıkış
+            <IconLogout /> Çıkış Yap
           </button>
         </div>
-      </div>
+      </aside>
 
-      {/* Main content */}
-      <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        {tab === 'chat' ? (
-          <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', maxWidth: '860px', width: '100%', margin: '0 auto', background: '#fff', boxShadow: '0 0 0 1px #e0e0e0' }}>
+      {/* Content */}
+      <main style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', background: 'var(--bg)' }}>
+        {/* Top bar */}
+        <header style={{
+          height: 52, flexShrink: 0,
+          borderBottom: '1px solid var(--border)',
+          background: 'var(--surface-1)',
+          display: 'flex', alignItems: 'center',
+          padding: '0 24px', gap: '12px',
+        }}>
+          <h2 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-1)' }}>
+            {tab === 'chat' ? 'Sohbet' : 'Belge Yönetimi'}
+          </h2>
+          <div style={{ marginLeft: 'auto', fontSize: '12px', color: 'var(--text-3)' }}>
+            {tab === 'chat'
+              ? 'Belgelerinize akıllı sorular sorun'
+              : 'Belgelerinizi yükleyin ve yönetin'}
+          </div>
+        </header>
+
+        {/* Page content */}
+        <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          {tab === 'chat' ? (
             <ChatWindow />
-          </div>
-        ) : (
-          <div style={{ flex: 1, overflow: 'auto', maxWidth: '700px', width: '100%', margin: '0 auto' }}>
-            <DocumentUpload />
-          </div>
-        )}
-      </div>
+          ) : (
+            <div style={{ flex: 1, overflowY: 'auto', padding: '24px', maxWidth: 760, width: '100%', margin: '0 auto' }}>
+              <DocumentUpload />
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   )
 }

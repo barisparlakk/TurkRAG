@@ -2,111 +2,193 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useStream } from '../hooks/useStream.js'
 import { CitationPanel } from './CitationPanel.jsx'
 
+const IconSend = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+  </svg>
+)
+
+const IconBot = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="8" r="4"/>
+    <path d="M20 21a8 8 0 1 0-16 0"/>
+    <line x1="12" y1="4" x2="12" y2="2"/>
+    <line x1="9.5" y1="6.5" x2="8" y2="5"/>
+    <line x1="14.5" y1="6.5" x2="16" y2="5"/>
+  </svg>
+)
+
+/* ── Single message ────────────────────────────────────── */
 function Message({ msg }) {
   const isUser = msg.role === 'user'
   const [showSources, setShowSources] = useState(false)
 
   return (
-    <div style={{
+    <div className="fade-up" style={{
       display: 'flex',
       justifyContent: isUser ? 'flex-end' : 'flex-start',
-      marginBottom: '12px',
+      marginBottom: '20px',
+      gap: '10px',
+      alignItems: 'flex-end',
     }}>
-      <div style={{
-        maxWidth: '75%',
-        minWidth: '60px',
-      }}>
+      {/* AI avatar */}
+      {!isUser && (
         <div style={{
-          padding: '10px 14px',
-          borderRadius: isUser ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-          background: isUser ? '#1a73e8' : '#fff',
-          color: isUser ? '#fff' : '#1a1a1a',
+          width: 30, height: 30, flexShrink: 0,
+          background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+          borderRadius: 10,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: '#fff', boxShadow: '0 0 12px rgba(99,102,241,0.3)',
+          marginBottom: showSources && msg.citations?.length ? 0 : 2,
+        }}>
+          <IconBot />
+        </div>
+      )}
+
+      <div style={{ maxWidth: '72%', minWidth: '60px' }}>
+        {/* Bubble */}
+        <div style={{
+          padding: '11px 15px',
+          borderRadius: isUser ? '16px 16px 4px 16px' : '4px 16px 16px 16px',
+          background: isUser
+            ? 'linear-gradient(135deg, #6366f1 0%, #7c3aed 100%)'
+            : 'var(--surface-2)',
+          color: isUser ? '#fff' : 'var(--text-1)',
           fontSize: '14px',
-          lineHeight: 1.6,
-          border: isUser ? 'none' : '1px solid #e0e0e0',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.07)',
+          lineHeight: 1.65,
+          border: isUser ? 'none' : '1px solid var(--border)',
+          boxShadow: isUser ? '0 4px 16px rgba(99,102,241,0.25)' : 'var(--shadow-sm)',
           whiteSpace: 'pre-wrap',
           wordBreak: 'break-word',
+          minHeight: msg.streaming && !msg.content ? 38 : undefined,
         }}>
-          {msg.content}
-          {msg.streaming && (
+          {msg.content || (msg.streaming ? null : '')}
+          {msg.streaming && !msg.content && (
+            <div className="typing-dots">
+              <span/><span/><span/>
+            </div>
+          )}
+          {msg.streaming && msg.content && (
             <span style={{
-              display: 'inline-block',
-              width: '2px',
-              height: '14px',
-              background: '#1a73e8',
-              marginLeft: '3px',
-              verticalAlign: 'text-bottom',
-              animation: 'blink 1s step-end infinite',
+              display: 'inline-block', width: 2, height: '1em',
+              background: 'var(--accent)', marginLeft: 3, verticalAlign: 'text-bottom',
+              animation: 'blink 0.9s step-end infinite',
             }} />
+          )}
+          {msg.isError && (
+            <span style={{ color: 'var(--error)', fontSize: '13px' }}>{msg.content}</span>
           )}
         </div>
 
-        {!isUser && msg.citations && msg.citations.length > 0 && (
-          <div style={{ marginTop: '4px' }}>
+        {/* Citations toggle */}
+        {!isUser && msg.citations?.length > 0 && (
+          <div style={{ marginTop: '6px' }}>
             <button
               onClick={() => setShowSources(!showSources)}
+              className="btn"
               style={{
-                background: 'none',
-                border: 'none',
-                color: '#1a73e8',
-                fontSize: '12px',
-                cursor: 'pointer',
-                padding: '2px 4px',
+                background: showSources ? 'var(--accent-muted)' : 'transparent',
+                color: 'var(--accent-hover)',
+                fontSize: '12px', padding: '4px 10px',
+                borderRadius: 20, fontWeight: 500,
+                border: '1px solid ' + (showSources ? 'rgba(99,102,241,0.3)' : 'transparent'),
               }}
             >
-              {showSources ? '▲ Kaynakları gizle' : `▼ ${msg.citations.length} kaynak`}
+              {showSources ? '↑ Kaynakları gizle' : `↓ ${msg.citations.length} kaynak`}
             </button>
             {showSources && (
-              <div style={{ border: '1px solid #e0e0e0', borderRadius: '8px', overflow: 'hidden', marginTop: '4px' }}>
+              <div className="fade-in" style={{
+                marginTop: '6px',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius-md)',
+                overflow: 'hidden',
+                background: 'var(--surface-1)',
+              }}>
                 <CitationPanel citations={msg.citations} />
               </div>
             )}
           </div>
         )}
 
+        {/* Query time */}
         {msg.queryTime && (
-          <div style={{ fontSize: '11px', color: '#aaa', marginTop: '3px', textAlign: 'right' }}>
+          <div style={{ fontSize: '11px', color: 'var(--text-3)', marginTop: '4px', textAlign: isUser ? 'right' : 'left' }}>
             {msg.queryTime} ms
           </div>
         )}
+      </div>
+
+      {/* User avatar */}
+      {isUser && (
+        <div style={{
+          width: 30, height: 30, flexShrink: 0,
+          background: 'var(--surface-3)',
+          borderRadius: 10, border: '1px solid var(--border)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: 'var(--text-2)', fontSize: '12px', fontWeight: 700,
+        }}>
+          S
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ── Welcome state ─────────────────────────────────────── */
+function EmptyState() {
+  return (
+    <div style={{
+      flex: 1, display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      padding: '40px 24px', gap: '16px',
+    }}>
+      <div style={{
+        width: 64, height: 64,
+        background: 'var(--accent-muted)',
+        border: '1px solid rgba(99,102,241,0.2)',
+        borderRadius: 20,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </div>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-1)', marginBottom: '6px' }}>
+          Merhaba, nasıl yardımcı olabilirim?
+        </div>
+        <div style={{ fontSize: '13px', color: 'var(--text-2)', lineHeight: 1.6, maxWidth: 360 }}>
+          Yüklediğiniz belgeler hakkında Türkçe sorular sorabilirsiniz. Önce <strong style={{ color: 'var(--accent-hover)' }}>Belgeler</strong> sekmesinden dosya yükleyin.
+        </div>
       </div>
     </div>
   )
 }
 
+/* ── Chat window ───────────────────────────────────────── */
 export function ChatWindow() {
-  const [messages, setMessages] = useState([
-    {
-      id: 'welcome',
-      role: 'assistant',
-      content: 'Merhaba! Belgelerinizle ilgili sorularınızı sorabilirsiniz. Önce belge yükleyin.',
-      citations: [],
-    },
-  ])
+  const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const { send, tokens, citations, isStreaming, error, reset } = useStream()
   const bottomRef = useRef()
+  const textareaRef = useRef()
   const streamMsgIdRef = useRef(null)
 
-  // Scroll to bottom on new messages/tokens
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, tokens])
 
-  // Update streaming message in-place
   useEffect(() => {
     if (!streamMsgIdRef.current) return
     setMessages((prev) =>
       prev.map((m) =>
         m.id === streamMsgIdRef.current
-          ? { ...m, content: tokens || '…', streaming: isStreaming }
+          ? { ...m, content: tokens || '', streaming: isStreaming }
           : m
       )
     )
   }, [tokens, isStreaming])
 
-  // When streaming finishes, attach citations
   useEffect(() => {
     if (!isStreaming && streamMsgIdRef.current && citations.length > 0) {
       setMessages((prev) =>
@@ -119,7 +201,6 @@ export function ChatWindow() {
     }
   }, [isStreaming, citations])
 
-  // Show error as assistant message
   useEffect(() => {
     if (error && streamMsgIdRef.current) {
       setMessages((prev) =>
@@ -136,11 +217,9 @@ export function ChatWindow() {
   const handleSend = () => {
     const q = input.trim()
     if (!q || isStreaming) return
-
     const userMsgId = `u_${Date.now()}`
     const asstMsgId = `a_${Date.now()}`
     streamMsgIdRef.current = asstMsgId
-
     setMessages((prev) => [
       ...prev,
       { id: userMsgId, role: 'user', content: q },
@@ -149,81 +228,97 @@ export function ChatWindow() {
     setInput('')
     reset()
     send(q)
+    setTimeout(() => textareaRef.current?.focus(), 0)
   }
 
   const handleKey = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSend()
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
   }
+
+  const hasMessages = messages.length > 0
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <style>{`
-        @keyframes blink { 0%, 100% { opacity: 1 } 50% { opacity: 0 } }
-      `}</style>
-
-      {/* Message list */}
+      {/* Messages */}
       <div style={{
-        flex: 1,
-        overflowY: 'auto',
-        padding: '16px',
-        display: 'flex',
-        flexDirection: 'column',
+        flex: 1, overflowY: 'auto',
+        padding: hasMessages ? '28px 32px' : 0,
+        display: 'flex', flexDirection: 'column',
+        maxWidth: 820, width: '100%', margin: '0 auto', alignSelf: 'stretch',
       }}>
-        {messages.map((msg) => <Message key={msg.id} msg={msg} />)}
+        {!hasMessages ? (
+          <EmptyState />
+        ) : (
+          messages.map((msg) => <Message key={msg.id} msg={msg} />)
+        )}
         <div ref={bottomRef} />
       </div>
 
-      {/* Input bar */}
+      {/* Input area */}
       <div style={{
-        borderTop: '1px solid #e0e0e0',
-        padding: '12px 16px',
-        display: 'flex',
-        gap: '8px',
-        background: '#fff',
+        flexShrink: 0,
+        borderTop: '1px solid var(--border)',
+        padding: '16px 24px 20px',
+        background: 'var(--surface-1)',
       }}>
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKey}
-          placeholder="Sorunuzu yazın… (Enter ile gönderin)"
-          rows={2}
-          disabled={isStreaming}
-          style={{
-            flex: 1,
-            padding: '8px 12px',
-            border: '1px solid #e0e0e0',
-            borderRadius: '12px',
-            fontSize: '14px',
-            resize: 'none',
-            outline: 'none',
-            fontFamily: 'inherit',
-            background: isStreaming ? '#f5f5f5' : '#fff',
-            transition: 'border-color 0.15s',
+        <div style={{
+          maxWidth: 820, margin: '0 auto',
+          display: 'flex', gap: '10px', alignItems: 'flex-end',
+          background: 'var(--surface-2)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--radius-lg)',
+          padding: '10px 10px 10px 16px',
+          transition: 'border-color 0.15s, box-shadow 0.15s',
+        }}
+          onFocusCapture={(e) => {
+            e.currentTarget.style.borderColor = 'var(--accent)'
+            e.currentTarget.style.boxShadow = '0 0 0 3px var(--accent-muted)'
           }}
-          onFocus={(e) => e.target.style.borderColor = '#1a73e8'}
-          onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
-        />
-        <button
-          onClick={handleSend}
-          disabled={isStreaming || !input.trim()}
-          style={{
-            background: isStreaming || !input.trim() ? '#cbd5e1' : '#1a73e8',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '12px',
-            padding: '0 20px',
-            fontSize: '14px',
-            fontWeight: 600,
-            cursor: isStreaming || !input.trim() ? 'not-allowed' : 'pointer',
-            transition: 'background 0.15s',
-            whiteSpace: 'nowrap',
+          onBlurCapture={(e) => {
+            e.currentTarget.style.borderColor = 'var(--border)'
+            e.currentTarget.style.boxShadow = 'none'
           }}
         >
-          {isStreaming ? '⏳' : 'Gönder'}
-        </button>
+          <textarea
+            ref={textareaRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKey}
+            placeholder="Sorunuzu yazın… (Enter ile gönderin, Shift+Enter yeni satır)"
+            rows={1}
+            disabled={isStreaming}
+            style={{
+              flex: 1, resize: 'none', border: 'none', outline: 'none',
+              background: 'transparent', color: 'var(--text-1)',
+              fontFamily: 'var(--font)', fontSize: '14px', lineHeight: 1.6,
+              maxHeight: 140, overflowY: 'auto',
+            }}
+            onInput={(e) => {
+              e.target.style.height = 'auto'
+              e.target.style.height = Math.min(e.target.scrollHeight, 140) + 'px'
+            }}
+          />
+          <button
+            onClick={handleSend}
+            disabled={isStreaming || !input.trim()}
+            className="btn btn-primary"
+            style={{
+              padding: '8px 14px', borderRadius: 'var(--radius-md)',
+              flexShrink: 0, alignSelf: 'flex-end',
+            }}
+          >
+            {isStreaming ? (
+              <span style={{
+                width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)',
+                borderTopColor: '#fff', borderRadius: '50%',
+                display: 'inline-block', animation: 'spin 0.7s linear infinite',
+              }} />
+            ) : <IconSend />}
+          </button>
+        </div>
+        <p style={{ textAlign: 'center', fontSize: '11px', color: 'var(--text-3)', marginTop: '10px' }}>
+          Yanıtlar yüklenen belgeler temel alınarak üretilir
+        </p>
       </div>
     </div>
   )
