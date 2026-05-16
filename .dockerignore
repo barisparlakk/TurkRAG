@@ -1,0 +1,33 @@
+.git
+.gitignore
+.dockerignore
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+.venv
+venv
+.env
+
+# Large model files (mount as volume in docker-compose)
+models/
+
+# Runtime data directories
+indexes/
+qdrant_storage/
+snapshots/
+storage/
+/tmp/uploads/
+
+# Frontend build artifacts and deps
+dashboard/node_modules/
+dashboard/dist/
+
+# Dev/test files not needed in image
+tests/
+eval/
+docs/
+SHIFT_NOTES.md
+
+# macOS
+.DS_Store

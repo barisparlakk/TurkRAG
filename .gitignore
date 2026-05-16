@@ -16,4 +16,7 @@ venv/
 .DS_Store
 bin/qdrant
 storage/
+qdrant_storage/
+snapshots/
+models/cross-encoder/
 .qdrant-initialized
