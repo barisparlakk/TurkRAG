@@ -16,10 +16,16 @@ from retrieval.bm25_store import BM25Store
 from retrieval.reranker import rerank
 from retrieval.vector_store import VectorStore
 
+import os
+
 logger = logging.getLogger(__name__)
 
 RRF_K = 60  # standard RRF constant
 RERANK_CANDIDATES = 10
+# Cross-encoder logit threshold below which results are considered off-topic.
+# ms-marco-MiniLM-L-6-v2 raw logits: relevant ≈ 0–10, irrelevant ≈ negative.
+# -2.0 is conservative — only rejects clearly off-topic queries.
+CONFIDENCE_THRESHOLD = float(os.getenv("RERANK_CONFIDENCE_THRESHOLD", "-2.0"))
 
 
 class HybridRetriever:
@@ -78,9 +84,17 @@ class HybridRetriever:
             for c in candidates:
                 c["rerank_score"] = c["rrf_score"]
 
-        # Step 6: return final_k
+        # Step 6: confidence gate — drop results when best score is off-topic
+        top_score = candidates[0].get("rerank_score", 0) if candidates else 0
+        if top_score < CONFIDENCE_THRESHOLD:
+            logger.info(
+                "Low confidence (%.2f < %.2f) for query='%s...' tenant=%s — returning empty",
+                top_score, CONFIDENCE_THRESHOLD, query[:40], tenant_slug,
+            )
+            return []
+
         results = candidates[:final_k]
-        logger.info("Retrieved %d chunks after reranking", len(results))
+        logger.info("Retrieved %d chunks after reranking (top_score=%.2f)", len(results), top_score)
         return results
 
     def _rrf_fusion(self, bm25_hits: list[dict], dense_hits: list[dict]) -> list[dict]:

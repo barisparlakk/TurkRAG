@@ -69,17 +69,19 @@ def is_available() -> bool:
     return Path(LLM_MODEL_PATH).exists()
 
 
-def generate_stream(prompt: str) -> Generator[str, None, None]:
+def generate_stream(prompt: str, max_tokens: int = MAX_TOKENS) -> Generator[str, None, None]:
     """Yield tokens one at a time from the LLM.
 
+    max_tokens overrides the global default — pass a smaller value (e.g. 60)
+    for short-output tasks like contextual chunk enrichment.
     Raises RuntimeError if the model is not available.
     """
     llm = _get_llm()
-    logger.info("Generating stream (prompt_len=%d)", len(prompt))
+    logger.info("Generating stream (prompt_len=%d, max_tokens=%d)", len(prompt), max_tokens)
 
     output = llm(
         prompt,
-        max_tokens=MAX_TOKENS,
+        max_tokens=max_tokens,
         temperature=TEMPERATURE,
         stream=True,
         stop=["<|im_end|>", "<|im_start|>", "</s>", "<|endoftext|>"],
@@ -91,9 +93,9 @@ def generate_stream(prompt: str) -> Generator[str, None, None]:
             yield token
 
 
-def generate(prompt: str) -> str:
+def generate(prompt: str, max_tokens: int = MAX_TOKENS) -> str:
     """Generate a full response synchronously (non-streaming)."""
-    return "".join(generate_stream(prompt))
+    return "".join(generate_stream(prompt, max_tokens=max_tokens))
 
 
 if __name__ == "__main__":
