@@ -15,7 +15,7 @@ from slowapi.util import get_remote_address
 
 from api.auth import create_token
 from api.middleware import setup_middleware
-from api.routers import analytics, chat, documents, health, tenants
+from api.routers import analytics, chat, documents, health, sessions, tenants
 
 logging.basicConfig(
     level=logging.INFO,
@@ -98,6 +98,7 @@ def _init_postgres():
                         role TEXT NOT NULL CHECK (role IN ('user', 'assistant')),
                         content TEXT NOT NULL,
                         citations JSONB DEFAULT '[]',
+                        feedback SMALLINT DEFAULT NULL,
                         created_at TIMESTAMPTZ DEFAULT NOW()
                     );
 
@@ -111,6 +112,8 @@ def _init_postgres():
                         query_time_ms INT,
                         created_at TIMESTAMPTZ DEFAULT NOW()
                     );
+
+                    ALTER TABLE messages ADD COLUMN IF NOT EXISTS feedback SMALLINT DEFAULT NULL;
 
                     CREATE INDEX IF NOT EXISTS idx_sessions_tenant ON sessions(tenant_id);
                     CREATE INDEX IF NOT EXISTS idx_messages_session ON messages(session_id);
@@ -145,6 +148,7 @@ app.include_router(documents.router)
 app.include_router(chat.router)
 app.include_router(tenants.router)
 app.include_router(analytics.router)
+app.include_router(sessions.router)
 
 
 # Simple token creation endpoint (dev convenience — replace with proper auth in production)

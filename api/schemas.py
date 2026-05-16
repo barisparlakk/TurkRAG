@@ -22,7 +22,8 @@ class QueryResponse(BaseModel):
     citations: list[CitationSource]
     query_time_ms: int
     tenant_id: str
-    session_id: str  # always returned so the client can continue the conversation
+    session_id: str        # continue the conversation
+    message_id: str | None = None  # assistant message DB id — used for feedback
 
 
 class DocumentUploadResponse(BaseModel):

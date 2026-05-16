@@ -56,6 +56,12 @@ export const api = {
   createTenant: (name, slug) => request('POST', '/tenants', { name, slug }),
   getTenantBySlug: (slug) => request('GET', `/tenants/by-slug/${slug}`),
 
+  // Sessions
+  listSessions: (limit = 30) => request('GET', `/sessions?limit=${limit}`),
+  getSessionMessages: (sessionId) => request('GET', `/sessions/${sessionId}/messages`),
+  submitFeedback: (messageId, value) =>
+    request('POST', `/sessions/messages/${messageId}/feedback`, { value }),
+
   // Analytics
   getStats: () => request('GET', '/analytics/stats'),
   getRecentQueries: (limit = 20) => request('GET', `/analytics/recent?limit=${limit}`),

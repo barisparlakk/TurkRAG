@@ -72,22 +72,25 @@ def _load_history(session_id: str) -> list:
         conn.close()
 
 
-def _save_messages(session_id: str, user_text: str, assistant_text: str, citations: list):
-    """Persist the user question and assistant answer to the messages table."""
+def _save_messages(session_id: str, user_text: str, assistant_text: str, citations: list) -> str | None:
+    """Persist user question + assistant answer. Returns assistant message UUID (for feedback)."""
     conn = None
     try:
         conn = get_conn()
         with conn, conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO messages (session_id, role, content, citations) VALUES "
-                "(%s, %s, %s, %s), (%s, %s, %s, %s)",
-                (
-                    session_id, "user", user_text, json.dumps([]),
-                    session_id, "assistant", assistant_text, json.dumps(citations),
-                ),
+                "INSERT INTO messages (session_id, role, content, citations) VALUES (%s, %s, %s, %s)",
+                (session_id, "user", user_text, json.dumps([])),
             )
+            cur.execute(
+                "INSERT INTO messages (session_id, role, content, citations) VALUES (%s, %s, %s, %s) RETURNING id",
+                (session_id, "assistant", assistant_text, json.dumps(citations)),
+            )
+            row = cur.fetchone()
+            return str(row[0]) if row else None
     except Exception as exc:
         logger.warning("Failed to save messages: %s", exc)
+        return None
     finally:
         if conn is not None:
             conn.close()
@@ -155,7 +158,7 @@ async def chat(body: QueryRequest, tenant_id: str = Depends(get_tenant_id)):
     query_time_ms = int((time.monotonic() - t_start) * 1000)
     logger.info("Chat query answered in %d ms for tenant %s", query_time_ms, tenant_id)
 
-    _save_messages(session_id, body.query, answer, raw_citations)
+    message_id = _save_messages(session_id, body.query, answer, raw_citations)
     _log_query(tenant_id, session_id, body.query, len(answer), len(citations), query_time_ms)
 
     return QueryResponse(
@@ -164,6 +167,7 @@ async def chat(body: QueryRequest, tenant_id: str = Depends(get_tenant_id)):
         query_time_ms=query_time_ms,
         tenant_id=tenant_id,
         session_id=session_id,
+        message_id=message_id,
     )
 
 
@@ -221,12 +225,19 @@ async def chat_stream(websocket: WebSocket):
     )
 
     if result:
-        _save_messages(session_id, query, result["text"], result["citations"])
+        message_id = _save_messages(session_id, query, result["text"], result["citations"])
         _log_query(
             tenant_id, session_id, query,
             len(result["text"]), len(result["citations"]),
             result.get("query_time_ms", 0),
         )
+        # Push message_id to client so it can submit feedback
+        if message_id:
+            import contextlib as _cl
+            with _cl.suppress(Exception):
+                await websocket.send_text(
+                    json.dumps({"type": "message_id", "message_id": message_id})
+                )
 
     with contextlib.suppress(Exception):
         await websocket.close()

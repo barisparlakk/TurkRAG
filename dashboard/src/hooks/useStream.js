@@ -3,47 +3,49 @@ import { api, getToken } from '../api/client.js'
 
 /**
  * WebSocket streaming hook for TurkRAG chat.
- * Returns { send, tokens, citations, queryTime, sessionId, isStreaming, error, reset }
+ * Returns { send, abort, tokens, citations, queryTime, sessionId, messageId,
+ *           isStreaming, error, reset, resetSession }
  *
- * Pass a sessionId to continue an existing conversation; omit (or pass null)
- * to start a new one. The hook updates sessionId from the server's 'done' frame.
+ * - Pass sessionId to continue an existing conversation.
+ * - messageId is set after the server sends the message_id frame (post-save).
+ * - abort() cancels an in-flight stream.
  */
 export function useStream() {
   const [tokens, setTokens] = useState('')
   const [citations, setCitations] = useState([])
   const [queryTime, setQueryTime] = useState(null)
   const [sessionId, setSessionId] = useState(null)
+  const [messageId, setMessageId] = useState(null)
   const [isStreaming, setIsStreaming] = useState(false)
   const [error, setError] = useState(null)
   const wsRef = useRef(null)
 
   useEffect(() => {
-    return () => {
-      if (wsRef.current) {
-        wsRef.current.close()
-        wsRef.current = null
-      }
-    }
+    return () => { wsRef.current?.close(); wsRef.current = null }
   }, [])
 
   const reset = useCallback(() => {
     setTokens('')
     setCitations([])
     setQueryTime(null)
+    setMessageId(null)
     setError(null)
     setIsStreaming(false)
   }, [])
 
-  const resetSession = useCallback(() => {
-    setSessionId(null)
-  }, [])
+  const resetSession = useCallback(() => setSessionId(null), [])
 
-  const send = useCallback((query, currentSessionId = null, topK = 5) => {
-    // Close any existing connection
+  const abort = useCallback(() => {
     if (wsRef.current) {
       wsRef.current.close()
       wsRef.current = null
     }
+    setIsStreaming(false)
+  }, [])
+
+  const send = useCallback((query, currentSessionId = null, topK = 5) => {
+    wsRef.current?.close()
+    wsRef.current = null
 
     reset()
     setIsStreaming(true)
@@ -62,11 +64,7 @@ export function useStream() {
 
     ws.onmessage = (event) => {
       let frame
-      try {
-        frame = JSON.parse(event.data)
-      } catch {
-        return
-      }
+      try { frame = JSON.parse(event.data) } catch { return }
 
       if (frame.type === 'token') {
         setTokens((prev) => prev + frame.content)
@@ -76,6 +74,9 @@ export function useStream() {
         if (frame.session_id) setSessionId(frame.session_id)
         setIsStreaming(false)
         ws.close()
+      } else if (frame.type === 'message_id') {
+        // Sent after DB save — used for feedback buttons
+        if (frame.message_id) setMessageId(frame.message_id)
       } else if (frame.type === 'error') {
         setError(frame.message)
         setIsStreaming(false)
@@ -83,15 +84,10 @@ export function useStream() {
       }
     }
 
-    ws.onerror = () => {
-      setError('WebSocket bağlantı hatası')
-      setIsStreaming(false)
-    }
-
-    ws.onclose = () => {
-      setIsStreaming(false)
-    }
+    ws.onerror = () => { setError('WebSocket bağlantı hatası'); setIsStreaming(false) }
+    ws.onclose = () => { setIsStreaming(false) }
   }, [reset])
 
-  return { send, tokens, citations, queryTime, sessionId, isStreaming, error, reset, resetSession }
+  return { send, abort, tokens, citations, queryTime, sessionId, messageId,
+           isStreaming, error, reset, resetSession }
 }
