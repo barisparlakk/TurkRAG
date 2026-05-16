@@ -1,5 +1,9 @@
 """RRF fusion tests — pure unit tests with mock BM25/dense stores."""
 
+from unittest.mock import patch
+
+import numpy as np
+
 from retrieval.hybrid import RRF_K, HybridRetriever
 
 
@@ -79,3 +83,33 @@ class TestRRFFusion:
         result = self._fuse([hit], [])
         assert result[0]["text"] == "some text"
         assert result[0]["filename"] == "x.txt"
+
+
+class TestRerankerFallback:
+    """retrieve() falls back to RRF order when reranker is unavailable."""
+
+    def _run_retrieve(self, reranker_side_effect=None):
+        chunks = [_make_hit(f"d{i}", i, f"passage {i} text long enough") for i in range(3)]
+        fake_vec = np.zeros(768, dtype="float32")
+
+        with (
+            patch("ingestion.embedder.embed", return_value=fake_vec.reshape(1, -1)),
+            patch("retrieval.bm25_store.BM25Store.search", return_value=chunks),
+            patch("retrieval.vector_store.VectorStore.search", return_value=chunks),
+            patch("retrieval.reranker.rerank", side_effect=reranker_side_effect or [0.9, 0.5, 0.1]),
+        ):
+            return HybridRetriever().retrieve("sorgu", "t", final_k=3)
+
+    def test_returns_results_when_reranker_unavailable(self):
+        results = self._run_retrieve(reranker_side_effect=RuntimeError("model missing"))
+        assert len(results) == 3
+
+    def test_rerank_score_equals_rrf_score_on_fallback(self):
+        results = self._run_retrieve(reranker_side_effect=RuntimeError("model missing"))
+        for r in results:
+            assert r["rerank_score"] == r["rrf_score"]
+
+    def test_normal_reranking_applies_scores(self):
+        results = self._run_retrieve()
+        rerank_scores = [r["rerank_score"] for r in results]
+        assert rerank_scores == sorted(rerank_scores, reverse=True)

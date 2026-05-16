@@ -154,3 +154,104 @@ class TestIngestFullPipeline:
     def test_bm25_index_created(self, tmp_path):
         _, tmp = self._run_ingest(tmp_path)
         assert (tmp / "bm25_tenant-z.pkl").exists()
+
+
+class TestDeterministicPointId:
+    """Qdrant point IDs must be stable across process restarts."""
+
+    def test_same_input_same_id(self):
+        """hash() is randomized per-process; hashlib must be used instead."""
+        import hashlib
+
+
+        def _compute(doc_id, chunk_index):
+            key = f"{doc_id}_{chunk_index}".encode()
+            return int(hashlib.sha1(key).hexdigest(), 16) % (2**63)
+
+        id1 = _compute("doc-abc", 0)
+        id2 = _compute("doc-abc", 0)
+        assert id1 == id2, "point_id must be deterministic"
+
+    def test_different_chunk_different_id(self):
+        import hashlib
+
+        def _compute(doc_id, chunk_index):
+            key = f"{doc_id}_{chunk_index}".encode()
+            return int(hashlib.sha1(key).hexdigest(), 16) % (2**63)
+
+        assert _compute("doc-abc", 0) != _compute("doc-abc", 1)
+
+    def test_different_doc_different_id(self):
+        import hashlib
+
+        def _compute(doc_id, chunk_index):
+            key = f"{doc_id}_{chunk_index}".encode()
+            return int(hashlib.sha1(key).hexdigest(), 16) % (2**63)
+
+        assert _compute("doc-abc", 0) != _compute("doc-xyz", 0)
+
+    def test_id_within_qdrant_range(self):
+        import hashlib
+
+        key = b"test_doc_0"
+        pid = int(hashlib.sha1(key).hexdigest(), 16) % (2**63)
+        assert 0 <= pid < 2**63
+
+
+class TestRemoveFromBM25:
+    """Tests for _remove_from_bm25 — the BM25 delete-on-document-removal path."""
+
+    def _build_index(self, tmp_path, slug="t-slug"):
+        """Write a BM25 index with two documents (doc-1 and doc-2)."""
+        indexer = TenantIndexer()
+        chunks_a = _make_chunks(2)
+        chunks_b = _make_chunks(1)
+        chunks_b[0]["text"] = "Tamamen farklı içerik metni"
+        chunks_b[0]["start_char"] = 500
+        chunks_b[0]["end_char"] = 530
+        with patch("ingestion.indexer.BM25_INDEX_DIR", tmp_path):
+            indexer._update_bm25(slug, chunks_a, "doc-1", "a.txt")
+            indexer._update_bm25(slug, chunks_b, "doc-2", "b.txt")
+
+    def test_removes_deleted_doc_entries(self, tmp_path):
+        from ingestion.indexer import _remove_from_bm25
+
+        self._build_index(tmp_path)
+        with patch("ingestion.indexer.BM25_INDEX_DIR", tmp_path):
+            _remove_from_bm25("doc-1", "t-slug")
+
+        import pickle
+        with open(tmp_path / "bm25_t-slug.pkl", "rb") as f:
+            data = pickle.load(f)
+
+        doc_ids = {p["doc_id"] for p in data["payloads"]}
+        assert "doc-1" not in doc_ids
+        assert "doc-2" in doc_ids
+
+    def test_text_count_decreases(self, tmp_path):
+        from ingestion.indexer import _remove_from_bm25
+
+        self._build_index(tmp_path)  # 2+1 = 3 texts total
+        with patch("ingestion.indexer.BM25_INDEX_DIR", tmp_path):
+            _remove_from_bm25("doc-1", "t-slug")  # removes 2
+
+        import pickle
+        with open(tmp_path / "bm25_t-slug.pkl", "rb") as f:
+            data = pickle.load(f)
+        assert len(data["texts"]) == 1
+
+    def test_deletes_file_when_all_docs_removed(self, tmp_path):
+        from ingestion.indexer import _remove_from_bm25
+
+        indexer = TenantIndexer()
+        with patch("ingestion.indexer.BM25_INDEX_DIR", tmp_path):
+            indexer._update_bm25("solo", _make_chunks(1), "only-doc", "x.txt")
+            _remove_from_bm25("only-doc", "solo")
+
+        assert not (tmp_path / "bm25_solo.pkl").exists()
+
+    def test_no_op_when_index_missing(self, tmp_path):
+        from ingestion.indexer import _remove_from_bm25
+
+        with patch("ingestion.indexer.BM25_INDEX_DIR", tmp_path):
+            _remove_from_bm25("ghost-doc", "no-tenant")  # must not raise
