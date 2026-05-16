@@ -55,6 +55,4 @@ class VectorStore:
         return hits
 
     def collection_exists(self) -> bool:
-        client = self._get_client()
-        existing = [c.name for c in client.get_collections().collections]
-        return self.collection_name in existing
+        return self._get_client().collection_exists(self.collection_name)

@@ -25,8 +25,7 @@ def _ensure_collection(client, tenant_slug: str):
     from qdrant_client.models import Distance, VectorParams
 
     collection_name = f"tenant_{tenant_slug}"
-    existing = [c.name for c in client.get_collections().collections]
-    if collection_name not in existing:
+    if not client.collection_exists(collection_name):
         logger.info("Creating Qdrant collection: %s", collection_name)
         client.create_collection(
             collection_name=collection_name,

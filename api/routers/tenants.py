@@ -111,8 +111,7 @@ def _provision_qdrant(tenant_slug: str):
 
     client = QdrantClient(url=QDRANT_URL)
     collection_name = f"tenant_{tenant_slug}"
-    existing = [c.name for c in client.get_collections().collections]
-    if collection_name not in existing:
+    if not client.collection_exists(collection_name):
         client.create_collection(
             collection_name=collection_name,
             vectors_config=VectorParams(size=768, distance=Distance.COSINE),

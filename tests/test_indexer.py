@@ -131,7 +131,7 @@ class TestIngestFullPipeline:
         mock_conn.cursor.return_value = mock_cur
 
         mock_qdrant = MagicMock()
-        mock_qdrant.get_collections.return_value.collections = []
+        mock_qdrant.collection_exists.return_value = False
 
         with (
             patch("ingestion.embedder.embed", return_value=fake_embeddings),

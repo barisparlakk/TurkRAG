@@ -46,8 +46,7 @@ def create_tenant(name: str, slug: str) -> dict:
 
         client = QdrantClient(url=QDRANT_URL)
         collection_name = f"tenant_{slug}"
-        existing = [c.name for c in client.get_collections().collections]
-        if collection_name not in existing:
+        if not client.collection_exists(collection_name):
             client.create_collection(
                 collection_name=collection_name,
                 vectors_config=VectorParams(size=768, distance=Distance.COSINE),
