@@ -73,3 +73,23 @@ class TestDocumentUploadValidation:
             headers={"Authorization": "Bearer fake"},
         )
         assert resp.status_code in (401, 403, 422)
+
+    def test_unsupported_extension_returns_422_with_valid_token(self, client):
+        from io import BytesIO
+        # /auth/token doesn't hit the DB — any UUID-like tenant_id works
+        token_resp = client.post("/auth/token", json={
+            "tenant_id": "00000000-0000-0000-0000-000000000001",
+            "user_id": "test",
+            "role": "member",
+        })
+        if token_resp.status_code != 200:
+            pytest.skip("Token endpoint unavailable")
+        token = token_resp.json()["access_token"]
+
+        resp = client.post(
+            "/documents/upload",
+            files={"file": ("malware.exe", BytesIO(b"MZ\x90\x00"), "application/octet-stream")},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert resp.status_code == 422
+        assert ".exe" in resp.json().get("detail", "").lower() or "unsupported" in resp.json().get("detail", "").lower()
