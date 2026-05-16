@@ -3,6 +3,7 @@
 import logging
 import os
 import uuid
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
@@ -96,7 +97,6 @@ async def delete_tenant(slug: str, _=Depends(require_admin)):
         logger.warning("Could not delete Qdrant collection for '%s': %s", slug, exc)
 
     # Remove BM25 index file
-    from pathlib import Path
     bm25_path = Path(os.getenv("BM25_INDEX_DIR", "indexes")) / f"bm25_{slug}.pkl"
     if bm25_path.exists():
         bm25_path.unlink()
