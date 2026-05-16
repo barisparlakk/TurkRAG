@@ -67,7 +67,7 @@ export function CitationPanel({ citations }) {
                 fontSize: '12.5px', color: 'var(--text-2)',
                 lineHeight: 1.65, fontStyle: 'italic',
               }}>
-                "{cit.text_preview}…"
+                "{cit.text_preview}{cit.text_preview?.length >= 120 ? '…' : ''}"
               </div>
             )}
           </div>

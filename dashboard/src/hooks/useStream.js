@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { api, getToken } from '../api/client.js'
 
 /**
@@ -16,6 +16,15 @@ export function useStream() {
   const [isStreaming, setIsStreaming] = useState(false)
   const [error, setError] = useState(null)
   const wsRef = useRef(null)
+
+  useEffect(() => {
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close()
+        wsRef.current = null
+      }
+    }
+  }, [])
 
   const reset = useCallback(() => {
     setTokens('')
