@@ -16,7 +16,6 @@ import argparse
 import json
 import logging
 import os
-import sys
 from datetime import datetime
 from pathlib import Path
 
@@ -29,11 +28,11 @@ def run_eval(tenant_slug: str, queries_path: str) -> dict:
     """Run RAGAS evaluation and return a results dict."""
     from datasets import Dataset
     from ragas import evaluate
-    from ragas.metrics import faithfulness, answer_relevancy, context_precision, context_recall
+    from ragas.metrics import answer_relevancy, context_precision, context_recall, faithfulness
 
-    from retrieval.hybrid import HybridRetriever
-    from generation.prompt import build_prompt
     from generation.llm import generate, is_available
+    from generation.prompt import build_prompt
+    from retrieval.hybrid import HybridRetriever
 
     # Load test queries
     queries_file = Path(queries_path)

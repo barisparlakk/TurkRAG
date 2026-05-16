@@ -2,13 +2,17 @@
 
 Uses ms-marco-MiniLM-L-6-v2 which generalises well to Turkish text.
 Only called on the top-10 fused candidates to keep latency low.
+
+Set RERANKER_MODEL_PATH to a local SentenceTransformer directory.
+Default: models/cross-encoder/
 """
 
 import logging
+import os
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-_MODEL_NAME = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 _reranker_instance = None
 
 
@@ -17,9 +21,18 @@ def _get_reranker():
     if _reranker_instance is not None:
         return _reranker_instance
 
+    model_path = Path(os.getenv("RERANKER_MODEL_PATH", "models/cross-encoder"))
+    if not model_path.exists() or not model_path.is_dir():
+        raise RuntimeError(
+            f"Reranker model not found at '{model_path}'. "
+            "Download cross-encoder/ms-marco-MiniLM-L-6-v2 and place it there, "
+            "or set RERANKER_MODEL_PATH to a local SentenceTransformer directory. "
+            "Never load from HuggingFace Hub in production."
+        )
+
     from sentence_transformers import CrossEncoder
-    logger.info("Loading cross-encoder reranker: %s", _MODEL_NAME)
-    _reranker_instance = CrossEncoder(_MODEL_NAME, max_length=512)
+    logger.info("Loading cross-encoder reranker from %s", model_path)
+    _reranker_instance = CrossEncoder(str(model_path), max_length=512)
     logger.info("Reranker loaded.")
     return _reranker_instance
 

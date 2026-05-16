@@ -9,7 +9,6 @@ import logging
 import os
 import sys
 import uuid
-from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +22,7 @@ def create_tenant(name: str, slug: str) -> dict:
 
     conn = psycopg2.connect(POSTGRES_URL)
     try:
-        with conn:
-            with conn.cursor() as cur:
+        with conn, conn.cursor() as cur:
                 cur.execute("SELECT id FROM tenants WHERE slug=%s", (slug,))
                 if cur.fetchone():
                     print(f"✗ Tenant slug '{slug}' already exists.")
@@ -44,7 +42,7 @@ def create_tenant(name: str, slug: str) -> dict:
     # Provision Qdrant
     try:
         from qdrant_client import QdrantClient
-        from qdrant_client.models import VectorParams, Distance
+        from qdrant_client.models import Distance, VectorParams
 
         client = QdrantClient(url=QDRANT_URL)
         collection_name = f"tenant_{slug}"

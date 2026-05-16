@@ -35,12 +35,11 @@ def _ensure_tenant(name: str, slug: str) -> str:
                 return str(row[0])
 
             tenant_id = str(uuid.uuid4())
-            with conn:
-                with conn.cursor() as c:
-                    c.execute(
-                        "INSERT INTO tenants (id, name, slug) VALUES (%s, %s, %s)",
-                        (tenant_id, name, slug),
-                    )
+            with conn, conn.cursor() as c:
+                c.execute(
+                    "INSERT INTO tenants (id, name, slug) VALUES (%s, %s, %s)",
+                    (tenant_id, name, slug),
+                )
             logger.info("Created tenant '%s' (%s)", slug, tenant_id)
             return tenant_id
     finally:
@@ -49,7 +48,7 @@ def _ensure_tenant(name: str, slug: str) -> str:
 
 def _ensure_qdrant_collection(slug: str):
     from qdrant_client import QdrantClient
-    from qdrant_client.models import VectorParams, Distance
+    from qdrant_client.models import Distance, VectorParams
 
     client = QdrantClient(url=QDRANT_URL)
     collection_name = f"tenant_{slug}"
@@ -64,11 +63,13 @@ def _ensure_qdrant_collection(slug: str):
 
 def ingest_file(file_path: Path, tenant_id: str, tenant_slug: str):
     """Parse, chunk and index a single file."""
-    import psycopg2
     import hashlib
-    from ingestion.parser import parse_document
+
+    import psycopg2
+
     from ingestion.chunker import TurkishChunker
     from ingestion.indexer import TenantIndexer
+    from ingestion.parser import parse_document
 
     content = file_path.read_bytes()
     file_hash = hashlib.sha256(content).hexdigest()
@@ -82,8 +83,7 @@ def ingest_file(file_path: Path, tenant_id: str, tenant_slug: str):
                 return
 
         doc_id = str(uuid.uuid4())
-        with conn:
-            with conn.cursor() as cur:
+        with conn, conn.cursor() as cur:
                 cur.execute(
                     "INSERT INTO documents (id, tenant_id, filename, file_hash, status) VALUES (%s,%s,%s,%s,'processing')",
                     (doc_id, tenant_id, file_path.name, file_hash),
@@ -118,7 +118,7 @@ if __name__ == "__main__":
     _ensure_qdrant_collection(tenant_slug)
 
     files = sorted(SAMPLE_DIR.glob("*"))
-    supported = {".pdf", ".docx", ".txt"}
+    supported = {".pdf", ".docx", ".txt", ".xlsx", ".xls", ".csv"}
     files = [f for f in files if f.suffix.lower() in supported]
 
     if not files:
@@ -130,7 +130,7 @@ if __name__ == "__main__":
         ingest_file(f, tenant_id, tenant_slug)
 
     print(f"\n✓ Ingested {len(files)} files for tenant '{tenant_slug}'")
-    print(f"\nTo query the demo tenant, get a token:")
-    print(f"  curl -X POST http://localhost:8000/auth/token \\")
-    print(f'    -H "Content-Type: application/json" \\')
+    print("\nTo query the demo tenant, get a token:")
+    print("  curl -X POST http://localhost:8000/auth/token \\")
+    print('    -H "Content-Type: application/json" \\')
     print(f'    -d \'{{"tenant_id":"{tenant_id}","user_id":"demo","role":"member"}}\'')
