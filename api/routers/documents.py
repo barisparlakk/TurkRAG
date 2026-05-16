@@ -97,11 +97,14 @@ async def list_documents(tenant_id: str = Depends(get_tenant_id)):
 @router.delete("/{doc_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_document(doc_id: str, tenant_id: str = Depends(get_tenant_id)):
     """Remove a document from Qdrant, BM25, and PostgreSQL."""
+    tenant_slug = None
     conn = get_conn()
     try:
         with conn, conn.cursor() as cur:
             cur.execute(
-                "SELECT id, tenant_id FROM documents WHERE id=%s",
+                """SELECT d.id, d.tenant_id, t.slug
+                   FROM documents d JOIN tenants t ON t.id = d.tenant_id
+                   WHERE d.id=%s""",
                 (doc_id,),
             )
             row = cur.fetchone()
@@ -109,21 +112,12 @@ async def delete_document(doc_id: str, tenant_id: str = Depends(get_tenant_id)):
                 raise HTTPException(status_code=404, detail="Document not found")
             if str(row[1]) != tenant_id:
                 raise HTTPException(status_code=403, detail="Access denied")
+            tenant_slug = row[2]
             cur.execute("DELETE FROM documents WHERE id=%s", (doc_id,))
     finally:
         conn.close()
 
-    # Get tenant slug for Qdrant
-    conn = get_conn()
-    try:
-        with conn.cursor() as cur:
-            cur.execute("SELECT slug FROM tenants WHERE id=%s", (tenant_id,))
-            slug_row = cur.fetchone()
-    finally:
-        conn.close()
-
-    if slug_row:
-        tenant_slug = slug_row[0]
+    if tenant_slug:
         from ingestion.indexer import delete_document_vectors
         try:
             delete_document_vectors(doc_id, tenant_slug)
