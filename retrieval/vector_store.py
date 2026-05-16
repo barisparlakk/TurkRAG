@@ -46,7 +46,8 @@ class VectorStore:
                 "doc_id": payload.get("doc_id", ""),
                 "chunk_index": payload.get("chunk_index", 0),
                 "filename": payload.get("filename", ""),
-                "char_start": payload.get("char_start", 0),
+                "start_char": payload.get("start_char", 0),
+                "end_char": payload.get("end_char", 0),
                 "score": float(hit.score),
                 "dense_rank": rank,
             })
