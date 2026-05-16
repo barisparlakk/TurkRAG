@@ -81,21 +81,20 @@ function Message({ msg }) {
           wordBreak: 'break-word',
           minHeight: msg.streaming && !msg.content ? 38 : undefined,
         }}>
-          {stripThink(msg.content) || (msg.streaming ? null : '')}
-          {msg.streaming && !stripThink(msg.content) && (
+          {msg.isError
+            ? <span style={{ color: 'var(--error)', fontSize: '13px' }}>{msg.content}</span>
+            : stripThink(msg.content) || (msg.streaming ? null : '')}
+          {!msg.isError && msg.streaming && !stripThink(msg.content) && (
             <div className="typing-dots">
               <span/><span/><span/>
             </div>
           )}
-          {msg.streaming && stripThink(msg.content) && (
+          {!msg.isError && msg.streaming && stripThink(msg.content) && (
             <span style={{
               display: 'inline-block', width: 2, height: '1em',
               background: 'var(--accent)', marginLeft: 3, verticalAlign: 'text-bottom',
               animation: 'blink 0.9s step-end infinite',
             }} />
-          )}
-          {msg.isError && (
-            <span style={{ color: 'var(--error)', fontSize: '13px' }}>{msg.content}</span>
           )}
         </div>
 
