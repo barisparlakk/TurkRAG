@@ -1,6 +1,7 @@
 """Turkish-aware chunker tests — abbreviation handling and chunk structure."""
 
 import pytest
+
 from ingestion.chunker import TurkishChunker
 
 REQUIRED_KEYS = {"text", "chunk_index", "start_char", "end_char"}

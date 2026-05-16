@@ -1,9 +1,8 @@
 """Tests for document parser — TXT and CSV (no binary deps required)."""
 
 import csv
-import io
+
 import pytest
-from pathlib import Path
 
 from ingestion.parser import parse_document
 

@@ -1,12 +1,9 @@
 """TenantIndexer unit tests — all external I/O mocked."""
 
 import pickle
-import tempfile
-from pathlib import Path
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import MagicMock, patch
 
 import numpy as np
-import pytest
 
 from ingestion.indexer import TenantIndexer
 
@@ -42,7 +39,6 @@ class TestBM25Payload:
     """Verify that BM25 payloads contain start_char and end_char."""
 
     def test_payload_keys_include_char_offsets(self, tmp_path):
-        import bm25s
 
         chunks = _make_chunks(2)
         indexer = TenantIndexer()
@@ -151,13 +147,8 @@ class TestIngestFullPipeline:
         mock_qdrant, _ = self._run_ingest(tmp_path)
         mock_qdrant.create_collection.assert_called_once()
 
-    def test_upserts_correct_number_of_points(self, tmp_path):
+    def test_upserts_called(self, tmp_path):
         mock_qdrant, _ = self._run_ingest(tmp_path)
-        total_points = sum(
-            len(c.kwargs.get("points", c.args[1] if len(c.args) > 1 else []))
-            for c in mock_qdrant.upsert.call_args_list
-        )
-        # bm25s upserts in batches of 100 — with 3 chunks, 1 batch
         assert mock_qdrant.upsert.called
 
     def test_bm25_index_created(self, tmp_path):

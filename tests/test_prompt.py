@@ -1,7 +1,6 @@
 """Tests for ChatML prompt construction."""
 
-import pytest
-from generation.prompt import build_prompt, SYSTEM_PROMPT_TR, MAX_HISTORY_TURNS
+from generation.prompt import MAX_HISTORY_TURNS, SYSTEM_PROMPT_TR, build_prompt
 
 
 def _chunk(i, filename="belge.pdf", text="içerik metni burada yer almaktadır"):

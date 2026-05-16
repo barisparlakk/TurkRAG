@@ -1,7 +1,6 @@
 """RRF fusion tests — pure unit tests with mock BM25/dense stores."""
 
-import pytest
-from retrieval.hybrid import HybridRetriever, RRF_K
+from retrieval.hybrid import RRF_K, HybridRetriever
 
 
 def _make_hit(doc_id: str, chunk_index: int, text: str = "") -> dict:

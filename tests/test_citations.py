@@ -1,6 +1,5 @@
 """Tests for citation extraction and think-tag stripping."""
 
-import pytest
 from generation.citations import extract_citations, strip_think_tags
 
 

@@ -1,6 +1,7 @@
 """API integration tests using FastAPI TestClient — no live DB or LLM required."""
 
 import os
+
 import pytest
 
 os.environ.setdefault("POSTGRES_URL", "postgresql://test:test@localhost/test_unused")
@@ -11,6 +12,7 @@ os.environ.setdefault("TURKISH_EMBEDDER_PATH", "/dev/null")
 @pytest.fixture(scope="module")
 def client():
     from fastapi.testclient import TestClient
+
     import api.main as main_module
     original = main_module._init_postgres
 
