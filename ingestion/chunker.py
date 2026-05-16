@@ -55,7 +55,7 @@ class TurkishChunker:
     MIN_SENTENCE_CHARS = 40
 
     def chunk(self, text: str) -> List[Dict]:
-        """Return a list of chunk dicts with keys: text, index, char_start."""
+        """Return a list of chunk dicts with keys: text, chunk_index, start_char, end_char."""
         # First split on paragraph breaks, then on sentence boundaries within each paragraph
         paragraphs = _NEWLINE_RE.split(text)
         sentences: List[str] = []
@@ -104,10 +104,12 @@ class TurkishChunker:
             # If adding this sentence would exceed the limit, flush first
             if current_len + len(sent) + 1 > self.MAX_CHARS and current_sentences:
                 chunk_text = overlap_prefix + " ".join(current_sentences) if overlap_prefix else " ".join(current_sentences)
+                stripped = chunk_text.strip()
                 chunks.append({
-                    "text": chunk_text.strip(),
-                    "index": len(chunks),
-                    "char_start": char_start,
+                    "text": stripped,
+                    "chunk_index": len(chunks),
+                    "start_char": char_start,
+                    "end_char": char_start + len(stripped),
                 })
                 # Build overlap from tail of current chunk
                 overlap_prefix = self._build_overlap(current_sentences)
@@ -121,10 +123,12 @@ class TurkishChunker:
         # Flush remaining
         if current_sentences:
             chunk_text = overlap_prefix + " ".join(current_sentences) if overlap_prefix else " ".join(current_sentences)
+            stripped = chunk_text.strip()
             chunks.append({
-                "text": chunk_text.strip(),
-                "index": len(chunks),
-                "char_start": char_start,
+                "text": stripped,
+                "chunk_index": len(chunks),
+                "start_char": char_start,
+                "end_char": char_start + len(stripped),
             })
 
         return chunks
@@ -162,5 +166,5 @@ if __name__ == "__main__":
     chunker = TurkishChunker()
     result = chunker.chunk(sample)
     for c in result:
-        print(f"\n--- Chunk {c['index']} (char_start={c['char_start']}) ---")
+        print(f"\n--- Chunk {c['chunk_index']} (start_char={c['start_char']}, end_char={c['end_char']}) ---")
         print(c["text"])

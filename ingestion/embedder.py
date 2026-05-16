@@ -14,7 +14,6 @@ import numpy as np
 
 logger = logging.getLogger(__name__)
 
-_BASE_MODEL = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
 _TURKISH_CHECKPOINT = os.getenv("TURKISH_EMBEDDER_PATH", "models/turkish-embedder")
 
 _model_instance = None
@@ -29,12 +28,15 @@ def _get_model():
     from sentence_transformers import SentenceTransformer
 
     turkish_path = Path(_TURKISH_CHECKPOINT)
-    if turkish_path.exists() and turkish_path.is_dir():
-        logger.info("Loading fine-tuned Turkish embedder from %s", turkish_path)
-        _model_instance = SentenceTransformer(str(turkish_path))
-    else:
-        logger.info("Turkish checkpoint not found at %s. Loading base model: %s", turkish_path, _BASE_MODEL)
-        _model_instance = SentenceTransformer(_BASE_MODEL)
+    if not turkish_path.exists() or not turkish_path.is_dir():
+        raise RuntimeError(
+            f"Embedding model not found at '{turkish_path}'. "
+            "Download and place the model there, or set TURKISH_EMBEDDER_PATH "
+            "to point to a local SentenceTransformer directory. "
+            "Never load from HuggingFace Hub in production."
+        )
+    logger.info("Loading Turkish embedder from %s", turkish_path)
+    _model_instance = SentenceTransformer(str(turkish_path))
 
     dim = getattr(_model_instance, "get_embedding_dimension", None) or getattr(_model_instance, "get_sentence_embedding_dimension", None)
     logger.info("Embedding model loaded. Dimension: %d", dim())
