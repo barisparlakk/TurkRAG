@@ -92,6 +92,12 @@ class TurkishChunker:
                 merged.append(buffer)
         return merged
 
+    @staticmethod
+    def _make_chunk(index: int, sentences: List[str], overlap_prefix: str, char_start: int) -> Dict:
+        raw = (overlap_prefix + " ".join(sentences)) if overlap_prefix else " ".join(sentences)
+        text = raw.strip()
+        return {"text": text, "chunk_index": index, "start_char": char_start, "end_char": char_start + len(text)}
+
     def _build_chunks(self, sentences: List[str]) -> List[Dict]:
         """Accumulate sentences into MAX_CHARS chunks with OVERLAP_CHARS overlap."""
         chunks: List[Dict] = []
@@ -101,35 +107,18 @@ class TurkishChunker:
         char_start = 0
 
         for sent in sentences:
-            # If adding this sentence would exceed the limit, flush first
             if current_len + len(sent) + 1 > self.MAX_CHARS and current_sentences:
-                chunk_text = overlap_prefix + " ".join(current_sentences) if overlap_prefix else " ".join(current_sentences)
-                stripped = chunk_text.strip()
-                chunks.append({
-                    "text": stripped,
-                    "chunk_index": len(chunks),
-                    "start_char": char_start,
-                    "end_char": char_start + len(stripped),
-                })
-                # Build overlap from tail of current chunk
+                chunks.append(self._make_chunk(len(chunks), current_sentences, overlap_prefix, char_start))
                 overlap_prefix = self._build_overlap(current_sentences)
                 char_start += current_len
                 current_sentences = []
                 current_len = 0
 
             current_sentences.append(sent)
-            current_len += len(sent) + 1  # +1 for space
+            current_len += len(sent) + 1
 
-        # Flush remaining
         if current_sentences:
-            chunk_text = overlap_prefix + " ".join(current_sentences) if overlap_prefix else " ".join(current_sentences)
-            stripped = chunk_text.strip()
-            chunks.append({
-                "text": stripped,
-                "chunk_index": len(chunks),
-                "start_char": char_start,
-                "end_char": char_start + len(stripped),
-            })
+            chunks.append(self._make_chunk(len(chunks), current_sentences, overlap_prefix, char_start))
 
         return chunks
 
