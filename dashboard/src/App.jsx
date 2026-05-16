@@ -215,10 +215,63 @@ function LoginPage({ onLogin }) {
   )
 }
 
+/* ── Session history panel (shown inside sidebar when on chat tab) ─────────── */
+function SessionHistory({ selectedId, onSelect, refreshTrigger }) {
+  const [sessions, setSessions] = useState([])
+
+  useEffect(() => {
+    api.listSessions(20)
+      .then(setSessions)
+      .catch(() => {})
+  }, [refreshTrigger])
+
+  if (!sessions.length) return null
+
+  return (
+    <div style={{ padding: '0 10px', marginTop: '4px' }}>
+      <div style={{
+        fontSize: '10px', fontWeight: 600, color: 'var(--text-3)',
+        letterSpacing: '0.08em', textTransform: 'uppercase', padding: '4px 6px 6px',
+      }}>
+        Geçmiş Sohbetler
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', maxHeight: 220, overflowY: 'auto' }}>
+        {sessions.map((s) => (
+          <button
+            key={s.id}
+            onClick={() => onSelect(s.id)}
+            className="btn"
+            style={{
+              width: '100%', justifyContent: 'flex-start', textAlign: 'left',
+              padding: '7px 10px', borderRadius: 'var(--radius-md)',
+              background: selectedId === s.id ? 'var(--accent-muted)' : 'transparent',
+              color: selectedId === s.id ? 'var(--accent-hover)' : 'var(--text-2)',
+              fontSize: '12px', fontWeight: selectedId === s.id ? 600 : 400,
+              borderLeft: `2px solid ${selectedId === s.id ? 'var(--accent)' : 'transparent'}`,
+              overflow: 'hidden',
+            }}
+            onMouseEnter={(e) => { if (selectedId !== s.id) e.currentTarget.style.background = 'var(--surface-3)' }}
+            onMouseLeave={(e) => { if (selectedId !== s.id) e.currentTarget.style.background = 'transparent' }}
+          >
+            <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {s.preview}
+            </div>
+            <div style={{ fontSize: '10px', color: 'var(--text-3)', marginTop: '1px' }}>
+              {new Date(s.created_at).toLocaleDateString('tr-TR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 /* ── Main app layout ───────────────────────────────────── */
 export default function App() {
   const [tenant, setTenant] = useState(null)
   const [tab, setTab] = useState('chat')
+  const [selectedSession, setSelectedSession] = useState(null)
+  const [sessionRefresh, setSessionRefresh] = useState(0)
 
   if (!tenant) {
     return <LoginPage onLogin={setTenant} />
@@ -247,6 +300,18 @@ export default function App() {
           <NavItem icon={<IconDocs />} label="Belgeler" active={tab === 'documents'} onClick={() => setTab('documents')} />
           <NavItem icon={<IconAnalytics />} label="Analitik" active={tab === 'analytics'} onClick={() => setTab('analytics')} />
         </nav>
+
+        {/* Session history — only visible on chat tab */}
+        {tab === 'chat' && (
+          <>
+            <div style={{ height: 1, background: 'var(--border)', margin: '10px 16px 6px' }} />
+            <SessionHistory
+              selectedId={selectedSession}
+              onSelect={(id) => { setSelectedSession(id); setTab('chat') }}
+              refreshTrigger={sessionRefresh}
+            />
+          </>
+        )}
 
         {/* Spacer */}
         <div style={{ flex: 1 }} />
@@ -299,7 +364,11 @@ export default function App() {
         {/* Page content — both always mounted to preserve chat history */}
         <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: tab === 'chat' ? 'flex' : 'none', flex: 1, overflow: 'hidden', flexDirection: 'column' }}>
-            <ChatWindow />
+            <ChatWindow
+              selectedSession={selectedSession}
+              onSessionChange={setSelectedSession}
+              onNewSession={() => setSessionRefresh((n) => n + 1)}
+            />
           </div>
           <div style={{ display: tab === 'documents' ? 'flex' : 'none', flex: 1, overflowY: 'auto', flexDirection: 'column' }}>
             <div style={{ padding: '24px', maxWidth: 760, width: '100%', margin: '0 auto' }}>
