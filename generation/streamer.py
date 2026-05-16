@@ -6,8 +6,11 @@ Frame protocol:
   {"type": "error",   "message": "<error description>"}
 """
 
+import asyncio
 import json
 import logging
+import queue as stdlib_queue
+import threading
 import time
 from typing import Any
 
@@ -62,11 +65,37 @@ async def stream_rag_response(
             })
             return None
 
-        # Stream tokens
+        # Stream tokens — run sync generator in a thread to avoid blocking the event loop.
+        # cancel_event lets the consumer signal early termination (e.g. client disconnect).
         full_response = []
-        for token in generate_stream(prompt):
-            full_response.append(token)
-            await send({"type": "token", "content": token})
+        token_queue: stdlib_queue.SimpleQueue = stdlib_queue.SimpleQueue()
+        cancel_event = threading.Event()
+
+        def _produce():
+            try:
+                for token in generate_stream(prompt):
+                    if cancel_event.is_set():
+                        break
+                    token_queue.put(token)
+            except Exception as exc:
+                token_queue.put(exc)
+            finally:
+                token_queue.put(None)
+
+        threading.Thread(target=_produce, daemon=True).start()
+        loop = asyncio.get_running_loop()
+        try:
+            while True:
+                item = await loop.run_in_executor(None, token_queue.get)
+                if item is None:
+                    break
+                if isinstance(item, BaseException):
+                    raise item
+                full_response.append(item)
+                await send({"type": "token", "content": item})
+        except Exception:
+            cancel_event.set()
+            raise
 
         response_text = strip_think_tags("".join(full_response))
         citations = extract_citations(response_text, chunks)

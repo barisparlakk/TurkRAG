@@ -98,7 +98,7 @@ def _parse_excel(file_path: str) -> str:
         # Find header row (first row with at least one non-None cell)
         header: list = []
         data_rows: list = []
-        for _, row in enumerate(rows):
+        for row in rows:
             values = [str(v).strip() if v is not None else "" for v in row]
             if not any(values):
                 continue

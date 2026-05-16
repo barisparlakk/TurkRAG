@@ -62,13 +62,18 @@ class HybridRetriever:
         # Take top RERANK_CANDIDATES for re-ranking
         candidates = fused[:RERANK_CANDIDATES]
 
-        # Step 5: cross-encoder reranking
+        # Step 5: cross-encoder reranking (falls back to RRF order if model unavailable)
         if len(candidates) > 1:
             passages = [c["text"] for c in candidates]
-            rerank_scores = rerank(query, passages)
-            for c, score in zip(candidates, rerank_scores, strict=False):
-                c["rerank_score"] = score
-            candidates.sort(key=lambda x: x.get("rerank_score", 0), reverse=True)
+            try:
+                rerank_scores = rerank(query, passages)
+                for c, score in zip(candidates, rerank_scores, strict=False):
+                    c["rerank_score"] = score
+                candidates.sort(key=lambda x: x.get("rerank_score", 0), reverse=True)
+            except Exception as exc:
+                logger.warning("Reranker unavailable (%s) — using RRF order", exc)
+                for c in candidates:
+                    c["rerank_score"] = c["rrf_score"]
         else:
             for c in candidates:
                 c["rerank_score"] = c["rrf_score"]
