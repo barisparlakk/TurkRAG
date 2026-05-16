@@ -6,10 +6,11 @@ import pickle
 from pathlib import Path
 from typing import List, Dict, Optional
 
+from api.db import get_conn
+
 logger = logging.getLogger(__name__)
 
 QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
-POSTGRES_URL = os.getenv("POSTGRES_URL", "postgresql://turkrag:turkrag_secret@localhost/turkrag")
 BM25_INDEX_DIR = Path(os.getenv("BM25_INDEX_DIR", "indexes"))
 EMBED_BATCH_SIZE = 32
 VECTOR_SIZE = 768
@@ -78,17 +79,18 @@ class TenantIndexer:
         collection_name = _ensure_collection(client, tenant_slug)
 
         points = []
-        for i, (chunk, vec) in enumerate(zip(chunks, embeddings)):
-            point_id = abs(hash(f"{document_id}_{chunk['index']}")) % (2**63)
+        for chunk, vec in zip(chunks, embeddings):
+            point_id = abs(hash(f"{document_id}_{chunk['chunk_index']}")) % (2**63)
             points.append(PointStruct(
                 id=point_id,
                 vector=vec.tolist(),
                 payload={
                     "text": chunk["text"],
                     "doc_id": document_id,
-                    "chunk_index": chunk["index"],
+                    "chunk_index": chunk["chunk_index"],
                     "filename": filename,
-                    "char_start": chunk.get("char_start", 0),
+                    "start_char": chunk["start_char"],
+                    "end_char": chunk["end_char"],
                 },
             ))
 
@@ -106,7 +108,7 @@ class TenantIndexer:
         index_path = BM25_INDEX_DIR / f"bm25_{tenant_slug}.pkl"
 
         texts = [c["text"] for c in chunks]
-        payloads = [{"chunk_index": c["index"], "text": c["text"], "doc_id": document_id, "filename": filename} for c in chunks]
+        payloads = [{"chunk_index": c["chunk_index"], "text": c["text"], "doc_id": document_id, "filename": filename} for c in chunks]
 
         # Load existing index corpus if present
         if index_path.exists():
@@ -133,8 +135,7 @@ class TenantIndexer:
 
     def _update_postgres_status(self, document_id: str, chunk_count: int):
         try:
-            import psycopg2
-            conn = psycopg2.connect(POSTGRES_URL)
+            conn = get_conn()
             with conn:
                 with conn.cursor() as cur:
                     cur.execute(
