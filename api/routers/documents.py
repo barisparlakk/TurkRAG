@@ -36,10 +36,10 @@ async def upload_document(
     content = await file.read()
     file_hash = hashlib.sha256(content).hexdigest()
 
-    # Reject duplicate uploads for this tenant
+    # Reject duplicate uploads for this tenant; insert processing row atomically
     conn = get_conn()
     try:
-        with conn.cursor() as cur:
+        with conn, conn.cursor() as cur:
             cur.execute(
                 "SELECT id FROM documents WHERE tenant_id=%s AND file_hash=%s",
                 (tenant_id, file_hash),
@@ -52,7 +52,6 @@ async def upload_document(
                 "INSERT INTO documents (id, tenant_id, filename, file_hash, status) VALUES (%s, %s, %s, %s, 'processing')",
                 (document_id, tenant_id, file.filename, file_hash),
             )
-        conn.commit()
     finally:
         conn.close()
 
