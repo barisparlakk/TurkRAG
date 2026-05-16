@@ -47,6 +47,12 @@ def _init_postgres():
     logger.info("Initialising PostgreSQL schema…")
     try:
         conn = psycopg2.connect(POSTGRES_URL)
+    except Exception as exc:
+        logger.error("Failed to connect to PostgreSQL: %s", exc)
+        logger.error("Ensure PostgreSQL is running and POSTGRES_URL is correct.")
+        return
+
+    try:
         with conn, conn.cursor() as cur:
             cur.execute("""
                     CREATE TABLE IF NOT EXISTS tenants (
@@ -106,11 +112,11 @@ def _init_postgres():
                     CREATE INDEX IF NOT EXISTS idx_query_logs_tenant ON query_logs(tenant_id);
                     CREATE INDEX IF NOT EXISTS idx_documents_tenant ON documents(tenant_id);
                 """)
-        conn.close()
         logger.info("PostgreSQL schema ready.")
     except Exception as exc:
-        logger.error("Failed to initialise PostgreSQL: %s", exc)
-        logger.error("Ensure PostgreSQL is running and POSTGRES_URL is correct.")
+        logger.error("Failed to initialise PostgreSQL schema: %s", exc)
+    finally:
+        conn.close()
 
 
 # Rate limiter (per IP; production should key on tenant_id)
