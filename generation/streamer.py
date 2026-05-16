@@ -31,7 +31,7 @@ async def stream_rag_response(
     completes so the caller can persist messages to the DB.
     Returns None if an error occurred before generation.
     """
-    from generation.citations import extract_citations
+    from generation.citations import extract_citations, strip_think_tags
     from generation.llm import generate_stream, is_available
     from generation.prompt import build_prompt
     from retrieval.hybrid import HybridRetriever
@@ -68,7 +68,6 @@ async def stream_rag_response(
             full_response.append(token)
             await send({"type": "token", "content": token})
 
-        from generation.citations import strip_think_tags
         response_text = strip_think_tags("".join(full_response))
         citations = extract_citations(response_text, chunks)
         query_time_ms = int((time.monotonic() - t_start) * 1000)
