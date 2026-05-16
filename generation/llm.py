@@ -18,8 +18,9 @@ if not Path(_default_model).exists():
 LLM_MODEL_PATH = os.getenv("LLM_MODEL_PATH", _default_model)
 N_CTX = int(os.getenv("LLM_N_CTX", "4096"))
 N_GPU_LAYERS = int(os.getenv("LLM_N_GPU_LAYERS", "-1"))  # -1 = use all available GPU layers
+N_THREADS = int(os.getenv("LLM_N_THREADS", "8"))         # CPU threads for prompt eval
 TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))
-MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "1024"))
+MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "512"))      # RAG answers rarely exceed 512 tokens
 
 _llm_instance = None
 _load_error: Optional[str] = None
@@ -52,6 +53,7 @@ def _get_llm():
             model_path=str(model_path),
             n_ctx=N_CTX,
             n_gpu_layers=N_GPU_LAYERS,
+            n_threads=N_THREADS,
             verbose=False,
         )
         logger.info("LLM loaded successfully.")

@@ -10,6 +10,7 @@ Pipeline:
 """
 
 import logging
+from concurrent.futures import ThreadPoolExecutor
 from typing import List, Dict
 
 from retrieval.bm25_store import BM25Store
@@ -45,9 +46,12 @@ class HybridRetriever:
         # Step 1: embed query
         query_vec = embed([query])[0].tolist()
 
-        # Step 2 & 3: sparse + dense search in parallel (sequential here for simplicity)
-        bm25_hits = BM25Store(tenant_slug).search(query, top_k=top_k)
-        dense_hits = VectorStore(tenant_slug).search(query_vec, top_k=top_k)
+        # Step 2 & 3: sparse + dense search — run both in parallel via threads
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            bm25_future = pool.submit(BM25Store(tenant_slug).search, query, top_k)
+            dense_future = pool.submit(VectorStore(tenant_slug).search, query_vec, top_k)
+            bm25_hits = bm25_future.result()
+            dense_hits = dense_future.result()
 
         if not bm25_hits and not dense_hits:
             logger.warning("No results from either BM25 or dense search for tenant '%s'", tenant_slug)

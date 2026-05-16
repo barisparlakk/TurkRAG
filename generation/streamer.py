@@ -2,14 +2,14 @@
 
 Frame protocol:
   {"type": "token",   "content": "<token_text>"}
-  {"type": "done",    "citations": [...], "query_time_ms": 340}
+  {"type": "done",    "citations": [...], "query_time_ms": 340, "session_id": "<uuid>"}
   {"type": "error",   "message": "<error description>"}
 """
 
 import json
 import logging
 import time
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -19,10 +19,17 @@ async def stream_rag_response(
     query: str,
     tenant_slug: str,
     top_k: int = 5,
-) -> None:
+    history: Optional[List[Dict]] = None,
+    session_id: Optional[str] = None,
+) -> Optional[Dict[str, Any]]:
     """Run full RAG pipeline and stream tokens over a WebSocket connection.
 
-    Sends token frames during generation, then a final 'done' frame with citations.
+    Sends token frames during generation, then a final 'done' frame with
+    citations and the session_id so the client can continue the conversation.
+
+    Returns a dict {"text", "citations", "query_time_ms"} after streaming
+    completes so the caller can persist messages to the DB.
+    Returns None if an error occurred before generation.
     """
     from retrieval.hybrid import HybridRetriever
     from generation.prompt import build_prompt
@@ -42,10 +49,10 @@ async def stream_rag_response(
 
         if not chunks:
             await send({"type": "error", "message": "İlgili belge bulunamadı. Lütfen önce belge yükleyin."})
-            return
+            return None
 
-        # Build prompt
-        prompt = build_prompt(query, chunks)
+        # Build prompt — include conversation history if provided
+        prompt = build_prompt(query, chunks, history=history)
 
         # Check LLM availability
         if not is_available():
@@ -53,7 +60,7 @@ async def stream_rag_response(
                 "type": "error",
                 "message": "LLM modeli yüklenmemiş. Lütfen modeli indirin ve sunucuyu yeniden başlatın.",
             })
-            return
+            return None
 
         # Stream tokens
         full_response = []
@@ -70,9 +77,13 @@ async def stream_rag_response(
             "type": "done",
             "citations": citations,
             "query_time_ms": query_time_ms,
+            "session_id": session_id,
         })
         logger.info("WS stream complete: %d tokens, %d ms", len(full_response), query_time_ms)
+
+        return {"text": response_text, "citations": citations, "query_time_ms": query_time_ms}
 
     except Exception as exc:
         logger.exception("Error during WS RAG streaming: %s", exc)
         await send({"type": "error", "message": str(exc)})
+        return None
