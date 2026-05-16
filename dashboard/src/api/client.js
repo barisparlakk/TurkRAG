@@ -56,6 +56,10 @@ export const api = {
   createTenant: (name, slug) => request('POST', '/tenants', { name, slug }),
   getTenantBySlug: (slug) => request('GET', `/tenants/by-slug/${slug}`),
 
+  // Analytics
+  getStats: () => request('GET', '/analytics/stats'),
+  getRecentQueries: (limit = 20) => request('GET', `/analytics/recent?limit=${limit}`),
+
   // Health
   health: () => request('GET', '/health'),
 

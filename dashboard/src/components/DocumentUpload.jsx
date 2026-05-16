@@ -33,7 +33,14 @@ function statusStyle(status) {
 
 function FileTypeTag({ filename }) {
   const ext = filename?.split('.').pop()?.toLowerCase() || ''
-  const colors = { pdf: ['#ef4444', '#fde8e8'], docx: ['#3b82f6', '#e8f0fe'], txt: ['#10b981', '#e6f9ee'] }
+  const colors = {
+    pdf:  ['#ef4444', '#fde8e8'],
+    docx: ['#3b82f6', '#e8f0fe'],
+    txt:  ['#10b981', '#e6f9ee'],
+    xlsx: ['#16a34a', '#dcfce7'],
+    xls:  ['#16a34a', '#dcfce7'],
+    csv:  ['#f59e0b', '#fef3c7'],
+  }
   const [color, bg] = colors[ext] || ['#8b93ad', 'var(--surface-3)']
   return (
     <span style={{
@@ -94,7 +101,7 @@ export function DocumentUpload() {
           Belge Yönetimi
         </h2>
         <p style={{ fontSize: '13px', color: 'var(--text-2)' }}>
-          PDF, DOCX ve TXT formatında dosyalar yükleyin.
+          PDF, DOCX, TXT, Excel (XLSX) ve CSV formatında dosyalar yükleyin.
         </p>
       </div>
 
@@ -130,12 +137,12 @@ export function DocumentUpload() {
           {dragging ? 'Bırakın' : 'Dosyaları buraya sürükleyin'}
         </div>
         <div style={{ fontSize: '12px', color: 'var(--text-3)' }}>
-          veya <span style={{ color: 'var(--accent-hover)', fontWeight: 500 }}>tıklayarak seçin</span> · PDF, DOCX, TXT
+          veya <span style={{ color: 'var(--accent-hover)', fontWeight: 500 }}>tıklayarak seçin</span> · PDF, DOCX, TXT, XLSX, CSV
         </div>
         <input
           ref={fileInputRef}
           type="file"
-          accept=".pdf,.docx,.txt"
+          accept=".pdf,.docx,.txt,.xlsx,.xls,.csv"
           multiple
           style={{ display: 'none' }}
           onChange={(e) => handleFiles(e.target.files)}

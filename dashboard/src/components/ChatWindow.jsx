@@ -25,15 +25,19 @@ const IconBot = () => (
   </svg>
 )
 
+const IconNewChat = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 5v14M5 12h14"/>
+  </svg>
+)
+
 function stripThink(text) {
-  // Remove complete <think>...</think> blocks (including multiline)
   let out = text.replace(/<think>[\s\S]*?<\/think>/g, '')
-  // Remove still-open <think> block that hasn't closed yet (streaming)
   out = out.replace(/<think>[\s\S]*$/, '')
   return out.trimStart()
 }
 
-/* ── Single message ────────────────────────────────────── */
+/* ── Single message ────────────────────────────────────────────────────────── */
 function Message({ msg }) {
   const isUser = msg.role === 'user'
   const [showSources, setShowSources] = useState(false)
@@ -128,7 +132,7 @@ function Message({ msg }) {
         {/* Query time */}
         {msg.queryTime && (
           <div style={{ fontSize: '11px', color: 'var(--text-3)', marginTop: '4px', textAlign: isUser ? 'right' : 'left' }}>
-            {msg.queryTime} ms
+            {(msg.queryTime / 1000).toFixed(1)}s
           </div>
         )}
       </div>
@@ -149,7 +153,7 @@ function Message({ msg }) {
   )
 }
 
-/* ── Welcome state ─────────────────────────────────────── */
+/* ── Welcome state ─────────────────────────────────────────────────────────── */
 function EmptyState() {
   return (
     <div style={{
@@ -180,14 +184,21 @@ function EmptyState() {
   )
 }
 
-/* ── Chat window ───────────────────────────────────────── */
+/* ── Chat window ───────────────────────────────────────────────────────────── */
 export function ChatWindow() {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
-  const { send, tokens, citations, isStreaming, error, reset } = useStream()
+  const { send, tokens, citations, queryTime, sessionId, isStreaming, error, reset, resetSession } = useStream()
   const bottomRef = useRef()
   const textareaRef = useRef()
   const streamMsgIdRef = useRef(null)
+  // Track current sessionId locally so we can pass it on the next send
+  const sessionIdRef = useRef(null)
+
+  // Keep sessionIdRef in sync with hook state
+  useEffect(() => {
+    sessionIdRef.current = sessionId
+  }, [sessionId])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -209,12 +220,12 @@ export function ChatWindow() {
       setMessages((prev) =>
         prev.map((m) =>
           m.id === streamMsgIdRef.current
-            ? { ...m, citations, streaming: false }
+            ? { ...m, citations, queryTime, streaming: false }
             : m
         )
       )
     }
-  }, [isStreaming, citations])
+  }, [isStreaming, citations, queryTime])
 
   useEffect(() => {
     if (error && streamMsgIdRef.current) {
@@ -242,7 +253,17 @@ export function ChatWindow() {
     ])
     setInput('')
     reset()
-    send(q)
+    send(q, sessionIdRef.current)
+    setTimeout(() => textareaRef.current?.focus(), 0)
+  }
+
+  const handleNewChat = () => {
+    if (isStreaming) return
+    setMessages([])
+    setInput('')
+    reset()
+    resetSession()
+    sessionIdRef.current = null
     setTimeout(() => textareaRef.current?.focus(), 0)
   }
 
@@ -254,6 +275,35 @@ export function ChatWindow() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      {/* Top bar — only shown when there are messages */}
+      {hasMessages && (
+        <div style={{
+          flexShrink: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '8px 24px',
+          borderBottom: '1px solid var(--border)',
+          background: 'var(--surface-1)',
+        }}>
+          <span style={{ fontSize: '12px', color: 'var(--text-3)' }}>
+            {sessionId ? `Oturum #${sessionId.slice(0, 8)}` : 'Yeni sohbet'}
+          </span>
+          <button
+            onClick={handleNewChat}
+            disabled={isStreaming}
+            className="btn"
+            style={{
+              display: 'flex', alignItems: 'center', gap: '5px',
+              fontSize: '12px', padding: '5px 10px',
+              color: 'var(--text-2)', borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border)',
+              opacity: isStreaming ? 0.4 : 1,
+            }}
+          >
+            <IconNewChat /> Yeni Sohbet
+          </button>
+        </div>
+      )}
+
       {/* Messages */}
       <div style={{
         flex: 1, overflowY: 'auto',
