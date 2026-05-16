@@ -1,8 +1,8 @@
 """Sentence embedding model wrapper with singleton caching.
 
-Loads a fine-tuned Turkish checkpoint if available at models/turkish-embedder/,
-otherwise falls back to the multilingual mpnet base model.
-Embeddings are L2-normalised for cosine similarity via inner product.
+Requires a local SentenceTransformer model at TURKISH_EMBEDDER_PATH
+(default: models/turkish-embedder/). Raises RuntimeError on missing path —
+never loads from HuggingFace Hub. Embeddings are L2-normalised.
 """
 
 import logging

@@ -135,7 +135,6 @@ class TurkishChunker:
 
 
 if __name__ == "__main__":
-    import re  # noqa: F401 — only needed in __main__ block below
     import sys
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 
