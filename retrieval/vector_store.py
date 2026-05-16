@@ -27,9 +27,9 @@ class VectorStore:
         client = self._get_client()
 
         try:
-            results = client.search(
+            response = client.query_points(
                 collection_name=self.collection_name,
-                query_vector=query_vector,
+                query=query_vector,
                 limit=top_k,
                 with_payload=True,
             )
@@ -38,7 +38,7 @@ class VectorStore:
             return []
 
         hits = []
-        for rank, hit in enumerate(results):
+        for rank, hit in enumerate(response.points):
             payload = hit.payload or {}
             hits.append({
                 "text": payload.get("text", ""),
