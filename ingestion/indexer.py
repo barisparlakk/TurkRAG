@@ -1,8 +1,10 @@
 """Ingestion pipeline: embed chunks → write to Qdrant + BM25 + PostgreSQL."""
 
+import hashlib
 import logging
 import os
 import pickle
+import threading
 from pathlib import Path
 
 from api.db import get_conn
@@ -14,6 +16,17 @@ QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 BM25_INDEX_DIR = Path(os.getenv("BM25_INDEX_DIR", "indexes"))
 EMBED_BATCH_SIZE = 32
 VECTOR_SIZE = 768
+
+# Per-tenant locks guard concurrent BM25 read-modify-write operations.
+_bm25_locks: dict[str, threading.Lock] = {}
+_bm25_locks_mutex = threading.Lock()
+
+
+def _bm25_lock(tenant_slug: str) -> threading.Lock:
+    with _bm25_locks_mutex:
+        if tenant_slug not in _bm25_locks:
+            _bm25_locks[tenant_slug] = threading.Lock()
+        return _bm25_locks[tenant_slug]
 
 
 def _qdrant_client():
@@ -79,7 +92,8 @@ class TenantIndexer:
 
         points = []
         for chunk, vec in zip(chunks, embeddings, strict=False):
-            point_id = abs(hash(f"{document_id}_{chunk['chunk_index']}")) % (2**63)
+            key = f"{document_id}_{chunk['chunk_index']}".encode()
+            point_id = int(hashlib.sha1(key).hexdigest(), 16) % (2**63)
             points.append(PointStruct(
                 id=point_id,
                 vector=vec.tolist(),
@@ -88,8 +102,8 @@ class TenantIndexer:
                     "doc_id": document_id,
                     "chunk_index": chunk["chunk_index"],
                     "filename": filename,
-                    "start_char": chunk["start_char"],
-                    "end_char": chunk["end_char"],
+                    "start_char": chunk.get("start_char", 0),
+                    "end_char": chunk.get("end_char", 0),
                 },
             ))
 
@@ -119,26 +133,26 @@ class TenantIndexer:
             for c in chunks
         ]
 
-        # Load existing index corpus if present
-        if index_path.exists():
-            with open(index_path, "rb") as f:
-                existing = pickle.load(f)
-            all_texts = existing["texts"] + texts
-            all_payloads = existing["payloads"] + payloads
-        else:
-            all_texts = texts
-            all_payloads = payloads
+        with _bm25_lock(tenant_slug):
+            if index_path.exists():
+                with open(index_path, "rb") as f:
+                    existing = pickle.load(f)
+                all_texts = existing["texts"] + texts
+                all_payloads = existing["payloads"] + payloads
+            else:
+                all_texts = texts
+                all_payloads = payloads
 
-        tokenized = bm25s.tokenize(all_texts, stopwords=_TURKISH_STOPWORDS)
-        retriever = bm25s.BM25()
-        retriever.index(tokenized)
+            tokenized = bm25s.tokenize(all_texts, stopwords=_TURKISH_STOPWORDS)
+            retriever = bm25s.BM25()
+            retriever.index(tokenized)
 
-        with open(index_path, "wb") as f:
-            pickle.dump({
-                "retriever": retriever,
-                "texts": all_texts,
-                "payloads": all_payloads,
-            }, f)
+            with open(index_path, "wb") as f:
+                pickle.dump({
+                    "retriever": retriever,
+                    "texts": all_texts,
+                    "payloads": all_payloads,
+                }, f)
 
         logger.info("BM25 index updated: %d total docs at %s", len(all_texts), index_path)
 
@@ -158,7 +172,7 @@ class TenantIndexer:
 
 
 def delete_document_vectors(document_id: str, tenant_slug: str):
-    """Remove all Qdrant points for a given document."""
+    """Remove all Qdrant points and BM25 entries for a given document."""
     from qdrant_client.models import FieldCondition, Filter, MatchValue
 
     client = _qdrant_client()
@@ -170,6 +184,46 @@ def delete_document_vectors(document_id: str, tenant_slug: str):
         ),
     )
     logger.info("Deleted Qdrant points for doc=%s in collection=%s", document_id, collection_name)
+
+    _remove_from_bm25(document_id, tenant_slug)
+
+
+def _remove_from_bm25(document_id: str, tenant_slug: str):
+    """Rebuild BM25 index for tenant_slug with document_id entries removed."""
+    import bm25s
+
+    index_path = BM25_INDEX_DIR / f"bm25_{tenant_slug}.pkl"
+    if not index_path.exists():
+        return
+
+    with _bm25_lock(tenant_slug):
+        if not index_path.exists():
+            return
+
+        with open(index_path, "rb") as f:
+            data = pickle.load(f)
+
+        kept = [
+            (text, payload)
+            for text, payload in zip(data["texts"], data["payloads"], strict=False)
+            if payload.get("doc_id") != document_id
+        ]
+
+        if not kept:
+            index_path.unlink()
+            logger.info("BM25 index empty after removing doc=%s; file deleted", document_id)
+            return
+
+        texts, payloads = zip(*kept, strict=False)
+        tokenized = bm25s.tokenize(list(texts), stopwords=_TURKISH_STOPWORDS)
+        retriever = bm25s.BM25()
+        retriever.index(tokenized)
+
+        with open(index_path, "wb") as f:
+            pickle.dump({"retriever": retriever, "texts": list(texts), "payloads": list(payloads)}, f)
+
+    logger.info("BM25 index rebuilt for tenant '%s': %d docs remain after removing doc=%s",
+                tenant_slug, len(texts), document_id)
 
 
 if __name__ == "__main__":
