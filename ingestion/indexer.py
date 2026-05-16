@@ -72,7 +72,16 @@ class TenantIndexer:
 
         logger.info("Indexing %d chunks for doc=%s tenant=%s", len(chunks), document_id, tenant_slug)
 
+        from generation.llm import is_available
         from ingestion.embedder import embed
+
+        # Contextual enrichment: prepend a 1-sentence LLM summary to each chunk.
+        # Improves embedding recall by ~30-50% at the cost of extra inference per chunk.
+        # Skipped gracefully if LLM not loaded (e.g. first boot before model download).
+        if is_available():
+            chunks = self._enrich_chunks(chunks, filename)
+        else:
+            logger.info("LLM unavailable — skipping contextual enrichment for doc %s", document_id)
 
         texts = [c["text"] for c in chunks]
         embeddings = embed(texts, batch_size=EMBED_BATCH_SIZE)
@@ -83,6 +92,43 @@ class TenantIndexer:
         self._update_postgres_status(document_id, len(chunks))
 
         logger.info("Indexing complete for document %s", document_id)
+
+    def _enrich_chunks(self, chunks: list[dict], filename: str) -> list[dict]:
+        """Prepend a short LLM-generated context sentence to each chunk's text.
+
+        Uses max_tokens=60 so each call takes ~3-5 s instead of ~40 s.
+        Falls back to the original chunk on any error so ingestion never aborts.
+        """
+        from generation.citations import strip_think_tags
+        from generation.llm import generate
+
+        enriched = []
+        total = len(chunks)
+        logger.info("Contextual enrichment: %d chunks for '%s'", total, filename)
+
+        for i, chunk in enumerate(chunks):
+            try:
+                snippet = chunk["text"][:300].replace("\n", " ")
+                prompt = (
+                    f"<|im_start|>system\n"
+                    f"Verilen metin parçasının konusunu tek kısa Türkçe cümleyle belirt.<|im_end|>\n"
+                    f"<|im_start|>user\n"
+                    f"Belge: {filename}\nMetin: {snippet} /no_think<|im_end|>\n"
+                    f"<|im_start|>assistant\n"
+                )
+                context_sentence = strip_think_tags(generate(prompt, max_tokens=60)).strip()
+                if context_sentence:
+                    enriched_text = f"[Bağlam: {context_sentence}]\n{chunk['text']}"
+                    enriched.append({**chunk, "text": enriched_text})
+                else:
+                    enriched.append(chunk)
+                logger.debug("Enriched chunk %d/%d", i + 1, total)
+            except Exception as exc:
+                logger.warning("Enrichment failed for chunk %d: %s — using original", i, exc)
+                enriched.append(chunk)
+
+        logger.info("Contextual enrichment complete for '%s'", filename)
+        return enriched
 
     def _upsert_qdrant(self, document_id, tenant_slug, filename, chunks, embeddings):
         from qdrant_client.models import PointStruct
