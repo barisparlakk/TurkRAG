@@ -14,7 +14,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
 from api.middleware import setup_middleware
-from api.routers import chat, documents, health, tenants
+from api.routers import chat, documents, health, tenants, analytics
 
 logging.basicConfig(
     level=logging.INFO,
@@ -73,6 +73,33 @@ def _init_postgres():
                         role TEXT DEFAULT 'member',
                         created_at TIMESTAMPTZ DEFAULT NOW()
                     );
+
+                    CREATE TABLE IF NOT EXISTS sessions (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+                        user_id TEXT NOT NULL DEFAULT 'anonymous',
+                        created_at TIMESTAMPTZ DEFAULT NOW()
+                    );
+
+                    CREATE TABLE IF NOT EXISTS messages (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        session_id UUID NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+                        role TEXT NOT NULL CHECK (role IN ('user', 'assistant')),
+                        content TEXT NOT NULL,
+                        citations JSONB DEFAULT '[]',
+                        created_at TIMESTAMPTZ DEFAULT NOW()
+                    );
+
+                    CREATE TABLE IF NOT EXISTS query_logs (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        tenant_id UUID NOT NULL,
+                        session_id UUID,
+                        query TEXT NOT NULL,
+                        answer_length INT,
+                        num_citations INT,
+                        query_time_ms INT,
+                        created_at TIMESTAMPTZ DEFAULT NOW()
+                    );
                 """)
         conn.close()
         logger.info("PostgreSQL schema ready.")
@@ -101,6 +128,7 @@ app.include_router(health.router)
 app.include_router(documents.router)
 app.include_router(chat.router)
 app.include_router(tenants.router)
+app.include_router(analytics.router)
 
 
 # Simple token creation endpoint (dev convenience — replace with proper auth in production)

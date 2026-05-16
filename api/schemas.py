@@ -8,6 +8,7 @@ import re
 class QueryRequest(BaseModel):
     query: str = Field(..., min_length=1, max_length=2000)
     top_k: int = Field(default=5, ge=1, le=20)
+    session_id: Optional[str] = None  # omit to start a new session
 
 
 class CitationSource(BaseModel):
@@ -21,6 +22,7 @@ class QueryResponse(BaseModel):
     citations: List[CitationSource]
     query_time_ms: int
     tenant_id: str
+    session_id: str  # always returned so the client can continue the conversation
 
 
 class DocumentUploadResponse(BaseModel):
