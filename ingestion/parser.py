@@ -1,4 +1,4 @@
-"""Document text extraction for PDF, DOCX, and TXT files."""
+"""Document text extraction for PDF, DOCX, TXT, XLSX, and CSV files."""
 
 import logging
 import re
@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 def parse_document(file_path: str) -> str:
-    """Extract raw text from a PDF, DOCX, or TXT file.
+    """Extract raw text from a PDF, DOCX, TXT, XLSX, or CSV file.
 
     Strips common header/footer noise heuristically.
     Returns clean plain text suitable for chunking.
@@ -24,8 +24,12 @@ def parse_document(file_path: str) -> str:
         text = _parse_docx(file_path)
     elif suffix == ".txt":
         text = _parse_txt(file_path)
+    elif suffix in (".xlsx", ".xls"):
+        text = _parse_excel(file_path)
+    elif suffix == ".csv":
+        text = _parse_csv(file_path)
     else:
-        raise ValueError(f"Unsupported file type: {suffix}. Supported: .pdf, .docx, .txt")
+        raise ValueError(f"Unsupported file type: {suffix}. Supported: .pdf, .docx, .txt, .xlsx, .csv")
 
     text = _clean_text(text)
     logger.info("Parsed %d characters from %s", len(text), path.name)
@@ -65,6 +69,85 @@ def _parse_txt(file_path: str) -> str:
         return Path(file_path).read_text(encoding="utf-8")
     except UnicodeDecodeError:
         return Path(file_path).read_text(encoding="latin-1")
+
+
+def _parse_excel(file_path: str) -> str:
+    """Convert an Excel workbook to structured plain text.
+
+    Each sheet becomes a section. The first non-empty row is treated as a
+    header and subsequent rows are rendered as 'Sütun: Değer' pairs so the
+    chunker can split on natural sentence boundaries.
+    """
+    import openpyxl
+
+    wb = openpyxl.load_workbook(file_path, data_only=True)
+    sections = []
+
+    for sheet_name in wb.sheetnames:
+        ws = wb[sheet_name]
+        rows = list(ws.iter_rows(values_only=True))
+        if not rows:
+            continue
+
+        # Find header row (first row with at least one non-None cell)
+        header: list = []
+        data_rows: list = []
+        for i, row in enumerate(rows):
+            values = [str(v).strip() if v is not None else "" for v in row]
+            if not any(values):
+                continue
+            if not header:
+                header = values
+            else:
+                data_rows.append(values)
+
+        if not header:
+            continue
+
+        section_lines = [f"=== Sayfa: {sheet_name} ==="]
+        for row_vals in data_rows:
+            # Skip fully empty rows
+            if not any(v for v in row_vals):
+                continue
+            pairs = [
+                f"{h}: {v}"
+                for h, v in zip(header, row_vals)
+                if v  # omit blank cells
+            ]
+            if pairs:
+                section_lines.append(". ".join(pairs) + ".")
+        sections.append("\n".join(section_lines))
+
+    result = "\n\n".join(sections)
+    logger.info("Excel parsed: %d sheet(s), %d chars", len(wb.sheetnames), len(result))
+    return result
+
+
+def _parse_csv(file_path: str) -> str:
+    """Convert a CSV file to structured plain text.
+
+    Each row is rendered as 'Sütun: Değer' pairs, one per line.
+    Handles UTF-8 and latin-1 encodings automatically.
+    """
+    import csv
+
+    def _read(encoding: str) -> str:
+        lines = []
+        with open(file_path, newline="", encoding=encoding) as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                pairs = [f"{k}: {v}" for k, v in row.items() if v and v.strip()]
+                if pairs:
+                    lines.append(". ".join(pairs) + ".")
+        return "\n".join(lines)
+
+    try:
+        text = _read("utf-8")
+    except UnicodeDecodeError:
+        text = _read("latin-1")
+
+    logger.info("CSV parsed: %d chars", len(text))
+    return text
 
 
 def _clean_text(text: str) -> str:
