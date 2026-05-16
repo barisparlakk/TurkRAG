@@ -1,28 +1,20 @@
 """Query analytics endpoints — tenant-scoped stats and recent query log."""
 
 import logging
-import os
 from fastapi import APIRouter, Depends
 from api.auth import get_tenant_id
+from api.db import get_conn
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/analytics", tags=["analytics"])
-
-POSTGRES_URL = os.getenv("POSTGRES_URL", "postgresql://turkrag:turkrag_secret@localhost/turkrag")
-
-
-def _db():
-    import psycopg2
-    return psycopg2.connect(POSTGRES_URL)
 
 
 @router.get("/stats")
 async def get_stats(tenant_id: str = Depends(get_tenant_id)):
     """Return summary analytics for the current tenant."""
-    conn = _db()
+    conn = get_conn()
     try:
         with conn.cursor() as cur:
-            # Overall totals
             cur.execute(
                 """SELECT
                      COUNT(*)                          AS total_queries,
@@ -36,7 +28,6 @@ async def get_stats(tenant_id: str = Depends(get_tenant_id)):
             row = cur.fetchone()
             total_queries, avg_query_time_ms, queries_today = row or (0, 0, 0)
 
-            # Top 5 most-asked questions (exact duplicates only — good enough for now)
             cur.execute(
                 """SELECT query, COUNT(*) AS cnt
                    FROM query_logs WHERE tenant_id=%s
@@ -45,18 +36,16 @@ async def get_stats(tenant_id: str = Depends(get_tenant_id)):
             )
             top_queries = [{"query": r[0], "count": r[1]} for r in cur.fetchall()]
 
-            # Top 5 most-cited documents
             cur.execute(
                 """SELECT
                      elem->>'filename' AS filename,
                      COUNT(*)          AS citations
-                   FROM messages,
-                        jsonb_array_elements(citations) AS elem
-                   WHERE session_id IN (
-                       SELECT id FROM sessions WHERE tenant_id=%s
-                   )
-                   AND role = 'assistant'
-                   AND jsonb_typeof(citations) = 'array'
+                   FROM messages
+                   JOIN sessions ON sessions.id = messages.session_id
+                        AND sessions.tenant_id = %s
+                   CROSS JOIN LATERAL jsonb_array_elements(messages.citations) AS elem
+                   WHERE messages.role = 'assistant'
+                     AND jsonb_typeof(messages.citations) = 'array'
                    GROUP BY filename
                    ORDER BY citations DESC LIMIT 5""",
                 (tenant_id,),
@@ -79,7 +68,7 @@ async def get_stats(tenant_id: str = Depends(get_tenant_id)):
 async def get_recent(limit: int = 20, tenant_id: str = Depends(get_tenant_id)):
     """Return the most recent query log entries for the current tenant."""
     limit = min(max(limit, 1), 100)
-    conn = _db()
+    conn = get_conn()
     try:
         with conn.cursor() as cur:
             cur.execute(

@@ -71,6 +71,12 @@ def _parse_txt(file_path: str) -> str:
         return Path(file_path).read_text(encoding="latin-1")
 
 
+def _row_to_sentence(header: list, values: list) -> str:
+    """Render header+value lists as 'Key: Value. Key: Value.' sentence."""
+    pairs = [f"{h}: {v}" for h, v in zip(header, values) if v]
+    return (". ".join(pairs) + ".") if pairs else ""
+
+
 def _parse_excel(file_path: str) -> str:
     """Convert an Excel workbook to structured plain text.
 
@@ -106,16 +112,11 @@ def _parse_excel(file_path: str) -> str:
 
         section_lines = [f"=== Sayfa: {sheet_name} ==="]
         for row_vals in data_rows:
-            # Skip fully empty rows
             if not any(v for v in row_vals):
                 continue
-            pairs = [
-                f"{h}: {v}"
-                for h, v in zip(header, row_vals)
-                if v  # omit blank cells
-            ]
-            if pairs:
-                section_lines.append(". ".join(pairs) + ".")
+            sentence = _row_to_sentence(header, row_vals)
+            if sentence:
+                section_lines.append(sentence)
         sections.append("\n".join(section_lines))
 
     result = "\n\n".join(sections)
@@ -135,10 +136,11 @@ def _parse_csv(file_path: str) -> str:
         lines = []
         with open(file_path, newline="", encoding=encoding) as f:
             reader = csv.DictReader(f)
+            header = reader.fieldnames or []
             for row in reader:
-                pairs = [f"{k}: {v}" for k, v in row.items() if v and v.strip()]
-                if pairs:
-                    lines.append(". ".join(pairs) + ".")
+                sentence = _row_to_sentence(header, [row.get(h, "") for h in header])
+                if sentence:
+                    lines.append(sentence)
         return "\n".join(lines)
 
     try:

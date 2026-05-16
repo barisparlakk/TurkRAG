@@ -100,6 +100,11 @@ def _init_postgres():
                         query_time_ms INT,
                         created_at TIMESTAMPTZ DEFAULT NOW()
                     );
+
+                    CREATE INDEX IF NOT EXISTS idx_sessions_tenant ON sessions(tenant_id);
+                    CREATE INDEX IF NOT EXISTS idx_messages_session ON messages(session_id);
+                    CREATE INDEX IF NOT EXISTS idx_query_logs_tenant ON query_logs(tenant_id);
+                    CREATE INDEX IF NOT EXISTS idx_documents_tenant ON documents(tenant_id);
                 """)
         conn.close()
         logger.info("PostgreSQL schema ready.")

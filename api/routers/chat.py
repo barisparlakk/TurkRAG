@@ -2,29 +2,20 @@
 
 import json
 import logging
-import os
 import time
-import uuid
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from api.auth import get_current_payload, get_tenant_id
+from api.db import get_conn
 from api.schemas import QueryRequest, QueryResponse, CitationSource
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/chat", tags=["chat"])
 
-POSTGRES_URL = os.getenv("POSTGRES_URL", "postgresql://turkrag:turkrag_secret@localhost/turkrag")
 HISTORY_LIMIT = 8  # max messages (4 turns) loaded from DB per request
 
 
-# ── DB helpers ────────────────────────────────────────────────────────────────
-
-def _db():
-    import psycopg2
-    return psycopg2.connect(POSTGRES_URL)
-
-
 def _get_tenant_slug(tenant_id: str) -> str:
-    conn = _db()
+    conn = get_conn()
     try:
         with conn.cursor() as cur:
             cur.execute("SELECT slug FROM tenants WHERE id=%s", (tenant_id,))
@@ -38,7 +29,7 @@ def _get_tenant_slug(tenant_id: str) -> str:
 
 def _get_or_create_session(tenant_id: str, session_id, user_id: str = "demo-user") -> str:
     """Return existing session UUID or create a new one."""
-    conn = _db()
+    conn = get_conn()
     try:
         with conn:
             with conn.cursor() as cur:
@@ -50,20 +41,18 @@ def _get_or_create_session(tenant_id: str, session_id, user_id: str = "demo-user
                     row = cur.fetchone()
                     if row:
                         return str(row[0])
-                # Create a new session
-                new_id = str(uuid.uuid4())
                 cur.execute(
-                    "INSERT INTO sessions (id, tenant_id, user_id) VALUES (%s, %s, %s)",
-                    (new_id, tenant_id, user_id),
+                    "INSERT INTO sessions (tenant_id, user_id) VALUES (%s, %s) RETURNING id",
+                    (tenant_id, user_id),
                 )
-                return new_id
+                return str(cur.fetchone()[0])
     finally:
         conn.close()
 
 
 def _load_history(session_id: str) -> list:
     """Load the last HISTORY_LIMIT messages for a session, oldest-first."""
-    conn = _db()
+    conn = get_conn()
     try:
         with conn.cursor() as cur:
             cur.execute(
@@ -83,17 +72,17 @@ def _load_history(session_id: str) -> list:
 
 def _save_messages(session_id: str, user_text: str, assistant_text: str, citations: list):
     """Persist the user question and assistant answer to the messages table."""
-    conn = _db()
+    conn = get_conn()
     try:
         with conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    "INSERT INTO messages (session_id, role, content, citations) VALUES (%s, %s, %s, %s)",
-                    (session_id, "user", user_text, json.dumps([])),
-                )
-                cur.execute(
-                    "INSERT INTO messages (session_id, role, content, citations) VALUES (%s, %s, %s, %s)",
-                    (session_id, "assistant", assistant_text, json.dumps(citations)),
+                    "INSERT INTO messages (session_id, role, content, citations) VALUES "
+                    "(%s, %s, %s, %s), (%s, %s, %s, %s)",
+                    (
+                        session_id, "user", user_text, json.dumps([]),
+                        session_id, "assistant", assistant_text, json.dumps(citations),
+                    ),
                 )
     finally:
         conn.close()
@@ -102,7 +91,7 @@ def _save_messages(session_id: str, user_text: str, assistant_text: str, citatio
 def _log_query(tenant_id: str, session_id: str, query: str,
                answer_length: int, num_citations: int, query_time_ms: int):
     """Write a query analytics record."""
-    conn = _db()
+    conn = get_conn()
     try:
         with conn:
             with conn.cursor() as cur:
@@ -118,8 +107,6 @@ def _log_query(tenant_id: str, session_id: str, query: str,
         conn.close()
 
 
-# ── Sync endpoint ─────────────────────────────────────────────────────────────
-
 @router.post("", response_model=QueryResponse)
 async def chat(body: QueryRequest, tenant_id: str = Depends(get_tenant_id)):
     """Synchronous RAG query. Returns full answer with citations."""
@@ -132,7 +119,7 @@ async def chat(body: QueryRequest, tenant_id: str = Depends(get_tenant_id)):
     from retrieval.hybrid import HybridRetriever
     from generation.prompt import build_prompt
     from generation.llm import generate, is_available
-    from generation.citations import extract_citations
+    from generation.citations import extract_citations, strip_think_tags
 
     chunks = HybridRetriever().retrieve(body.query, tenant_slug, final_k=body.top_k)
 
@@ -155,9 +142,7 @@ async def chat(body: QueryRequest, tenant_id: str = Depends(get_tenant_id)):
         )
 
     prompt = build_prompt(body.query, chunks, history=history)
-    answer = generate(prompt)
-    from generation.citations import strip_think_tags
-    answer = strip_think_tags(answer)
+    answer = strip_think_tags(generate(prompt))
     raw_citations = extract_citations(answer, chunks)
     citations = [CitationSource(**c) for c in raw_citations]
 
@@ -175,8 +160,6 @@ async def chat(body: QueryRequest, tenant_id: str = Depends(get_tenant_id)):
         session_id=session_id,
     )
 
-
-# ── WebSocket streaming endpoint ──────────────────────────────────────────────
 
 @router.websocket("/stream")
 async def chat_stream(websocket: WebSocket):
@@ -196,7 +179,6 @@ async def chat_stream(websocket: WebSocket):
         await websocket.close()
         return
 
-    # Authenticate via token in message
     from api.auth import decode_token
     token = payload_json.get("token", "")
     try:
@@ -209,7 +191,7 @@ async def chat_stream(websocket: WebSocket):
 
     query = payload_json.get("query", "").strip()
     top_k = int(payload_json.get("top_k", 5))
-    client_session_id = payload_json.get("session_id")  # may be None
+    client_session_id = payload_json.get("session_id")
 
     if not query:
         await websocket.send_text(json.dumps({"type": "error", "message": "Empty query"}))
@@ -232,7 +214,6 @@ async def chat_stream(websocket: WebSocket):
         history=history, session_id=session_id,
     )
 
-    # Persist messages + log after streaming completes
     if result:
         _save_messages(session_id, query, result["text"], result["citations"])
         _log_query(

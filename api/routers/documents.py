@@ -10,19 +10,14 @@ from typing import List
 from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, UploadFile, status
 
 from api.auth import get_current_payload, get_tenant_id
+from api.db import get_conn
 from api.schemas import DocumentListItem, DocumentUploadResponse
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/documents", tags=["documents"])
 
-POSTGRES_URL = os.getenv("POSTGRES_URL", "postgresql://turkrag:turkrag_secret@localhost/turkrag")
 UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", "/tmp/uploads"))
 ALLOWED_EXTENSIONS = {".pdf", ".docx", ".txt", ".xlsx", ".xls", ".csv"}
-
-
-def _db():
-    import psycopg2
-    return psycopg2.connect(POSTGRES_URL)
 
 
 @router.post("/upload", response_model=DocumentUploadResponse, status_code=status.HTTP_202_ACCEPTED)
@@ -43,7 +38,7 @@ async def upload_document(
     file_hash = hashlib.sha256(content).hexdigest()
 
     # Reject duplicate uploads for this tenant
-    conn = _db()
+    conn = get_conn()
     try:
         with conn.cursor() as cur:
             cur.execute(
@@ -77,7 +72,7 @@ async def upload_document(
 @router.get("", response_model=List[DocumentListItem])
 async def list_documents(tenant_id: str = Depends(get_tenant_id)):
     """List all documents for the current tenant."""
-    conn = _db()
+    conn = get_conn()
     try:
         with conn.cursor() as cur:
             cur.execute(
@@ -103,7 +98,7 @@ async def list_documents(tenant_id: str = Depends(get_tenant_id)):
 @router.delete("/{doc_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_document(doc_id: str, tenant_id: str = Depends(get_tenant_id)):
     """Remove a document from Qdrant, BM25, and PostgreSQL."""
-    conn = _db()
+    conn = get_conn()
     try:
         with conn:
             with conn.cursor() as cur:
@@ -121,7 +116,7 @@ async def delete_document(doc_id: str, tenant_id: str = Depends(get_tenant_id)):
         conn.close()
 
     # Get tenant slug for Qdrant
-    conn = _db()
+    conn = get_conn()
     try:
         with conn.cursor() as cur:
             cur.execute("SELECT slug FROM tenants WHERE id=%s", (tenant_id,))
@@ -142,12 +137,9 @@ async def delete_document(doc_id: str, tenant_id: str = Depends(get_tenant_id)):
 
 def _ingest_document(document_id: str, file_path: str, filename: str, tenant_id: str):
     """Background task: parse → chunk → embed → index."""
-    import psycopg2
-
     logger.info("Background ingestion started: doc=%s file=%s", document_id, file_path)
 
-    # Resolve tenant slug
-    conn = psycopg2.connect(POSTGRES_URL)
+    conn = get_conn()
     try:
         with conn.cursor() as cur:
             cur.execute("SELECT slug FROM tenants WHERE id=%s", (tenant_id,))
@@ -174,7 +166,7 @@ def _ingest_document(document_id: str, file_path: str, filename: str, tenant_id:
         logger.info("Ingestion complete: doc=%s", document_id)
     except Exception as exc:
         logger.exception("Ingestion failed for doc %s: %s", document_id, exc)
-        conn = psycopg2.connect(POSTGRES_URL)
+        conn = get_conn()
         try:
             with conn:
                 with conn.cursor() as cur:
