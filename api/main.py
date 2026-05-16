@@ -32,6 +32,11 @@ BM25_INDEX_DIR = Path(os.getenv("BM25_INDEX_DIR", "indexes"))
 async def lifespan(app: FastAPI):
     """Run startup tasks and yield to serve requests."""
     logger.info("TurkRAG API starting up…")
+    if os.getenv("JWT_SECRET", "change_this_in_production") == "change_this_in_production":
+        logger.warning(
+            "JWT_SECRET is the default insecure value. "
+            "Set JWT_SECRET env var before deploying to production."
+        )
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     BM25_INDEX_DIR.mkdir(parents=True, exist_ok=True)
     _init_postgres()
@@ -98,8 +103,8 @@ def _init_postgres():
 
                     CREATE TABLE IF NOT EXISTS query_logs (
                         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                        tenant_id UUID NOT NULL,
-                        session_id UUID,
+                        tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+                        session_id UUID REFERENCES sessions(id) ON DELETE SET NULL,
                         query TEXT NOT NULL,
                         answer_length INT,
                         num_citations INT,

@@ -130,13 +130,18 @@ def _ingest_document(document_id: str, file_path: str, filename: str, tenant_id:
     """Background task: parse → chunk → embed → index."""
     logger.info("Background ingestion started: doc=%s file=%s", document_id, file_path)
 
-    conn = get_conn()
+    row = None
+    conn = None
     try:
+        conn = get_conn()
         with conn.cursor() as cur:
             cur.execute("SELECT slug FROM tenants WHERE id=%s", (tenant_id,))
             row = cur.fetchone()
+    except Exception as exc:
+        logger.error("DB error resolving tenant for doc %s: %s", document_id, exc)
     finally:
-        conn.close()
+        if conn is not None:
+            conn.close()
 
     if not row:
         logger.error("Tenant %s not found — aborting ingestion for doc %s", tenant_id, document_id)

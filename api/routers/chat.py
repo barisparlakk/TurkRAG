@@ -74,8 +74,9 @@ def _load_history(session_id: str) -> list:
 
 def _save_messages(session_id: str, user_text: str, assistant_text: str, citations: list):
     """Persist the user question and assistant answer to the messages table."""
-    conn = get_conn()
+    conn = None
     try:
+        conn = get_conn()
         with conn, conn.cursor() as cur:
             cur.execute(
                 "INSERT INTO messages (session_id, role, content, citations) VALUES "
@@ -85,15 +86,19 @@ def _save_messages(session_id: str, user_text: str, assistant_text: str, citatio
                     session_id, "assistant", assistant_text, json.dumps(citations),
                 ),
             )
+    except Exception as exc:
+        logger.warning("Failed to save messages: %s", exc)
     finally:
-        conn.close()
+        if conn is not None:
+            conn.close()
 
 
 def _log_query(tenant_id: str, session_id: str, query: str,
                answer_length: int, num_citations: int, query_time_ms: int):
-    """Write a query analytics record."""
-    conn = get_conn()
+    """Write a query analytics record (best-effort — never raises)."""
+    conn = None
     try:
+        conn = get_conn()
         with conn, conn.cursor() as cur:
             cur.execute(
                 """INSERT INTO query_logs
@@ -104,7 +109,8 @@ def _log_query(tenant_id: str, session_id: str, query: str,
     except Exception as exc:
         logger.warning("Failed to write query log: %s", exc)
     finally:
-        conn.close()
+        if conn is not None:
+            conn.close()
 
 
 @router.post("", response_model=QueryResponse)

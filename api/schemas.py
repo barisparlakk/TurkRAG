@@ -46,7 +46,7 @@ class TenantCreate(BaseModel):
     @field_validator("slug")
     @classmethod
     def slug_must_be_valid(cls, v: str) -> str:
-        if not re.match(r"^[a-z0-9][a-z0-9-]*[a-z0-9]$", v):
+        if not re.match(r"^[a-z0-9]([a-z0-9-]*[a-z0-9])?$", v):
             raise ValueError("slug must be lowercase alphanumeric with hyphens, no leading/trailing hyphens")
         return v
 
