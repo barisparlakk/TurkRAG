@@ -17,9 +17,9 @@ Companies upload their own documents and chat with an AI that answers **only fro
 ```
                   ┌──────────────┐
    PDF/DOCX/TXT → │  Ingestion   │
-                  │  parser      │
+                  │  parser      │  PDF/DOCX/TXT/XLSX/CSV
                   │  chunker     │  Turkish-aware sentence chunker
-                  │  embedder    │  multilingual-mpnet-base-v2
+                  │  embedder    │  local SentenceTransformer (offline)
                   │  indexer     │
                   └──────┬───────┘
                          │
@@ -78,7 +78,7 @@ open http://localhost:5173
 |--------|----------|-------------|
 | `POST` | `/auth/token` | Issue a JWT for dev/testing |
 | `GET` | `/health` | Health check (Qdrant, Postgres, LLM) |
-| `POST` | `/documents/upload` | Upload PDF/DOCX/TXT |
+| `POST` | `/documents/upload` | Upload PDF/DOCX/TXT/XLSX/CSV |
 | `GET` | `/documents` | List tenant documents |
 | `DELETE` | `/documents/{id}` | Delete document |
 | `POST` | `/chat` | Synchronous RAG query |
@@ -86,6 +86,8 @@ open http://localhost:5173
 | `POST` | `/tenants` | Create tenant (admin) |
 | `GET` | `/tenants` | List tenants (admin) |
 | `DELETE` | `/tenants/{slug}` | Delete tenant + all data (admin) |
+| `GET` | `/analytics/stats` | Query stats (totals, top queries, top docs) |
+| `GET` | `/analytics/recent` | Recent query log entries |
 
 Interactive docs at: http://localhost:8000/docs
 
@@ -115,15 +117,26 @@ Sample files in `data/sample/`:
 
 ---
 
-## Fine-tune the Turkish Embedding Model
+## Embedding Model Setup
 
-Use Google Colab (A100) with the `nli_tr` dataset. See `TURKRAG_SETUP_GUIDE.md` for the full notebook.
+The embedder **never downloads from HuggingFace Hub at runtime**. You must place a SentenceTransformer checkpoint locally before starting the API.
 
 ```bash
-# After training, copy checkpoint to:
-models/turkish-embedder/
-# The embedder auto-loads this if present.
+# Option A: download the base multilingual model (offline after first pull)
+pip install sentence-transformers
+python -c "
+from sentence_transformers import SentenceTransformer
+m = SentenceTransformer('sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
+m.save('models/turkish-embedder')
+"
+
+# Option B: fine-tune on Turkish NLI data (Google Colab A100 recommended)
+# See TURKRAG_SETUP_GUIDE.md for the full training notebook.
+# After training, copy the checkpoint:
+cp -r /path/to/checkpoint models/turkish-embedder
 ```
+
+Set `TURKISH_EMBEDDER_PATH` env var to override the default `models/turkish-embedder` path.
 
 ---
 
@@ -148,6 +161,25 @@ Metrics: `faithfulness`, `answer_relevancy`, `context_precision`, `context_recal
 
 ---
 
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `POSTGRES_URL` | `postgresql://turkrag:turkrag_secret@localhost/turkrag` | PostgreSQL connection string |
+| `LLM_MODEL_PATH` | `models/qwen3-8b-instruct-q4_k_m.gguf` | Path to GGUF model file |
+| `LLM_N_CTX` | `4096` | LLM context window (tokens) |
+| `LLM_N_GPU_LAYERS` | `-1` | GPU layers (-1 = all) |
+| `LLM_N_THREADS` | `8` | CPU threads for prompt eval |
+| `LLM_TEMPERATURE` | `0.1` | Sampling temperature |
+| `LLM_MAX_TOKENS` | `512` | Max generated tokens per response |
+| `TURKISH_EMBEDDER_PATH` | `models/turkish-embedder` | Local SentenceTransformer directory |
+| `QDRANT_URL` | `http://localhost:6333` | Qdrant vector DB URL |
+| `JWT_SECRET` | *(required)* | Secret for signing JWTs |
+| `UPLOAD_DIR` | `/tmp/uploads` | Temporary file upload path |
+| `BM25_INDEX_DIR` | `indexes` | BM25 index persistence directory |
+
+---
+
 ## KVKK Compliance
 
 - All data stays on the customer's server (on-premise Docker)
@@ -164,7 +196,7 @@ Metrics: `faithfulness`, `answer_relevancy`, `context_precision`, `context_recal
 | Layer | Technology |
 |-------|-----------|
 | LLM | Qwen3-8B-Instruct GGUF (llama-cpp-python) |
-| Embeddings | paraphrase-multilingual-mpnet-base-v2 |
+| Embeddings | Local SentenceTransformer (offline, see setup) |
 | Vector DB | Qdrant |
 | Sparse index | BM25s |
 | Reranker | ms-marco-MiniLM-L-6-v2 |
