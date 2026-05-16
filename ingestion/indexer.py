@@ -6,6 +6,7 @@ import pickle
 from pathlib import Path
 
 from api.db import get_conn
+from retrieval.bm25_store import _TURKISH_STOPWORDS
 
 logger = logging.getLogger(__name__)
 
@@ -107,7 +108,17 @@ class TenantIndexer:
         index_path = BM25_INDEX_DIR / f"bm25_{tenant_slug}.pkl"
 
         texts = [c["text"] for c in chunks]
-        payloads = [{"chunk_index": c["chunk_index"], "text": c["text"], "doc_id": document_id, "filename": filename} for c in chunks]
+        payloads = [
+            {
+                "chunk_index": c["chunk_index"],
+                "text": c["text"],
+                "doc_id": document_id,
+                "filename": filename,
+                "start_char": c.get("start_char", 0),
+                "end_char": c.get("end_char", 0),
+            }
+            for c in chunks
+        ]
 
         # Load existing index corpus if present
         if index_path.exists():
@@ -133,17 +144,18 @@ class TenantIndexer:
         logger.info("BM25 index updated: %d total docs at %s", len(all_texts), index_path)
 
     def _update_postgres_status(self, document_id: str, chunk_count: int):
+        conn = get_conn()
         try:
-            conn = get_conn()
             with conn, conn.cursor() as cur:
                 cur.execute(
                     "UPDATE documents SET status='ready', chunk_count=%s WHERE id=%s",
                     (chunk_count, document_id),
                 )
-            conn.close()
             logger.info("PostgreSQL: document %s marked as ready (%d chunks)", document_id, chunk_count)
         except Exception as exc:
             logger.error("Failed to update PostgreSQL status: %s", exc)
+        finally:
+            conn.close()
 
 
 def delete_document_vectors(document_id: str, tenant_slug: str):
@@ -159,15 +171,6 @@ def delete_document_vectors(document_id: str, tenant_slug: str):
         ),
     )
     logger.info("Deleted Qdrant points for doc=%s in collection=%s", document_id, collection_name)
-
-
-_TURKISH_STOPWORDS = [
-    "bir", "bu", "şu", "o", "da", "de", "ki", "ile", "için",
-    "ve", "veya", "ama", "fakat", "çünkü", "gibi", "kadar",
-    "daha", "en", "çok", "az", "her", "hiç", "ne", "nasıl",
-    "olan", "olarak", "ise", "hem", "ya", "mi", "mı", "mu",
-    "mü", "değil", "var", "yok", "ben", "sen", "biz", "siz", "onlar",
-]
 
 
 if __name__ == "__main__":
