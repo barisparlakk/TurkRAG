@@ -1,7 +1,9 @@
 """Query analytics endpoints — tenant-scoped stats and recent query log."""
 
 import logging
+
 from fastapi import APIRouter, Depends
+
 from api.auth import get_tenant_id
 from api.db import get_conn
 

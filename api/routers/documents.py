@@ -5,11 +5,10 @@ import logging
 import os
 import uuid
 from pathlib import Path
-from typing import List
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, UploadFile, status
 
-from api.auth import get_current_payload, get_tenant_id
+from api.auth import get_tenant_id
 from api.db import get_conn
 from api.schemas import DocumentListItem, DocumentUploadResponse
 
@@ -69,7 +68,7 @@ async def upload_document(
     return DocumentUploadResponse(document_id=document_id, filename=file.filename, status="processing")
 
 
-@router.get("", response_model=List[DocumentListItem])
+@router.get("", response_model=list[DocumentListItem])
 async def list_documents(tenant_id: str = Depends(get_tenant_id)):
     """List all documents for the current tenant."""
     conn = get_conn()
@@ -100,18 +99,17 @@ async def delete_document(doc_id: str, tenant_id: str = Depends(get_tenant_id)):
     """Remove a document from Qdrant, BM25, and PostgreSQL."""
     conn = get_conn()
     try:
-        with conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    "SELECT id, tenant_id FROM documents WHERE id=%s",
-                    (doc_id,),
-                )
-                row = cur.fetchone()
-                if not row:
-                    raise HTTPException(status_code=404, detail="Document not found")
-                if str(row[1]) != tenant_id:
-                    raise HTTPException(status_code=403, detail="Access denied")
-                cur.execute("DELETE FROM documents WHERE id=%s", (doc_id,))
+        with conn, conn.cursor() as cur:
+            cur.execute(
+                "SELECT id, tenant_id FROM documents WHERE id=%s",
+                (doc_id,),
+            )
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail="Document not found")
+            if str(row[1]) != tenant_id:
+                raise HTTPException(status_code=403, detail="Access denied")
+            cur.execute("DELETE FROM documents WHERE id=%s", (doc_id,))
     finally:
         conn.close()
 
@@ -154,9 +152,9 @@ def _ingest_document(document_id: str, file_path: str, filename: str, tenant_id:
     tenant_slug = row[0]
 
     try:
-        from ingestion.parser import parse_document
         from ingestion.chunker import TurkishChunker
         from ingestion.indexer import TenantIndexer
+        from ingestion.parser import parse_document
 
         text = parse_document(file_path)
         chunks = TurkishChunker().chunk(text)
@@ -168,8 +166,7 @@ def _ingest_document(document_id: str, file_path: str, filename: str, tenant_id:
         logger.exception("Ingestion failed for doc %s: %s", document_id, exc)
         conn = get_conn()
         try:
-            with conn:
-                with conn.cursor() as cur:
-                    cur.execute("UPDATE documents SET status='error' WHERE id=%s", (document_id,))
+            with conn, conn.cursor() as cur:
+                cur.execute("UPDATE documents SET status='error' WHERE id=%s", (document_id,))
         finally:
             conn.close()

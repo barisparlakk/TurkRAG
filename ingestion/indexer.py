@@ -4,7 +4,6 @@ import logging
 import os
 import pickle
 from pathlib import Path
-from typing import List, Dict, Optional
 
 from api.db import get_conn
 
@@ -22,7 +21,7 @@ def _qdrant_client():
 
 
 def _ensure_collection(client, tenant_slug: str):
-    from qdrant_client.models import VectorParams, Distance
+    from qdrant_client.models import Distance, VectorParams
 
     collection_name = f"tenant_{tenant_slug}"
     existing = [c.name for c in client.get_collections().collections]
@@ -43,7 +42,7 @@ class TenantIndexer:
         document_id: str,
         tenant_slug: str,
         filename: str,
-        chunks: List[Dict],
+        chunks: list[dict],
     ) -> None:
         """Index all chunks for a document under the given tenant.
 
@@ -79,7 +78,7 @@ class TenantIndexer:
         collection_name = _ensure_collection(client, tenant_slug)
 
         points = []
-        for chunk, vec in zip(chunks, embeddings):
+        for chunk, vec in zip(chunks, embeddings, strict=False):
             point_id = abs(hash(f"{document_id}_{chunk['chunk_index']}")) % (2**63)
             points.append(PointStruct(
                 id=point_id,
@@ -101,7 +100,7 @@ class TenantIndexer:
 
         logger.info("Upserted %d points to Qdrant collection '%s'", len(points), collection_name)
 
-    def _update_bm25(self, tenant_slug: str, chunks: List[Dict], document_id: str = "", filename: str = ""):
+    def _update_bm25(self, tenant_slug: str, chunks: list[dict], document_id: str = "", filename: str = ""):
         import bm25s
 
         BM25_INDEX_DIR.mkdir(parents=True, exist_ok=True)
@@ -136,12 +135,11 @@ class TenantIndexer:
     def _update_postgres_status(self, document_id: str, chunk_count: int):
         try:
             conn = get_conn()
-            with conn:
-                with conn.cursor() as cur:
-                    cur.execute(
-                        "UPDATE documents SET status='ready', chunk_count=%s WHERE id=%s",
-                        (chunk_count, document_id),
-                    )
+            with conn, conn.cursor() as cur:
+                cur.execute(
+                    "UPDATE documents SET status='ready', chunk_count=%s WHERE id=%s",
+                    (chunk_count, document_id),
+                )
             conn.close()
             logger.info("PostgreSQL: document %s marked as ready (%d chunks)", document_id, chunk_count)
         except Exception as exc:
@@ -150,7 +148,7 @@ class TenantIndexer:
 
 def delete_document_vectors(document_id: str, tenant_slug: str):
     """Remove all Qdrant points for a given document."""
-    from qdrant_client.models import Filter, FieldCondition, MatchValue
+    from qdrant_client.models import FieldCondition, Filter, MatchValue
 
     client = _qdrant_client()
     collection_name = f"tenant_{tenant_slug}"
@@ -176,8 +174,8 @@ if __name__ == "__main__":
     import sys
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 
-    from ingestion.parser import parse_document
     from ingestion.chunker import TurkishChunker
+    from ingestion.parser import parse_document
 
     if len(sys.argv) < 4:
         print("Usage: python -m ingestion.indexer <file> <tenant_slug> <doc_id>")

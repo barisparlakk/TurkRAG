@@ -5,9 +5,9 @@ context and degrades retrieval quality. This chunker respects sentence
 boundaries while handling Turkish-specific abbreviations.
 """
 
-import regex  # supports variable-width lookbehinds (unlike stdlib re)
 import logging
-from typing import List, Dict
+
+import regex  # supports variable-width lookbehinds (unlike stdlib re)
 
 logger = logging.getLogger(__name__)
 
@@ -54,11 +54,11 @@ class TurkishChunker:
     OVERLAP_CHARS = 150
     MIN_SENTENCE_CHARS = 40
 
-    def chunk(self, text: str) -> List[Dict]:
+    def chunk(self, text: str) -> list[dict]:
         """Return a list of chunk dicts with keys: text, chunk_index, start_char, end_char."""
         # First split on paragraph breaks, then on sentence boundaries within each paragraph
         paragraphs = _NEWLINE_RE.split(text)
-        sentences: List[str] = []
+        sentences: list[str] = []
         for para in paragraphs:
             para = para.strip()
             if not para:
@@ -72,9 +72,9 @@ class TurkishChunker:
         logger.info("Chunked text into %d chunks (%d sentences input)", len(chunks), len(sentences))
         return chunks
 
-    def _merge_short(self, sentences: List[str]) -> List[str]:
+    def _merge_short(self, sentences: list[str]) -> list[str]:
         """Merge sentences shorter than MIN_SENTENCE_CHARS with the next one."""
-        merged: List[str] = []
+        merged: list[str] = []
         buffer = ""
         for sent in sentences:
             if buffer:
@@ -93,15 +93,15 @@ class TurkishChunker:
         return merged
 
     @staticmethod
-    def _make_chunk(index: int, sentences: List[str], overlap_prefix: str, char_start: int) -> Dict:
+    def _make_chunk(index: int, sentences: list[str], overlap_prefix: str, char_start: int) -> dict:
         raw = (overlap_prefix + " ".join(sentences)) if overlap_prefix else " ".join(sentences)
         text = raw.strip()
         return {"text": text, "chunk_index": index, "start_char": char_start, "end_char": char_start + len(text)}
 
-    def _build_chunks(self, sentences: List[str]) -> List[Dict]:
+    def _build_chunks(self, sentences: list[str]) -> list[dict]:
         """Accumulate sentences into MAX_CHARS chunks with OVERLAP_CHARS overlap."""
-        chunks: List[Dict] = []
-        current_sentences: List[str] = []
+        chunks: list[dict] = []
+        current_sentences: list[str] = []
         current_len = 0
         overlap_prefix = ""
         char_start = 0
@@ -122,9 +122,9 @@ class TurkishChunker:
 
         return chunks
 
-    def _build_overlap(self, sentences: List[str]) -> str:
+    def _build_overlap(self, sentences: list[str]) -> str:
         """Return the tail of sentences up to OVERLAP_CHARS as overlap prefix."""
-        overlap_sents: List[str] = []
+        overlap_sents: list[str] = []
         total = 0
         for sent in reversed(sentences):
             if total + len(sent) > self.OVERLAP_CHARS:
@@ -135,8 +135,8 @@ class TurkishChunker:
 
 
 if __name__ == "__main__":
-    import sys
     import re  # noqa: F401 — only needed in __main__ block below
+    import sys
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 
     sample = """

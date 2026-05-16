@@ -73,7 +73,7 @@ def _parse_txt(file_path: str) -> str:
 
 def _row_to_sentence(header: list, values: list) -> str:
     """Render header+value lists as 'Key: Value. Key: Value.' sentence."""
-    pairs = [f"{h}: {v}" for h, v in zip(header, values) if v]
+    pairs = [f"{h}: {v}" for h, v in zip(header, values, strict=False) if v]
     return (". ".join(pairs) + ".") if pairs else ""
 
 
@@ -98,7 +98,7 @@ def _parse_excel(file_path: str) -> str:
         # Find header row (first row with at least one non-None cell)
         header: list = []
         data_rows: list = []
-        for i, row in enumerate(rows):
+        for _, row in enumerate(rows):
             values = [str(v).strip() if v is not None else "" for v in row]
             if not any(values):
                 continue

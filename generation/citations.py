@@ -1,7 +1,6 @@
 """Extract which source chunks were actually cited in the LLM response."""
 
 import re
-from typing import List, Dict
 
 
 def strip_think_tags(text: str) -> str:
@@ -9,7 +8,7 @@ def strip_think_tags(text: str) -> str:
     return re.sub(r"<think>.*?</think>\s*", "", text, flags=re.DOTALL).strip()
 
 
-def extract_citations(response: str, context_chunks: List[Dict]) -> List[Dict]:
+def extract_citations(response: str, context_chunks: list[dict]) -> list[dict]:
     """Find which context chunks are referenced in the response.
 
     Heuristic: look for [Kaynak N] patterns in the response text.

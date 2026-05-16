@@ -3,9 +3,9 @@
 import logging
 import os
 import uuid
-from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
+
 from api.auth import require_admin
 from api.db import get_conn
 from api.schemas import TenantCreate, TenantResponse
@@ -36,19 +36,18 @@ async def create_tenant(body: TenantCreate, _=Depends(require_admin)):
     """Provision a new tenant: create DB row + Qdrant collection."""
     conn = get_conn()
     try:
-        with conn:
-            with conn.cursor() as cur:
-                # Check for duplicate slug
-                cur.execute("SELECT id FROM tenants WHERE slug=%s", (body.slug,))
-                if cur.fetchone():
-                    raise HTTPException(status_code=409, detail=f"Tenant slug '{body.slug}' already exists")
+        with conn, conn.cursor() as cur:
+            # Check for duplicate slug
+            cur.execute("SELECT id FROM tenants WHERE slug=%s", (body.slug,))
+            if cur.fetchone():
+                raise HTTPException(status_code=409, detail=f"Tenant slug '{body.slug}' already exists")
 
-                tenant_id = str(uuid.uuid4())
-                cur.execute(
-                    "INSERT INTO tenants (id, name, slug) VALUES (%s, %s, %s) RETURNING id, name, slug, created_at",
-                    (tenant_id, body.name, body.slug),
-                )
-                row = cur.fetchone()
+            tenant_id = str(uuid.uuid4())
+            cur.execute(
+                "INSERT INTO tenants (id, name, slug) VALUES (%s, %s, %s) RETURNING id, name, slug, created_at",
+                (tenant_id, body.name, body.slug),
+            )
+            row = cur.fetchone()
     finally:
         conn.close()
 
@@ -59,7 +58,7 @@ async def create_tenant(body: TenantCreate, _=Depends(require_admin)):
     return TenantResponse(id=row[0], name=row[1], slug=row[2], created_at=str(row[3]))
 
 
-@router.get("", response_model=List[TenantResponse])
+@router.get("", response_model=list[TenantResponse])
 async def list_tenants(_=Depends(require_admin)):
     """List all tenants."""
     conn = get_conn()
@@ -78,13 +77,12 @@ async def delete_tenant(slug: str, _=Depends(require_admin)):
     """Delete a tenant and all their data (Qdrant + PostgreSQL)."""
     conn = get_conn()
     try:
-        with conn:
-            with conn.cursor() as cur:
-                cur.execute("SELECT id FROM tenants WHERE slug=%s", (slug,))
-                row = cur.fetchone()
-                if not row:
-                    raise HTTPException(status_code=404, detail=f"Tenant '{slug}' not found")
-                cur.execute("DELETE FROM tenants WHERE slug=%s", (slug,))
+        with conn, conn.cursor() as cur:
+            cur.execute("SELECT id FROM tenants WHERE slug=%s", (slug,))
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail=f"Tenant '{slug}' not found")
+            cur.execute("DELETE FROM tenants WHERE slug=%s", (slug,))
     finally:
         conn.close()
 
@@ -109,7 +107,7 @@ async def delete_tenant(slug: str, _=Depends(require_admin)):
 
 def _provision_qdrant(tenant_slug: str):
     from qdrant_client import QdrantClient
-    from qdrant_client.models import VectorParams, Distance
+    from qdrant_client.models import Distance, VectorParams
 
     client = QdrantClient(url=QDRANT_URL)
     collection_name = f"tenant_{tenant_slug}"

@@ -4,7 +4,6 @@ import logging
 import os
 import pickle
 from pathlib import Path
-from typing import List, Dict
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +23,7 @@ class BM25Store:
 
     def __init__(self, tenant_slug: str):
         self.tenant_slug = tenant_slug
-        self._data: Dict | None = None
+        self._data: dict | None = None
 
     def _load(self):
         if self._data is not None:
@@ -40,7 +39,7 @@ class BM25Store:
             self._data = pickle.load(f)
         logger.info("BM25 index loaded for tenant '%s': %d docs", self.tenant_slug, len(self._data["texts"]))
 
-    def search(self, query: str, top_k: int = 20) -> List[Dict]:
+    def search(self, query: str, top_k: int = 20) -> list[dict]:
         """Return top_k BM25 hits for query, each with keys: text, score, bm25_rank."""
         import bm25s
 
@@ -56,7 +55,7 @@ class BM25Store:
         results, scores = retriever.retrieve(tokenized_query, k=min(top_k, len(payloads)))
 
         hits = []
-        for idx, score in zip(results[0], scores[0]):
+        for idx, score in zip(results[0], scores[0], strict=False):
             payload = payloads[int(idx)]
             hits.append({
                 **payload,

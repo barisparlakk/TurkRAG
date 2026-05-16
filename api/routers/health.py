@@ -2,7 +2,9 @@
 
 import logging
 import os
+
 from fastapi import APIRouter
+
 from api.schemas import HealthResponse
 
 logger = logging.getLogger(__name__)

@@ -1,12 +1,15 @@
 """Chat endpoints: sync POST and streaming WebSocket."""
 
+import contextlib
 import json
 import logging
 import time
-from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
-from api.auth import get_current_payload, get_tenant_id
+
+from fastapi import APIRouter, Depends, WebSocket
+
+from api.auth import get_tenant_id
 from api.db import get_conn
-from api.schemas import QueryRequest, QueryResponse, CitationSource
+from api.schemas import CitationSource, QueryRequest, QueryResponse
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -31,21 +34,20 @@ def _get_or_create_session(tenant_id: str, session_id, user_id: str = "demo-user
     """Return existing session UUID or create a new one."""
     conn = get_conn()
     try:
-        with conn:
-            with conn.cursor() as cur:
-                if session_id:
-                    cur.execute(
-                        "SELECT id FROM sessions WHERE id=%s AND tenant_id=%s",
-                        (session_id, tenant_id),
-                    )
-                    row = cur.fetchone()
-                    if row:
-                        return str(row[0])
+        with conn, conn.cursor() as cur:
+            if session_id:
                 cur.execute(
-                    "INSERT INTO sessions (tenant_id, user_id) VALUES (%s, %s) RETURNING id",
-                    (tenant_id, user_id),
+                    "SELECT id FROM sessions WHERE id=%s AND tenant_id=%s",
+                    (session_id, tenant_id),
                 )
-                return str(cur.fetchone()[0])
+                row = cur.fetchone()
+                if row:
+                    return str(row[0])
+            cur.execute(
+                "INSERT INTO sessions (tenant_id, user_id) VALUES (%s, %s) RETURNING id",
+                (tenant_id, user_id),
+            )
+            return str(cur.fetchone()[0])
     finally:
         conn.close()
 
@@ -74,16 +76,15 @@ def _save_messages(session_id: str, user_text: str, assistant_text: str, citatio
     """Persist the user question and assistant answer to the messages table."""
     conn = get_conn()
     try:
-        with conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    "INSERT INTO messages (session_id, role, content, citations) VALUES "
-                    "(%s, %s, %s, %s), (%s, %s, %s, %s)",
-                    (
-                        session_id, "user", user_text, json.dumps([]),
-                        session_id, "assistant", assistant_text, json.dumps(citations),
-                    ),
-                )
+        with conn, conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO messages (session_id, role, content, citations) VALUES "
+                "(%s, %s, %s, %s), (%s, %s, %s, %s)",
+                (
+                    session_id, "user", user_text, json.dumps([]),
+                    session_id, "assistant", assistant_text, json.dumps(citations),
+                ),
+            )
     finally:
         conn.close()
 
@@ -93,14 +94,13 @@ def _log_query(tenant_id: str, session_id: str, query: str,
     """Write a query analytics record."""
     conn = get_conn()
     try:
-        with conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    """INSERT INTO query_logs
+        with conn, conn.cursor() as cur:
+            cur.execute(
+                """INSERT INTO query_logs
                        (tenant_id, session_id, query, answer_length, num_citations, query_time_ms)
                        VALUES (%s, %s, %s, %s, %s, %s)""",
-                    (tenant_id, session_id, query, answer_length, num_citations, query_time_ms),
-                )
+                (tenant_id, session_id, query, answer_length, num_citations, query_time_ms),
+            )
     except Exception as exc:
         logger.warning("Failed to write query log: %s", exc)
     finally:
@@ -116,10 +116,10 @@ async def chat(body: QueryRequest, tenant_id: str = Depends(get_tenant_id)):
     session_id = _get_or_create_session(tenant_id, body.session_id)
     history = _load_history(session_id)
 
-    from retrieval.hybrid import HybridRetriever
-    from generation.prompt import build_prompt
-    from generation.llm import generate, is_available
     from generation.citations import extract_citations, strip_think_tags
+    from generation.llm import generate, is_available
+    from generation.prompt import build_prompt
+    from retrieval.hybrid import HybridRetriever
 
     chunks = HybridRetriever().retrieve(body.query, tenant_slug, final_k=body.top_k)
 
@@ -222,7 +222,5 @@ async def chat_stream(websocket: WebSocket):
             result.get("query_time_ms", 0),
         )
 
-    try:
+    with contextlib.suppress(Exception):
         await websocket.close()
-    except Exception:
-        pass

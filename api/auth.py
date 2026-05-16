@@ -1,9 +1,8 @@
 """JWT authentication and tenant extraction for the TurkRAG API."""
 
-import os
 import logging
-from datetime import datetime, timedelta, timezone
-from typing import Optional
+import os
+from datetime import UTC, datetime, timedelta
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -25,14 +24,14 @@ def create_token(tenant_id: str, user_id: str, role: str) -> str:
         "tenant_id": tenant_id,
         "user_id": user_id,
         "role": role,
-        "exp": datetime.now(timezone.utc) + timedelta(hours=JWT_EXPIRY_HOURS),
+        "exp": datetime.now(UTC) + timedelta(hours=JWT_EXPIRY_HOURS),
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
 def decode_token(token: str) -> dict:
     """Decode and verify a JWT. Raises HTTPException on failure."""
-    from jose import jwt, JWTError
+    from jose import JWTError, jwt
 
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
@@ -42,7 +41,7 @@ def decode_token(token: str) -> dict:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Invalid or expired token: {exc}",
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from exc
 
 
 async def get_current_payload(token: str = Depends(oauth2_scheme)) -> dict:

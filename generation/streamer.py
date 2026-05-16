@@ -9,7 +9,7 @@ Frame protocol:
 import json
 import logging
 import time
-from typing import List, Dict, Any, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -19,9 +19,9 @@ async def stream_rag_response(
     query: str,
     tenant_slug: str,
     top_k: int = 5,
-    history: Optional[List[Dict]] = None,
-    session_id: Optional[str] = None,
-) -> Optional[Dict[str, Any]]:
+    history: list[dict] | None = None,
+    session_id: str | None = None,
+) -> dict[str, Any] | None:
     """Run full RAG pipeline and stream tokens over a WebSocket connection.
 
     Sends token frames during generation, then a final 'done' frame with
@@ -31,14 +31,14 @@ async def stream_rag_response(
     completes so the caller can persist messages to the DB.
     Returns None if an error occurred before generation.
     """
-    from retrieval.hybrid import HybridRetriever
-    from generation.prompt import build_prompt
-    from generation.llm import generate_stream, is_available
     from generation.citations import extract_citations
+    from generation.llm import generate_stream, is_available
+    from generation.prompt import build_prompt
+    from retrieval.hybrid import HybridRetriever
 
     t_start = time.monotonic()
 
-    async def send(frame: Dict[str, Any]):
+    async def send(frame: dict[str, Any]):
         await websocket.send_text(json.dumps(frame, ensure_ascii=False))
 
     try:

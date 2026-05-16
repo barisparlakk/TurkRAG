@@ -2,7 +2,6 @@
 
 import logging
 import os
-from typing import List, Dict
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +22,7 @@ class VectorStore:
             self._client = QdrantClient(url=QDRANT_URL)
         return self._client
 
-    def search(self, query_vector: List[float], top_k: int = 20) -> List[Dict]:
+    def search(self, query_vector: list[float], top_k: int = 20) -> list[dict]:
         """Return top_k dense hits, each with keys: text, doc_id, chunk_index, filename, score, dense_rank."""
         client = self._get_client()
 

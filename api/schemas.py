@@ -1,14 +1,14 @@
 """Pydantic request/response models for the TurkRAG API."""
 
-from typing import List, Optional
-from pydantic import BaseModel, Field, field_validator
 import re
+
+from pydantic import BaseModel, Field, field_validator
 
 
 class QueryRequest(BaseModel):
     query: str = Field(..., min_length=1, max_length=2000)
     top_k: int = Field(default=5, ge=1, le=20)
-    session_id: Optional[str] = None  # omit to start a new session
+    session_id: str | None = None  # omit to start a new session
 
 
 class CitationSource(BaseModel):
@@ -19,7 +19,7 @@ class CitationSource(BaseModel):
 
 class QueryResponse(BaseModel):
     answer: str
-    citations: List[CitationSource]
+    citations: list[CitationSource]
     query_time_ms: int
     tenant_id: str
     session_id: str  # always returned so the client can continue the conversation
@@ -34,7 +34,7 @@ class DocumentUploadResponse(BaseModel):
 class DocumentListItem(BaseModel):
     id: str
     filename: str
-    chunk_count: Optional[int]
+    chunk_count: int | None
     status: str
     created_at: str
 

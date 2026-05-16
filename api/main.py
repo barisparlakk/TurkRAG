@@ -8,13 +8,14 @@ import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
+from api.auth import create_token
 from api.middleware import setup_middleware
-from api.routers import chat, documents, health, tenants, analytics
+from api.routers import analytics, chat, documents, health, tenants
 
 logging.basicConfig(
     level=logging.INFO,
@@ -46,9 +47,8 @@ def _init_postgres():
     logger.info("Initialising PostgreSQL schema…")
     try:
         conn = psycopg2.connect(POSTGRES_URL)
-        with conn:
-            with conn.cursor() as cur:
-                cur.execute("""
+        with conn, conn.cursor() as cur:
+            cur.execute("""
                     CREATE TABLE IF NOT EXISTS tenants (
                         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                         name TEXT NOT NULL UNIQUE,
@@ -137,10 +137,6 @@ app.include_router(analytics.router)
 
 
 # Simple token creation endpoint (dev convenience — replace with proper auth in production)
-from fastapi import Request
-from api.auth import create_token
-
-
 @app.post("/auth/token", tags=["auth"])
 async def get_token(request: Request):
     """Issue a JWT for dev/testing. Body: {tenant_id, user_id, role}."""

@@ -6,8 +6,8 @@ so the rest of the API can still serve non-LLM endpoints.
 
 import logging
 import os
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))
 MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "512"))      # RAG answers rarely exceed 512 tokens
 
 _llm_instance = None
-_load_error: Optional[str] = None
+_load_error: str | None = None
 
 
 def _get_llm():

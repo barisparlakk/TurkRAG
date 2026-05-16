@@ -8,7 +8,6 @@ Embeddings are L2-normalised for cosine similarity via inner product.
 import logging
 import os
 from pathlib import Path
-from typing import List, Optional
 
 import numpy as np
 
@@ -43,7 +42,7 @@ def _get_model():
     return _model_instance
 
 
-def embed(texts: List[str], batch_size: int = 32) -> np.ndarray:
+def embed(texts: list[str], batch_size: int = 32) -> np.ndarray:
     """Batch-encode texts into normalised float32 embeddings.
 
     Returns shape (N, D) where D is the embedding dimension (768 for mpnet).
@@ -74,7 +73,6 @@ def embedding_dim() -> int:
 
 
 if __name__ == "__main__":
-    import sys
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 
     test_texts = [

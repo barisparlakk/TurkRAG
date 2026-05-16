@@ -5,7 +5,6 @@ Only called on the top-10 fused candidates to keep latency low.
 """
 
 import logging
-from typing import List
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +24,7 @@ def _get_reranker():
     return _reranker_instance
 
 
-def rerank(query: str, passages: List[str]) -> List[float]:
+def rerank(query: str, passages: list[str]) -> list[float]:
     """Score (query, passage) pairs and return a float relevance score per passage.
 
     Scores are logits (not probabilities) — higher means more relevant.

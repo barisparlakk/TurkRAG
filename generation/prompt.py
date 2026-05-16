@@ -6,7 +6,6 @@ History turns are injected between the system message and the current user
 turn so the model can answer follow-up questions correctly.
 """
 
-from typing import List, Dict, Optional
 
 SYSTEM_PROMPT_TR = """Sen yardımcı bir yapay zeka asistanısın.
 Sadece aşağıdaki bağlam belgelerini kullanarak Türkçe olarak yanıt ver.
@@ -20,8 +19,8 @@ MAX_HISTORY_TURNS = 4
 
 def build_prompt(
     query: str,
-    context_chunks: List[Dict],
-    history: Optional[List[Dict]] = None,
+    context_chunks: list[dict],
+    history: list[dict] | None = None,
 ) -> str:
     """Assemble the full ChatML prompt for Qwen3.
 
