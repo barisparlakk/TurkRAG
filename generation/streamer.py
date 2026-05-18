@@ -109,6 +109,21 @@ async def stream_rag_response(
         })
         logger.info("WS stream complete: %d tokens, %d ms", len(full_response), query_time_ms)
 
+        # Generate follow-up questions in a thread (after done frame — no latency to main answer)
+        try:
+            from generation.followups import generate_followups
+            followup_queue: stdlib_queue.SimpleQueue = stdlib_queue.SimpleQueue()
+
+            def _gen_followups():
+                followup_queue.put(generate_followups(query, response_text))
+
+            threading.Thread(target=_gen_followups, daemon=True).start()
+            follow_ups = await loop.run_in_executor(None, followup_queue.get)
+            if follow_ups:
+                await send({"type": "follow_ups", "questions": follow_ups})
+        except Exception as exc:
+            logger.warning("Could not send follow-up questions: %s", exc)
+
         return {"text": response_text, "citations": citations, "query_time_ms": query_time_ms}
 
     except Exception as exc:

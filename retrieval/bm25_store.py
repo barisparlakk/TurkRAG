@@ -40,8 +40,14 @@ class BM25Store:
         logger.info("BM25 index loaded for tenant '%s': %d docs", self.tenant_slug, len(self._data["texts"]))
 
     def search(self, query: str, top_k: int = 20) -> list[dict]:
-        """Return top_k BM25 hits for query, each with keys: text, score, bm25_rank."""
+        """Return top_k BM25 hits for query, each with keys: text, score, bm25_rank.
+
+        Query is morphologically expanded before tokenization so Turkish
+        inflected variants (çalışanlar/çalış, prosedürler/prosedür) match.
+        """
         import bm25s
+
+        from retrieval.turkish_stemmer import expand_query
 
         self._load()
         if not self._data or not self._data.get("texts"):
@@ -51,7 +57,9 @@ class BM25Store:
         retriever = self._data["retriever"]
         payloads = self._data["payloads"]
 
-        tokenized_query = bm25s.tokenize([query], stopwords=_TURKISH_STOPWORDS)
+        expanded = expand_query(query)
+        logger.debug("BM25 expanded query: '%s' → '%s'", query[:60], expanded[:80])
+        tokenized_query = bm25s.tokenize([expanded], stopwords=_TURKISH_STOPWORDS)
         results, scores = retriever.retrieve(tokenized_query, k=min(top_k, len(payloads)))
 
         hits = []

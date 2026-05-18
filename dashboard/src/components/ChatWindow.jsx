@@ -40,6 +40,12 @@ const IconStop = () => (
     <rect x="4" y="4" width="16" height="16" rx="2"/>
   </svg>
 )
+const IconExport = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+    <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+  </svg>
+)
 const IconThumbUp = () => (
   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/>
@@ -81,7 +87,7 @@ function ActionBtn({ onClick, title, active, children, color }) {
 }
 
 /* ── Single message ────────────────────────────────────────────────────────── */
-function Message({ msg, isLast, onRegenerate, isStreaming }) {
+function Message({ msg, isLast, onRegenerate, isStreaming, onFollowUp }) {
   const isUser = msg.role === 'user'
   const [showSources, setShowSources] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -215,10 +221,44 @@ function Message({ msg, isLast, onRegenerate, isStreaming }) {
           </div>
         )}
 
-        {/* Query time */}
-        {msg.queryTime && (
+        {/* Elapsed / query time */}
+        {!isUser && (msg.streaming || msg.queryTime) && (
           <div style={{ fontSize: '11px', color: 'var(--text-3)', marginTop: '4px' }}>
-            {(msg.queryTime / 1000).toFixed(1)}s
+            {msg.streaming
+              ? <span style={{ opacity: 0.7 }}>⏱ {msg.elapsed ?? 0}s…</span>
+              : `${(msg.queryTime / 1000).toFixed(1)}s`}
+          </div>
+        )}
+
+        {/* Follow-up chips */}
+        {!isUser && isLast && msg.followUps?.length > 0 && !msg.streaming && (
+          <div style={{ marginTop: '10px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+            {msg.followUps.map((q, i) => (
+              <button
+                key={i}
+                onClick={() => onFollowUp?.(q)}
+                className="btn"
+                style={{
+                  fontSize: '12px', padding: '5px 11px',
+                  background: 'var(--accent-muted)',
+                  color: 'var(--accent-hover)',
+                  border: '1px solid rgba(99,102,241,0.2)',
+                  borderRadius: 20, cursor: 'pointer',
+                  transition: 'all 0.15s',
+                  textAlign: 'left', maxWidth: 320,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(99,102,241,0.15)'
+                  e.currentTarget.style.borderColor = 'rgba(99,102,241,0.4)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'var(--accent-muted)'
+                  e.currentTarget.style.borderColor = 'rgba(99,102,241,0.2)'
+                }}
+              >
+                {q}
+              </button>
+            ))}
           </div>
         )}
       </div>
@@ -270,12 +310,26 @@ function EmptyState() {
 export function ChatWindow({ selectedSession, onSessionChange, onNewSession }) {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
+  const [elapsed, setElapsed] = useState(0)
   const { send, abort, tokens, citations, queryTime, sessionId, messageId,
-          isStreaming, error, reset, resetSession } = useStream()
+          followUps, isStreaming, error, reset, resetSession } = useStream()
   const bottomRef = useRef()
   const textareaRef = useRef()
   const streamMsgIdRef = useRef(null)
   const sessionIdRef = useRef(null)
+  const streamStartRef = useRef(null)
+
+  // Elapsed streaming timer
+  useEffect(() => {
+    if (isStreaming) {
+      streamStartRef.current = Date.now()
+      setElapsed(0)
+      const id = setInterval(() => {
+        setElapsed(((Date.now() - streamStartRef.current) / 1000).toFixed(1))
+      }, 100)
+      return () => clearInterval(id)
+    }
+  }, [isStreaming])
 
   // Sync sessionIdRef ← hook state
   useEffect(() => { sessionIdRef.current = sessionId }, [sessionId])
@@ -311,9 +365,11 @@ export function ChatWindow({ selectedSession, onSessionChange, onNewSession }) {
   useEffect(() => {
     if (!streamMsgIdRef.current) return
     setMessages((prev) => prev.map((m) =>
-      m.id === streamMsgIdRef.current ? { ...m, content: tokens || '', streaming: isStreaming } : m
+      m.id === streamMsgIdRef.current
+        ? { ...m, content: tokens || '', streaming: isStreaming, elapsed }
+        : m
     ))
-  }, [tokens, isStreaming])
+  }, [tokens, isStreaming, elapsed])
 
   useEffect(() => {
     if (!isStreaming && streamMsgIdRef.current && citations.length > 0) {
@@ -330,6 +386,14 @@ export function ChatWindow({ selectedSession, onSessionChange, onNewSession }) {
       m.id === streamMsgIdRef.current ? { ...m, message_id: messageId } : m
     ))
   }, [messageId])
+
+  // Attach follow-up questions to the last assistant message
+  useEffect(() => {
+    if (!followUps.length || !streamMsgIdRef.current) return
+    setMessages((prev) => prev.map((m) =>
+      m.id === streamMsgIdRef.current ? { ...m, followUps } : m
+    ))
+  }, [followUps])
 
   useEffect(() => {
     if (error && streamMsgIdRef.current) {
@@ -379,6 +443,31 @@ export function ChatWindow({ selectedSession, onSessionChange, onNewSession }) {
     send(lastUser.content, sessionIdRef.current)
   }, [messages, isStreaming, reset, send])
 
+  const handleExport = useCallback(() => {
+    const lines = messages.map((m) => {
+      const role = m.role === 'user' ? '**Kullanıcı**' : '**Asistan**'
+      const content = stripThink(m.content)
+      const citations = m.citations?.length
+        ? '\n\n*Kaynaklar: ' + m.citations.map((c) => c.filename).join(', ') + '*'
+        : ''
+      const time = m.queryTime ? `\n\n*Yanıt süresi: ${(m.queryTime / 1000).toFixed(1)}s*` : ''
+      return `${role}\n\n${content}${citations}${time}`
+    })
+    const md = `# TurkRAG Sohbet Geçmişi\n\n${lines.join('\n\n---\n\n')}`
+    const blob = new Blob([md], { type: 'text/markdown' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `sohbet-${new Date().toISOString().slice(0, 10)}.md`
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [messages])
+
+  const handleFollowUp = useCallback((q) => {
+    if (isStreaming) return
+    handleSend(q)
+  }, [isStreaming, handleSend])
+
   const handleNewChat = () => {
     if (isStreaming) return
     setMessages([])
@@ -408,18 +497,33 @@ export function ChatWindow({ selectedSession, onSessionChange, onNewSession }) {
           <span style={{ fontSize: '12px', color: 'var(--text-3)' }}>
             {sessionIdRef.current ? `Oturum #${sessionIdRef.current.slice(0, 8)}` : 'Yeni sohbet'}
           </span>
-          <button
-            onClick={handleNewChat} disabled={isStreaming}
-            className="btn"
-            style={{
-              display: 'flex', alignItems: 'center', gap: '5px',
-              fontSize: '12px', padding: '5px 10px', color: 'var(--text-2)',
-              borderRadius: 'var(--radius-md)', border: '1px solid var(--border)',
-              opacity: isStreaming ? 0.4 : 1,
-            }}
-          >
-            <IconNewChat /> Yeni Sohbet
-          </button>
+          <div style={{ display: 'flex', gap: '6px' }}>
+            <button
+              onClick={handleExport} disabled={isStreaming || !messages.length}
+              className="btn"
+              style={{
+                display: 'flex', alignItems: 'center', gap: '5px',
+                fontSize: '12px', padding: '5px 10px', color: 'var(--text-2)',
+                borderRadius: 'var(--radius-md)', border: '1px solid var(--border)',
+                opacity: (isStreaming || !messages.length) ? 0.4 : 1,
+              }}
+              title="Sohbeti Markdown olarak dışa aktar"
+            >
+              <IconExport /> Dışa Aktar
+            </button>
+            <button
+              onClick={handleNewChat} disabled={isStreaming}
+              className="btn"
+              style={{
+                display: 'flex', alignItems: 'center', gap: '5px',
+                fontSize: '12px', padding: '5px 10px', color: 'var(--text-2)',
+                borderRadius: 'var(--radius-md)', border: '1px solid var(--border)',
+                opacity: isStreaming ? 0.4 : 1,
+              }}
+            >
+              <IconNewChat /> Yeni Sohbet
+            </button>
+          </div>
         </div>
       )}
 
@@ -435,6 +539,7 @@ export function ChatWindow({ selectedSession, onSessionChange, onNewSession }) {
             key={msg.id} msg={msg}
             isLast={msg === lastAsstMsg}
             onRegenerate={handleRegenerate}
+            onFollowUp={handleFollowUp}
             isStreaming={isStreaming}
           />
         ))}

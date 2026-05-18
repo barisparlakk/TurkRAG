@@ -6,10 +6,14 @@ so the rest of the API can still serve non-LLM endpoints.
 
 import logging
 import os
+import threading
 from collections.abc import Generator
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
+
+_load_lock = threading.Lock()   # guards singleton init
+_infer_lock = threading.Lock()  # llama.cpp not thread-safe; serialize all calls
 
 # Try both the official naming and unsloth's naming convention
 _default_model = "models/qwen3-8b-instruct-q4_k_m.gguf"
@@ -29,37 +33,41 @@ _load_error: str | None = None
 def _get_llm():
     global _llm_instance, _load_error
 
-    if _llm_instance is not None:
+    if _llm_instance is not None:  # fast path, no lock once loaded
         return _llm_instance
 
-    if _load_error is not None:
-        raise RuntimeError(_load_error)
+    with _load_lock:
+        # Re-check inside lock — another thread may have loaded while we waited
+        if _llm_instance is not None:
+            return _llm_instance
+        if _load_error is not None:
+            raise RuntimeError(_load_error)
 
-    model_path = Path(LLM_MODEL_PATH)
-    if not model_path.exists():
-        _load_error = (
-            f"LLM model file not found at '{model_path}'. "
-            "Download it with:\n"
-            "  pip install huggingface-hub\n"
-            "  huggingface-cli download Qwen/Qwen3-8B-Instruct-GGUF "
-            "qwen3-8b-instruct-q4_k_m.gguf --local-dir ./models"
-        )
-        raise RuntimeError(_load_error)
+        model_path = Path(LLM_MODEL_PATH)
+        if not model_path.exists():
+            _load_error = (
+                f"LLM model file not found at '{model_path}'. "
+                "Download it with:\n"
+                "  pip install huggingface-hub\n"
+                "  huggingface-cli download Qwen/Qwen3-8B-Instruct-GGUF "
+                "qwen3-8b-instruct-q4_k_m.gguf --local-dir ./models"
+            )
+            raise RuntimeError(_load_error)
 
-    try:
-        from llama_cpp import Llama
-        logger.info("Loading LLM from %s (n_ctx=%d, n_gpu_layers=%d)", model_path, N_CTX, N_GPU_LAYERS)
-        _llm_instance = Llama(
-            model_path=str(model_path),
-            n_ctx=N_CTX,
-            n_gpu_layers=N_GPU_LAYERS,
-            n_threads=N_THREADS,
-            verbose=False,
-        )
-        logger.info("LLM loaded successfully.")
-    except Exception as exc:
-        _load_error = f"Failed to load LLM: {exc}"
-        raise RuntimeError(_load_error) from exc
+        try:
+            from llama_cpp import Llama
+            logger.info("Loading LLM from %s (n_ctx=%d, n_gpu_layers=%d)", model_path, N_CTX, N_GPU_LAYERS)
+            _llm_instance = Llama(
+                model_path=str(model_path),
+                n_ctx=N_CTX,
+                n_gpu_layers=N_GPU_LAYERS,
+                n_threads=N_THREADS,
+                verbose=False,
+            )
+            logger.info("LLM loaded successfully.")
+        except Exception as exc:
+            _load_error = f"Failed to load LLM: {exc}"
+            raise RuntimeError(_load_error) from exc
 
     return _llm_instance
 
@@ -75,20 +83,23 @@ def generate_stream(prompt: str, max_tokens: int = MAX_TOKENS) -> Generator[str,
     max_tokens overrides the global default — pass a smaller value (e.g. 60)
     for short-output tasks like contextual chunk enrichment.
     Raises RuntimeError if the model is not available.
+    Thread-safe: serialized via _infer_lock (llama.cpp is not thread-safe).
     """
     llm = _get_llm()
     logger.info("Generating stream (prompt_len=%d, max_tokens=%d)", len(prompt), max_tokens)
 
-    output = llm(
-        prompt,
-        max_tokens=max_tokens,
-        temperature=TEMPERATURE,
-        stream=True,
-        stop=["<|im_end|>", "<|im_start|>", "</s>", "<|endoftext|>"],
-    )
+    with _infer_lock:
+        output = llm(
+            prompt,
+            max_tokens=max_tokens,
+            temperature=TEMPERATURE,
+            stream=True,
+            stop=["<|im_end|>", "<|im_start|>", "</s>", "<|endoftext|>"],
+        )
+        # Consume inside the lock — llama.cpp generator is lazy
+        tokens = [chunk["choices"][0]["text"] for chunk in output]
 
-    for chunk in output:
-        token = chunk["choices"][0]["text"]
+    for token in tokens:
         if token:
             yield token
 

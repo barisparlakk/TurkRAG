@@ -10,13 +10,14 @@ Pipeline:
 """
 
 import logging
+import os
 from concurrent.futures import ThreadPoolExecutor
+
+import numpy as np
 
 from retrieval.bm25_store import BM25Store
 from retrieval.reranker import rerank
 from retrieval.vector_store import VectorStore
-
-import os
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +27,43 @@ RERANK_CANDIDATES = 10
 # ms-marco-MiniLM-L-6-v2 raw logits: relevant ≈ 0–10, irrelevant ≈ negative.
 # -2.0 is conservative — only rejects clearly off-topic queries.
 CONFIDENCE_THRESHOLD = float(os.getenv("RERANK_CONFIDENCE_THRESHOLD", "-2.0"))
+
+# HyDE: embed a hypothetical answer instead of the raw query for dense retrieval.
+# Improves recall for question-style queries. Disabled automatically if LLM unavailable.
+HYDE_ENABLED = os.getenv("HYDE_ENABLED", "true").lower() == "true"
+HYDE_MAX_TOKENS = int(os.getenv("HYDE_MAX_TOKENS", "80"))
+
+
+def _hyde_embed(query: str) -> list[float] | None:
+    """Generate a short hypothetical answer and return its embedding.
+
+    Returns None if LLM is unavailable or generation fails — caller falls back
+    to the raw query embedding.
+    """
+    try:
+        from generation.citations import strip_think_tags
+        from generation.llm import generate, is_available
+        from ingestion.embedder import embed
+
+        if not is_available():
+            return None
+
+        prompt = (
+            "<|im_start|>system\n"
+            "Soruya kısa bir Türkçe paragrafla yanıt ver. "
+            "Bilmiyorsan tahmini bir yanıt yaz.<|im_end|>\n"
+            f"<|im_start|>user\n{query} /no_think<|im_end|>\n"
+            "<|im_start|>assistant\n"
+        )
+        hypo = strip_think_tags(generate(prompt, max_tokens=HYDE_MAX_TOKENS)).strip()
+        if not hypo:
+            return None
+        vec = embed([hypo])[0]
+        logger.debug("HyDE: generated hypothetical answer (%d chars)", len(hypo))
+        return vec.tolist()
+    except Exception as exc:
+        logger.warning("HyDE generation failed: %s — using raw query embedding", exc)
+        return None
 
 
 class HybridRetriever:
@@ -48,8 +86,21 @@ class HybridRetriever:
         logger.info("Hybrid retrieval: query='%s...' tenant=%s top_k=%d final_k=%d",
                     query[:50], tenant_slug, top_k, final_k)
 
-        # Step 1: embed query
-        query_vec = embed([query])[0].tolist()
+        # Step 1: embed query (+ optional HyDE blend)
+        query_vec_raw = embed([query])[0]
+
+        if HYDE_ENABLED:
+            hyde_vec = _hyde_embed(query)
+            if hyde_vec is not None:
+                # Blend: 50% query + 50% hypothetical answer, then re-normalise
+                blended = (query_vec_raw + np.array(hyde_vec)) / 2.0
+                norm = np.linalg.norm(blended)
+                query_vec = (blended / norm if norm > 0 else blended).tolist()
+                logger.debug("HyDE: using blended query+hypothesis embedding")
+            else:
+                query_vec = query_vec_raw.tolist()
+        else:
+            query_vec = query_vec_raw.tolist()
 
         # Step 2 & 3: sparse + dense search — run both in parallel via threads
         with ThreadPoolExecutor(max_workers=2) as pool:
@@ -93,8 +144,8 @@ class HybridRetriever:
             )
             return []
 
-        results = candidates[:final_k]
-        logger.info("Retrieved %d chunks after reranking (top_score=%.2f)", len(results), top_score)
+        results = _mmr(candidates, final_k, lambda_param=0.5)
+        logger.info("Retrieved %d chunks after MMR (top_score=%.2f)", len(results), top_score)
         return results
 
     def _rrf_fusion(self, bm25_hits: list[dict], dense_hits: list[dict]) -> list[dict]:
@@ -126,6 +177,50 @@ class HybridRetriever:
         logger.debug("RRF fusion: %d BM25 + %d dense → %d unique candidates",
                      len(bm25_hits), len(dense_hits), len(fused))
         return fused
+
+
+def _mmr(candidates: list[dict], k: int, lambda_param: float = 0.5) -> list[dict]:
+    """Maximal Marginal Relevance: balance relevance vs. diversity.
+
+    lambda_param=1.0 → pure relevance (same as top-k).
+    lambda_param=0.0 → pure diversity.
+    0.5 is a good default for RAG where duplicate chunks hurt more than help.
+
+    Uses TF-IDF-style token overlap as a cheap similarity proxy — no extra
+    embedding calls needed.
+    """
+    if len(candidates) <= k:
+        return candidates
+
+    def _token_set(text: str) -> set:
+        return set(text.lower().split())
+
+    selected: list[dict] = []
+    remaining = list(candidates)
+
+    while len(selected) < k and remaining:
+        if not selected:
+            # First pick: highest relevance score
+            best = max(remaining, key=lambda c: c.get("rerank_score", 0))
+        else:
+            # MMR score = λ * relevance − (1−λ) * max_similarity_to_selected
+            selected_tokens = [_token_set(s["text"]) for s in selected]
+
+            def _mmr_score(c):
+                rel = c.get("rerank_score", 0)
+                c_tokens = _token_set(c["text"])
+                max_sim = max(
+                    len(c_tokens & s) / max(len(c_tokens | s), 1)
+                    for s in selected_tokens
+                )
+                return lambda_param * rel - (1 - lambda_param) * max_sim
+
+            best = max(remaining, key=_mmr_score)
+
+        selected.append(best)
+        remaining.remove(best)
+
+    return selected
 
 
 if __name__ == "__main__":

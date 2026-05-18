@@ -4,10 +4,11 @@ import { api, getToken } from '../api/client.js'
 /**
  * WebSocket streaming hook for TurkRAG chat.
  * Returns { send, abort, tokens, citations, queryTime, sessionId, messageId,
- *           isStreaming, error, reset, resetSession }
+ *           followUps, isStreaming, error, reset, resetSession }
  *
  * - Pass sessionId to continue an existing conversation.
  * - messageId is set after the server sends the message_id frame (post-save).
+ * - followUps is set after the server sends the follow_ups frame.
  * - abort() cancels an in-flight stream.
  */
 export function useStream() {
@@ -16,6 +17,7 @@ export function useStream() {
   const [queryTime, setQueryTime] = useState(null)
   const [sessionId, setSessionId] = useState(null)
   const [messageId, setMessageId] = useState(null)
+  const [followUps, setFollowUps] = useState([])
   const [isStreaming, setIsStreaming] = useState(false)
   const [error, setError] = useState(null)
   const wsRef = useRef(null)
@@ -29,6 +31,7 @@ export function useStream() {
     setCitations([])
     setQueryTime(null)
     setMessageId(null)
+    setFollowUps([])
     setError(null)
     setIsStreaming(false)
   }, [])
@@ -73,10 +76,13 @@ export function useStream() {
         setQueryTime(frame.query_time_ms ?? null)
         if (frame.session_id) setSessionId(frame.session_id)
         setIsStreaming(false)
-        ws.close()
+        // Don't close yet — follow_ups and message_id frames still coming
+      } else if (frame.type === 'follow_ups') {
+        if (frame.questions?.length) setFollowUps(frame.questions)
+        // Don't close yet — message_id frame still coming
       } else if (frame.type === 'message_id') {
-        // Sent after DB save — used for feedback buttons
         if (frame.message_id) setMessageId(frame.message_id)
+        ws.close() // message_id is last server frame — safe to close
       } else if (frame.type === 'error') {
         setError(frame.message)
         setIsStreaming(false)
@@ -89,5 +95,5 @@ export function useStream() {
   }, [reset])
 
   return { send, abort, tokens, citations, queryTime, sessionId, messageId,
-           isStreaming, error, reset, resetSession }
+           followUps, isStreaming, error, reset, resetSession }
 }

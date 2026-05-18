@@ -41,7 +41,7 @@ async def upload_document(
     try:
         with conn, conn.cursor() as cur:
             cur.execute(
-                "SELECT id FROM documents WHERE tenant_id=%s AND file_hash=%s",
+                "SELECT id FROM documents WHERE tenant_id=%s AND file_hash=%s AND status='ready'",
                 (tenant_id, file_hash),
             )
             if cur.fetchone():

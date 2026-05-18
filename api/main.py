@@ -40,9 +40,16 @@ async def lifespan(app: FastAPI):
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     BM25_INDEX_DIR.mkdir(parents=True, exist_ok=True)
     _init_postgres()
+    # Warm up connection pool
+    from api.db import _get_pool
+    _get_pool()
     logger.info("Startup complete. Ready to serve.")
     yield
     logger.info("TurkRAG API shutting down.")
+    from api.db import _pool
+    if _pool is not None:
+        _pool.closeall()
+        logger.info("DB connection pool closed.")
 
 
 def _init_postgres():
@@ -127,8 +134,25 @@ def _init_postgres():
         conn.close()
 
 
-# Rate limiter (per IP; production should key on tenant_id)
-limiter = Limiter(key_func=get_remote_address)
+def _rate_limit_key(request: Request) -> str:
+    """Key by tenant_id from JWT if present, otherwise fall back to IP.
+
+    This ensures each tenant has its own independent rate bucket.
+    """
+    auth = request.headers.get("Authorization", "")
+    if auth.startswith("Bearer "):
+        try:
+            from api.auth import decode_token
+            claims = decode_token(auth[7:])
+            return f"tenant:{claims['tenant_id']}"
+        except Exception:
+            pass
+    return get_remote_address(request)
+
+
+# Per-tenant rate limiter — 60 requests/minute per tenant (or IP as fallback)
+RATE_LIMIT = os.getenv("RATE_LIMIT", "60/minute")
+limiter = Limiter(key_func=_rate_limit_key, default_limits=[RATE_LIMIT])
 
 app = FastAPI(
     title="TurkRAG API",
