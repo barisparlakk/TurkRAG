@@ -61,6 +61,13 @@ async def upload_document(
     save_path.write_bytes(content)
     logger.info("Saved upload: %s → %s (%d bytes)", file.filename, save_path, len(content))
 
+    # Invalidate semantic cache for this tenant
+    try:
+        from retrieval.semantic_cache import get_cache
+        get_cache().invalidate(tenant_id)
+    except Exception as exc:
+        logger.warning("Cache invalidation failed: %s", exc)
+
     # Trigger background ingestion
     background_tasks.add_task(_ingest_document, document_id, str(save_path), file.filename, tenant_id)
 
@@ -124,6 +131,22 @@ async def delete_document(doc_id: str, tenant_id: str = Depends(get_tenant_id)):
             logger.warning("Could not delete Qdrant vectors for doc %s: %s", doc_id, exc)
 
     logger.info("Deleted document %s from tenant %s", doc_id, tenant_id)
+
+
+@router.get("/jobs/{job_id}")
+async def get_job_status(job_id: str, tenant_id: str = Depends(get_tenant_id)):
+    """Get ingestion job status."""
+    from ingestion.queue import get_job_status as _get_job_status
+    conn = get_conn()
+    try:
+        result = _get_job_status(job_id, conn)
+    finally:
+        conn.close()
+    if not result:
+        raise HTTPException(status_code=404, detail="Job not found")
+    if result["tenant_id"] != tenant_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    return result
 
 
 def _ingest_document(document_id: str, file_path: str, filename: str, tenant_id: str):

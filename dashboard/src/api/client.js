@@ -1,5 +1,12 @@
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
+// Axios-like wrapper for AdminPanel compatibility
+export const apiClient = {
+  get: async (path) => ({ data: await request('GET', path) }),
+  post: async (path, body) => ({ data: await request('POST', path, body) }),
+  delete: async (path) => ({ data: await request('DELETE', path) }),
+}
+
 let _token = localStorage.getItem('turkrag_token') || ''
 
 export function setToken(token) {
@@ -68,6 +75,18 @@ export const api = {
 
   // Health
   health: () => request('GET', '/health'),
+
+  // Export
+  exportSessionTxt: (sessionId) => `${API_BASE}/export/sessions/${sessionId}/txt`,
+  exportSessionJson: (sessionId) => `${API_BASE}/export/sessions/${sessionId}/json`,
+  getAnalyticsReport: () => request('GET', '/export/analytics/report'),
+
+  // Evaluation
+  runEval: () => request('POST', '/eval/run'),
+  getEvalHistory: () => request('GET', '/eval/history'),
+
+  // Jobs
+  getJobStatus: (jobId) => request('GET', `/jobs/${jobId}`),
 
   // WebSocket URL
   wsUrl: () => `${API_BASE.replace(/^http/, 'ws')}/chat/stream`,

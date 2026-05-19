@@ -15,7 +15,7 @@ from slowapi.util import get_remote_address
 
 from api.auth import create_token
 from api.middleware import setup_middleware
-from api.routers import analytics, chat, documents, health, sessions, tenants
+from api.routers import analytics, chat, documents, evaluation, export, health, permissions, sessions, tenants
 
 logging.basicConfig(
     level=logging.INFO,
@@ -43,9 +43,13 @@ async def lifespan(app: FastAPI):
     # Warm up connection pool
     from api.db import _get_pool
     _get_pool()
+    # Start background ingestion worker
+    from ingestion.worker import start_worker, stop_worker
+    start_worker()
     logger.info("Startup complete. Ready to serve.")
     yield
     logger.info("TurkRAG API shutting down.")
+    stop_worker()
     from api.db import _pool
     if _pool is not None:
         _pool.closeall()
@@ -122,10 +126,59 @@ def _init_postgres():
 
                     ALTER TABLE messages ADD COLUMN IF NOT EXISTS feedback SMALLINT DEFAULT NULL;
 
+                    CREATE TABLE IF NOT EXISTS document_permissions (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        document_id UUID NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
+                        user_id TEXT NOT NULL,
+                        permission_level TEXT NOT NULL CHECK (permission_level IN ('viewer', 'editor', 'owner')),
+                        granted_by TEXT,
+                        created_at TIMESTAMPTZ DEFAULT NOW(),
+                        UNIQUE(document_id, user_id)
+                    );
+
+                    CREATE TABLE IF NOT EXISTS eval_runs (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+                        metrics_json JSONB,
+                        num_queries INT,
+                        avg_score NUMERIC(5,4),
+                        created_at TIMESTAMPTZ DEFAULT NOW()
+                    );
+
+                    CREATE TABLE IF NOT EXISTS ingestion_jobs (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+                        document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
+                        filename TEXT NOT NULL,
+                        file_path TEXT,
+                        status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'failed')),
+                        error_message TEXT,
+                        created_at TIMESTAMPTZ DEFAULT NOW(),
+                        started_at TIMESTAMPTZ,
+                        completed_at TIMESTAMPTZ
+                    );
+
+                    CREATE TABLE IF NOT EXISTS document_versions (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        document_id UUID NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
+                        version INT NOT NULL DEFAULT 1,
+                        filename TEXT NOT NULL,
+                        chunk_count INT,
+                        is_current BOOLEAN DEFAULT true,
+                        created_at TIMESTAMPTZ DEFAULT NOW()
+                    );
+
+                    ALTER TABLE documents ADD COLUMN IF NOT EXISTS version INT DEFAULT 1;
+                    ALTER TABLE documents ADD COLUMN IF NOT EXISTS parent_id UUID REFERENCES documents(id);
+
                     CREATE INDEX IF NOT EXISTS idx_sessions_tenant ON sessions(tenant_id);
                     CREATE INDEX IF NOT EXISTS idx_messages_session ON messages(session_id);
                     CREATE INDEX IF NOT EXISTS idx_query_logs_tenant ON query_logs(tenant_id);
                     CREATE INDEX IF NOT EXISTS idx_documents_tenant ON documents(tenant_id);
+                    CREATE INDEX IF NOT EXISTS idx_doc_permissions_user ON document_permissions(user_id);
+                    CREATE INDEX IF NOT EXISTS idx_doc_permissions_doc ON document_permissions(document_id);
+                    CREATE INDEX IF NOT EXISTS idx_ingestion_jobs_status ON ingestion_jobs(status);
+                    CREATE INDEX IF NOT EXISTS idx_eval_runs_tenant ON eval_runs(tenant_id);
                 """)
         logger.info("PostgreSQL schema ready.")
     except Exception as exc:
@@ -173,6 +226,9 @@ app.include_router(chat.router)
 app.include_router(tenants.router)
 app.include_router(analytics.router)
 app.include_router(sessions.router)
+app.include_router(evaluation.router)
+app.include_router(export.router)
+app.include_router(permissions.router)
 
 
 # Simple token creation endpoint (dev convenience — replace with proper auth in production)

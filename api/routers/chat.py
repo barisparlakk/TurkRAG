@@ -119,14 +119,39 @@ def _log_query(tenant_id: str, session_id: str, query: str,
 @router.post("", response_model=QueryResponse)
 async def chat(body: QueryRequest, tenant_id: str = Depends(get_tenant_id)):
     """Synchronous RAG query. Returns full answer with citations."""
+    from guardrails.filters import detect_prompt_injection, filter_pii
+    from fastapi import HTTPException
+
+    if detect_prompt_injection(body.query):
+        raise HTTPException(status_code=400, detail="Potansiyel prompt injection tespit edildi.")
+
     t_start = time.monotonic()
 
     tenant_slug = _get_tenant_slug(tenant_id)
     session_id = _get_or_create_session(tenant_id, body.session_id)
     history = _load_history(session_id)
 
+    # Check semantic cache first
+    from retrieval.semantic_cache import get_cache
+    cache = get_cache()
+    cache_hit = cache.get(body.query, tenant_id)
+    if cache_hit:
+        query_time_ms = int((time.monotonic() - t_start) * 1000)
+        citations = [CitationSource(**c) for c in cache_hit.citations]
+        message_id = _save_messages(session_id, body.query, cache_hit.answer, cache_hit.citations)
+        _log_query(tenant_id, session_id, body.query, len(cache_hit.answer), len(citations), query_time_ms)
+        return QueryResponse(
+            answer=cache_hit.answer,
+            citations=citations,
+            query_time_ms=query_time_ms,
+            tenant_id=tenant_id,
+            session_id=session_id,
+            message_id=message_id,
+        )
+
     from generation.citations import extract_citations, strip_think_tags
     from generation.llm import generate, is_available
+    from generation.memory import build_context_with_memory
     from generation.prompt import build_prompt
     from retrieval.hybrid import HybridRetriever
 
@@ -150,10 +175,15 @@ async def chat(body: QueryRequest, tenant_id: str = Depends(get_tenant_id)):
             session_id=session_id,
         )
 
-    prompt = build_prompt(body.query, chunks, history=history)
+    compressed_history = build_context_with_memory(history)
+    prompt = build_prompt(body.query, chunks, history=compressed_history)
     answer = strip_think_tags(generate(prompt))
+    answer = filter_pii(answer)
     raw_citations = extract_citations(answer, chunks)
     citations = [CitationSource(**c) for c in raw_citations]
+
+    # Cache the result
+    cache.put(body.query, answer, raw_citations, tenant_id)
 
     query_time_ms = int((time.monotonic() - t_start) * 1000)
     logger.info("Chat query answered in %d ms for tenant %s", query_time_ms, tenant_id)

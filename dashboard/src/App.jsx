@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { ChatWindow } from './components/ChatWindow.jsx'
 import { DocumentUpload } from './components/DocumentUpload.jsx'
 import { AnalyticsDashboard } from './components/AnalyticsDashboard.jsx'
+import AdminPanel from './components/AdminPanel.jsx'
 import { api, setToken } from './api/client.js'
 
 const IconChat = () => (
@@ -299,6 +300,7 @@ export default function App() {
           <NavItem icon={<IconChat />} label="Sohbet" active={tab === 'chat'} onClick={() => setTab('chat')} />
           <NavItem icon={<IconDocs />} label="Belgeler" active={tab === 'documents'} onClick={() => setTab('documents')} />
           <NavItem icon={<IconAnalytics />} label="Analitik" active={tab === 'analytics'} onClick={() => setTab('analytics')} />
+          <NavItem icon={<IconDocs />} label="Yönetim" active={tab === 'admin'} onClick={() => setTab('admin')} />
         </nav>
 
         {/* Session history — only visible on chat tab */}
@@ -354,10 +356,10 @@ export default function App() {
           padding: '0 24px', gap: '12px',
         }}>
           <h2 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-1)' }}>
-            {{ chat: 'Sohbet', documents: 'Belge Yönetimi', analytics: 'Analitik' }[tab]}
+            {{ chat: 'Sohbet', documents: 'Belge Yönetimi', analytics: 'Analitik', admin: 'Yönetim Paneli' }[tab]}
           </h2>
           <div style={{ marginLeft: 'auto', fontSize: '12px', color: 'var(--text-3)' }}>
-            {{ chat: 'Belgelerinize akıllı sorular sorun', documents: 'Belgelerinizi yükleyin ve yönetin', analytics: 'Sorgu istatistikleri ve kullanım özeti' }[tab]}
+            {{ chat: 'Belgelerinize akıllı sorular sorun', documents: 'Belgelerinizi yükleyin ve yönetin', analytics: 'Sorgu istatistikleri ve kullanım özeti', admin: 'Sistem yönetimi ve kiracı ayarları' }[tab]}
           </div>
         </header>
 
@@ -378,6 +380,11 @@ export default function App() {
           <div style={{ display: tab === 'analytics' ? 'flex' : 'none', flex: 1, overflowY: 'auto', flexDirection: 'column' }}>
             <div style={{ padding: '24px', maxWidth: 900, width: '100%', margin: '0 auto' }}>
               <AnalyticsDashboard />
+            </div>
+          </div>
+          <div style={{ display: tab === 'admin' ? 'flex' : 'none', flex: 1, overflowY: 'auto', flexDirection: 'column' }}>
+            <div style={{ padding: '24px', maxWidth: 900, width: '100%', margin: '0 auto' }}>
+              <AdminPanel />
             </div>
           </div>
         </div>
