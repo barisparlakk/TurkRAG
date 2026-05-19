@@ -1,132 +1,381 @@
-import { useState, useEffect } from 'react';
-import { apiClient } from '../api/client';
+import React, { useState, useEffect, useCallback } from 'react'
+import { api } from '../api/client.js'
 
-export default function AdminPanel() {
-  const [tenants, setTenants] = useState([]);
-  const [documents, setDocuments] = useState([]);
-  const [health, setHealth] = useState(null);
-  const [newTenant, setNewTenant] = useState({ name: '', slug: '' });
-  const [loading, setLoading] = useState(true);
+/* ── Icons ─────────────────────────────────────────────────────────────────── */
+const IconCheck = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+)
+const IconX = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+)
+const IconRefresh = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.25"/>
+  </svg>
+)
+
+/* ── Section title ──────────────────────────────────────────────────────────── */
+function SectionTitle({ children }) {
+  return (
+    <div style={{
+      fontSize: '11px', fontWeight: 700, color: 'var(--text-3)',
+      letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '12px',
+    }}>
+      {children}
+    </div>
+  )
+}
+
+/* ── Status pill ────────────────────────────────────────────────────────────── */
+function StatusPill({ ok, label }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: '6px',
+      background: ok ? 'var(--success-muted)' : 'var(--error-muted)',
+      border: `1px solid ${ok ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}`,
+      color: ok ? 'var(--success)' : 'var(--error)',
+      borderRadius: 20, padding: '4px 10px', fontSize: '12px', fontWeight: 600,
+    }}>
+      {ok ? <IconCheck /> : <IconX />}
+      {label}
+    </div>
+  )
+}
+
+/* ── Health section ─────────────────────────────────────────────────────────── */
+function HealthSection({ health }) {
+  if (!health) return null
+  return (
+    <div style={{
+      background: 'var(--surface-1)', border: '1px solid var(--border)',
+      borderRadius: 'var(--radius-lg)', padding: '20px 22px',
+    }}>
+      <SectionTitle>Sistem Durumu</SectionTitle>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+        <StatusPill ok={health.status === 'ok'} label="API" />
+        <StatusPill ok={health.qdrant === 'ok'} label="Qdrant" />
+        <StatusPill ok={health.postgres === 'ok'} label="PostgreSQL" />
+        <StatusPill ok={health.llm_available} label="LLM" />
+      </div>
+      {health.version && (
+        <div style={{ fontSize: '11px', color: 'var(--text-3)', marginTop: '10px' }}>
+          v{health.version}
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ── Tenant create section ──────────────────────────────────────────────────── */
+function TenantSection({ onCreated }) {
+  const [name, setName] = useState('')
+  const [slug, setSlug] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [success, setSuccess] = useState(null)
+  const [tenants, setTenants] = useState([])
 
   useEffect(() => {
-    loadData();
-  }, []);
+    api.listTenants().then(setTenants).catch(() => {})
+  }, [success])
 
-  async function loadData() {
-    setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!name.trim() || !slug.trim()) return
+    setLoading(true); setError(null); setSuccess(null)
     try {
-      const [healthRes, docsRes] = await Promise.all([
-        apiClient.get('/health'),
-        apiClient.get('/documents'),
-      ]);
-      setHealth(healthRes.data);
-      setDocuments(docsRes.data);
+      await api.createTenant(name.trim(), slug.trim().toLowerCase())
+      setSuccess(`"${slug}" kiracısı oluşturuldu`)
+      setName(''); setSlug('')
+      onCreated?.()
     } catch (err) {
-      console.error('Failed to load admin data:', err);
-    }
-    setLoading(false);
-  }
-
-  async function createTenant(e) {
-    e.preventDefault();
-    try {
-      await apiClient.post('/tenants', newTenant);
-      setNewTenant({ name: '', slug: '' });
-      loadData();
-    } catch (err) {
-      alert(err.response?.data?.detail || 'Failed to create tenant');
+      setError(err.message)
+    } finally {
+      setLoading(false)
     }
   }
 
-  if (loading) return <div className="p-4">Yükleniyor...</div>;
+  // Auto-generate slug from name
+  const handleNameChange = (val) => {
+    setName(val)
+    setSlug(val.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''))
+  }
 
   return (
-    <div className="p-4 space-y-6">
-      <h2 className="text-xl font-bold">Yönetim Paneli</h2>
+    <div style={{
+      background: 'var(--surface-1)', border: '1px solid var(--border)',
+      borderRadius: 'var(--radius-lg)', padding: '20px 22px',
+    }}>
+      <SectionTitle>Kiracı Yönetimi</SectionTitle>
 
-      {/* System Health */}
-      <section className="border rounded p-4">
-        <h3 className="font-semibold mb-2">Sistem Durumu</h3>
-        {health && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-            <div className={`p-2 rounded ${health.status === 'healthy' ? 'bg-green-100' : 'bg-red-100'}`}>
-              API: {health.status}
+      {/* Tenant list */}
+      {tenants.length > 0 && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
+          {tenants.map((t) => (
+            <div key={t.id} style={{
+              background: 'var(--surface-2)', border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-md)', padding: '6px 12px',
+              fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '2px',
+            }}>
+              <span style={{ fontWeight: 600, color: 'var(--text-1)' }}>{t.name}</span>
+              <span style={{ color: 'var(--text-3)', fontFamily: 'monospace' }}>{t.slug}</span>
             </div>
-            <div className={`p-2 rounded ${health.qdrant === 'connected' ? 'bg-green-100' : 'bg-red-100'}`}>
-              Qdrant: {health.qdrant}
-            </div>
-            <div className={`p-2 rounded ${health.postgres === 'connected' ? 'bg-green-100' : 'bg-red-100'}`}>
-              PostgreSQL: {health.postgres}
-            </div>
-            <div className={`p-2 rounded ${health.llm_available ? 'bg-green-100' : 'bg-yellow-100'}`}>
-              LLM: {health.llm_available ? 'Hazır' : 'Yok'}
-            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Create form */}
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <input
+            type="text"
+            placeholder="Kiracı adı"
+            value={name}
+            onChange={(e) => handleNameChange(e.target.value)}
+            className="input-field"
+            style={{ flex: '1 1 160px' }}
+            required
+          />
+          <input
+            type="text"
+            placeholder="slug (otomatik)"
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
+            className="input-field"
+            style={{ flex: '1 1 140px', fontFamily: 'monospace', fontSize: '13px' }}
+            required
+          />
+          <button
+            type="submit"
+            disabled={loading || !name.trim() || !slug.trim()}
+            className="btn btn-primary"
+            style={{ padding: '8px 16px', fontSize: '13px', flexShrink: 0 }}
+          >
+            {loading ? '…' : '+ Oluştur'}
+          </button>
+        </div>
+
+        {error && (
+          <div style={{
+            background: 'var(--error-muted)', border: '1px solid rgba(239,68,68,0.2)',
+            color: 'var(--error)', fontSize: '12px',
+            borderRadius: 'var(--radius-md)', padding: '8px 12px',
+          }}>
+            {error}
           </div>
         )}
-      </section>
-
-      {/* Create Tenant */}
-      <section className="border rounded p-4">
-        <h3 className="font-semibold mb-2">Yeni Kiracı Oluştur</h3>
-        <form onSubmit={createTenant} className="flex gap-2">
-          <input
-            type="text"
-            placeholder="İsim"
-            value={newTenant.name}
-            onChange={(e) => setNewTenant({ ...newTenant, name: e.target.value })}
-            className="border px-2 py-1 rounded text-sm"
-            required
-          />
-          <input
-            type="text"
-            placeholder="slug (küçük harf)"
-            value={newTenant.slug}
-            onChange={(e) => setNewTenant({ ...newTenant, slug: e.target.value })}
-            className="border px-2 py-1 rounded text-sm"
-            required
-          />
-          <button type="submit" className="bg-blue-500 text-white px-3 py-1 rounded text-sm">
-            Oluştur
-          </button>
-        </form>
-      </section>
-
-      {/* Document Status */}
-      <section className="border rounded p-4">
-        <h3 className="font-semibold mb-2">Belgeler ({documents.length})</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b">
-                <th className="text-left p-1">Dosya</th>
-                <th className="text-left p-1">Durum</th>
-                <th className="text-left p-1">Parça</th>
-                <th className="text-left p-1">Tarih</th>
-              </tr>
-            </thead>
-            <tbody>
-              {documents.map((doc) => (
-                <tr key={doc.id} className="border-b">
-                  <td className="p-1">{doc.filename}</td>
-                  <td className="p-1">
-                    <span className={`px-1 rounded text-xs ${
-                      doc.status === 'ready' ? 'bg-green-100' :
-                      doc.status === 'processing' ? 'bg-yellow-100' : 'bg-red-100'
-                    }`}>
-                      {doc.status}
-                    </span>
-                  </td>
-                  <td className="p-1">{doc.chunk_count ?? '-'}</td>
-                  <td className="p-1">{new Date(doc.created_at).toLocaleDateString('tr-TR')}</td>
-                </tr>
-              ))}
-              {documents.length === 0 && (
-                <tr><td colSpan={4} className="p-2 text-center text-gray-500">Belge yok</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
+        {success && (
+          <div style={{
+            background: 'var(--success-muted)', border: '1px solid rgba(16,185,129,0.2)',
+            color: 'var(--success)', fontSize: '12px',
+            borderRadius: 'var(--radius-md)', padding: '8px 12px',
+          }}>
+            ✓ {success}
+          </div>
+        )}
+      </form>
     </div>
-  );
+  )
+}
+
+/* ── Documents section ──────────────────────────────────────────────────────── */
+function DocumentsSection() {
+  const [docs, setDocs] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    try { setDocs(await api.listDocuments()) } catch { }
+    setLoading(false)
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  const statusBadge = (status) => {
+    if (status === 'ready') return { label: 'Hazır', color: 'var(--success)', bg: 'var(--success-muted)' }
+    if (status === 'error') return { label: 'Hata', color: 'var(--error)', bg: 'var(--error-muted)' }
+    return { label: 'İşleniyor', color: 'var(--warning)', bg: 'var(--warning-muted)' }
+  }
+
+  return (
+    <div style={{
+      background: 'var(--surface-1)', border: '1px solid var(--border)',
+      borderRadius: 'var(--radius-lg)', overflow: 'hidden',
+    }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '16px 20px', borderBottom: '1px solid var(--border)',
+        background: 'var(--surface-2)',
+      }}>
+        <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+          Tüm Belgeler ({docs.length})
+        </div>
+        <button onClick={load} disabled={loading} className="btn" style={{
+          fontSize: '11px', padding: '4px 10px', border: '1px solid var(--border)',
+          borderRadius: 'var(--radius-md)', color: 'var(--text-2)',
+          display: 'flex', alignItems: 'center', gap: '5px',
+          opacity: loading ? 0.5 : 1,
+        }}>
+          <IconRefresh /> Yenile
+        </button>
+      </div>
+
+      {loading ? (
+        <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-3)', fontSize: '13px' }}>
+          Yükleniyor…
+        </div>
+      ) : docs.length === 0 ? (
+        <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-3)', fontSize: '13px' }}>
+          Belge yok
+        </div>
+      ) : (
+        <>
+          {/* Table header */}
+          <div style={{
+            display: 'grid', gridTemplateColumns: '1fr 80px 60px 100px',
+            padding: '8px 20px', borderBottom: '1px solid var(--border)',
+            fontSize: '11px', fontWeight: 700, color: 'var(--text-3)',
+            letterSpacing: '0.06em', textTransform: 'uppercase',
+          }}>
+            <div>Dosya</div>
+            <div style={{ textAlign: 'center' }}>Durum</div>
+            <div style={{ textAlign: 'right' }}>Parça</div>
+            <div style={{ textAlign: 'right' }}>Tarih</div>
+          </div>
+
+          {docs.map((doc, i) => {
+            const badge = statusBadge(doc.status)
+            return (
+              <div key={doc.id} style={{
+                display: 'grid', gridTemplateColumns: '1fr 80px 60px 100px',
+                padding: '10px 20px', alignItems: 'center',
+                borderBottom: i < docs.length - 1 ? '1px solid var(--border)' : 'none',
+                fontSize: '13px',
+              }}>
+                <div style={{
+                  color: 'var(--text-1)', overflow: 'hidden',
+                  textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: 12,
+                }}>
+                  {doc.filename}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <span style={{
+                    fontSize: '11px', fontWeight: 600,
+                    background: badge.bg, color: badge.color,
+                    borderRadius: 20, padding: '2px 8px',
+                  }}>
+                    {badge.label}
+                  </span>
+                </div>
+                <div style={{ textAlign: 'right', color: 'var(--text-2)' }}>
+                  {doc.chunk_count ?? '—'}
+                </div>
+                <div style={{ textAlign: 'right', color: 'var(--text-3)', fontSize: '11px' }}>
+                  {new Date(doc.created_at).toLocaleDateString('tr-TR', { month: 'short', day: 'numeric' })}
+                </div>
+              </div>
+            )
+          })}
+        </>
+      )}
+    </div>
+  )
+}
+
+/* ── RAG Config section ─────────────────────────────────────────────────────── */
+function ConfigSection() {
+  const configs = [
+    { label: 'HyDE', desc: 'Hypothetical Document Embedding', env: 'HYDE_ENABLED', default: 'true' },
+    { label: 'Güven Eşiği', desc: 'Rerank confidence threshold', env: 'RERANK_CONFIDENCE_THRESHOLD', default: '-2.0' },
+    { label: 'Maks Token', desc: 'LLM max output tokens', env: 'LLM_MAX_TOKENS', default: '512' },
+    { label: 'İş Parçacığı', desc: 'LLM CPU threads', env: 'LLM_N_THREADS', default: '8' },
+    { label: 'Hız Limiti', desc: 'Per-tenant rate limit', env: 'RATE_LIMIT', default: '60/minute' },
+  ]
+
+  return (
+    <div style={{
+      background: 'var(--surface-1)', border: '1px solid var(--border)',
+      borderRadius: 'var(--radius-lg)', padding: '20px 22px',
+    }}>
+      <SectionTitle>RAG Konfigürasyonu</SectionTitle>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+        {configs.map((c, i) => (
+          <div key={c.env} style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '10px 0',
+            borderBottom: i < configs.length - 1 ? '1px solid var(--border)' : 'none',
+          }}>
+            <div>
+              <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-1)' }}>{c.label}</div>
+              <div style={{ fontSize: '11px', color: 'var(--text-3)', marginTop: 2 }}>{c.desc}</div>
+            </div>
+            <div style={{
+              fontFamily: 'monospace', fontSize: '12px',
+              background: 'var(--surface-2)', border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-sm)', padding: '3px 8px', color: 'var(--accent-hover)',
+            }}>
+              {c.default}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ fontSize: '11px', color: 'var(--text-3)', marginTop: '12px' }}>
+        Değerleri değiştirmek için <code style={{ fontFamily: 'monospace', color: 'var(--accent-hover)' }}>.env</code> dosyasını düzenleyin ve API'yi yeniden başlatın.
+      </div>
+    </div>
+  )
+}
+
+/* ── Main ───────────────────────────────────────────────────────────────────── */
+export default function AdminPanel() {
+  const [health, setHealth] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [refreshKey, setRefreshKey] = useState(0)
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    try { setHealth(await api.health()) } catch { }
+    setLoading(false)
+  }, [])
+
+  useEffect(() => { load() }, [load, refreshKey])
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      {/* Page header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-1)', marginBottom: '4px' }}>
+            Yönetim Paneli
+          </h2>
+          <p style={{ fontSize: '13px', color: 'var(--text-2)' }}>
+            Sistem durumu, kiracı yönetimi ve konfigürasyon
+          </p>
+        </div>
+        <button
+          onClick={() => { load(); setRefreshKey((n) => n + 1) }}
+          disabled={loading}
+          className="btn"
+          style={{
+            fontSize: '12px', padding: '6px 14px',
+            border: '1px solid var(--border)', borderRadius: 'var(--radius-md)',
+            color: 'var(--text-2)', opacity: loading ? 0.5 : 1,
+            display: 'flex', alignItems: 'center', gap: '6px',
+          }}
+        >
+          <IconRefresh /> {loading ? 'Yükleniyor…' : 'Yenile'}
+        </button>
+      </div>
+
+      <HealthSection health={health} />
+      <TenantSection onCreated={() => setRefreshKey((n) => n + 1)} />
+      <DocumentsSection key={refreshKey} />
+      <ConfigSection />
+    </div>
+  )
 }

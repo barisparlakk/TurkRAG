@@ -30,6 +30,13 @@ const IconAnalytics = () => (
   </svg>
 )
 
+const IconAdmin = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+    <path d="M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/>
+  </svg>
+)
 const IconLogout = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -300,7 +307,7 @@ export default function App() {
           <NavItem icon={<IconChat />} label="Sohbet" active={tab === 'chat'} onClick={() => setTab('chat')} />
           <NavItem icon={<IconDocs />} label="Belgeler" active={tab === 'documents'} onClick={() => setTab('documents')} />
           <NavItem icon={<IconAnalytics />} label="Analitik" active={tab === 'analytics'} onClick={() => setTab('analytics')} />
-          <NavItem icon={<IconDocs />} label="Yönetim" active={tab === 'admin'} onClick={() => setTab('admin')} />
+          <NavItem icon={<IconAdmin />} label="Yönetim" active={tab === 'admin'} onClick={() => setTab('admin')} />
         </nav>
 
         {/* Session history — only visible on chat tab */}
