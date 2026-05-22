@@ -3,95 +3,11 @@ import { ChatWindow } from './components/ChatWindow.jsx'
 import { DocumentUpload } from './components/DocumentUpload.jsx'
 import { AnalyticsDashboard } from './components/AnalyticsDashboard.jsx'
 import AdminPanel from './components/AdminPanel.jsx'
+import { Header } from './components/Header.jsx'
+import { Sidebar } from './components/Sidebar.jsx'
+import { SourcesPanel } from './components/SourcesPanel.jsx'
+import { ToastProvider } from './components/Toast.jsx'
 import { api, setToken } from './api/client.js'
-
-const IconChat = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-  </svg>
-)
-
-const IconDocs = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-    <polyline points="14 2 14 8 20 8"/>
-    <line x1="16" y1="13" x2="8" y2="13"/>
-    <line x1="16" y1="17" x2="8" y2="17"/>
-    <polyline points="10 9 9 9 8 9"/>
-  </svg>
-)
-
-const IconAnalytics = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="18" y1="20" x2="18" y2="10"/>
-    <line x1="12" y1="20" x2="12" y2="4"/>
-    <line x1="6" y1="20" x2="6" y2="14"/>
-    <line x1="2" y1="20" x2="22" y2="20"/>
-  </svg>
-)
-
-const IconAdmin = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="3"/>
-    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
-    <path d="M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/>
-  </svg>
-)
-const IconLogout = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-    <polyline points="16 17 21 12 16 7"/>
-    <line x1="21" y1="12" x2="9" y2="12"/>
-  </svg>
-)
-
-/* ── Logo ──────────────────────────────────────────────── */
-function Logo() {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '24px 20px 20px' }}>
-      <div style={{
-        width: 34, height: 34, borderRadius: 10,
-        background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: '0 0 16px rgba(99,102,241,0.4)',
-        flexShrink: 0,
-      }}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
-      </div>
-      <div>
-        <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-1)', letterSpacing: '-0.01em' }}>TurkRAG</div>
-        <div style={{ fontSize: '10px', color: 'var(--text-3)', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Belge Asistanı</div>
-      </div>
-    </div>
-  )
-}
-
-/* ── Nav item ──────────────────────────────────────────── */
-function NavItem({ icon, label, active, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      className="btn"
-      style={{
-        width: '100%', justifyContent: 'flex-start',
-        padding: '9px 14px', gap: '10px',
-        borderRadius: 'var(--radius-md)',
-        background: active ? 'var(--accent-muted)' : 'transparent',
-        color: active ? 'var(--accent-hover)' : 'var(--text-2)',
-        fontSize: '13.5px', fontWeight: active ? 600 : 400,
-        borderLeft: active ? '2px solid var(--accent)' : '2px solid transparent',
-        transition: 'all 0.15s',
-      }}
-      onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = 'var(--surface-3)' }}
-      onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent' }}
-    >
-      {icon}
-      {label}
-    </button>
-  )
-}
 
 /* ── Login ─────────────────────────────────────────────── */
 function LoginPage({ onLogin }) {
@@ -113,7 +29,7 @@ function LoginPage({ onLogin }) {
       const tenant = await api.getTenantBySlug(slug)
       const data = await api.getToken(tenant.id, 'demo-user', 'member')
       setToken(data.access_token)
-      onLogin({ slug, id: tenant.id })
+      onLogin({ slug, id: tenant.id, name: tenant.name || tenant.slug })
     } catch (err) {
       setLoginError(`Giriş başarısız: ${err.message}`)
     } finally {
@@ -125,37 +41,25 @@ function LoginPage({ onLogin }) {
     <div style={{
       minHeight: '100vh',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(99,102,241,0.18) 0%, var(--bg) 70%)',
+      background: 'var(--bg)',
       padding: '24px',
     }}>
-      {/* Subtle grid pattern */}
-      <div style={{
-        position: 'fixed', inset: 0, opacity: 0.03, pointerEvents: 'none',
-        backgroundImage: 'linear-gradient(var(--text-1) 1px, transparent 1px), linear-gradient(90deg, var(--text-1) 1px, transparent 1px)',
-        backgroundSize: '40px 40px',
-      }} />
-
       <div className="fade-up" style={{
         width: '100%', maxWidth: '400px',
-        background: 'var(--surface-1)',
+        background: 'var(--glass-bg)',
+        backdropFilter: 'var(--glass-blur)',
+        WebkitBackdropFilter: 'var(--glass-blur)',
         border: '1px solid var(--border)',
         borderRadius: 'var(--radius-xl)',
         padding: '40px 36px',
-        boxShadow: '0 0 0 1px var(--border-soft), var(--shadow-lg)',
+        boxShadow: 'var(--shadow-xl)',
         position: 'relative', zIndex: 1,
       }}>
-        {/* Header */}
+        {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{
-            width: 56, height: 56, margin: '0 auto 16px',
-            borderRadius: 16,
-            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 0 32px rgba(99,102,241,0.35)',
-          }}>
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
+          <div style={{ width: 80, height: 80, margin: '0 auto 16px' }}>
+            <img src="/logo-light.png" className="logo-light" style={{ width: 80, height: 80, objectFit: 'contain' }} alt="TurkRAG" />
+            <img src="/logo-dark.png"  className="logo-dark"  style={{ width: 80, height: 80, objectFit: 'contain' }} alt="TurkRAG" />
           </div>
           <h1 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--text-1)', letterSpacing: '-0.02em' }}>
             TurkRAG
@@ -166,7 +70,11 @@ function LoginPage({ onLogin }) {
         </div>
 
         <form onSubmit={handleLogin}>
-          <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-2)', letterSpacing: '0.04em', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+          <label style={{
+            fontSize: '12px', fontWeight: 600, color: 'var(--text-2)',
+            letterSpacing: '0.04em', textTransform: 'uppercase',
+            display: 'block', marginBottom: '8px',
+          }}>
             Çalışma Alanı
           </label>
           {tenants.length > 0 ? (
@@ -210,7 +118,11 @@ function LoginPage({ onLogin }) {
             style={{ width: '100%', padding: '12px', fontSize: '14px', borderRadius: 'var(--radius-md)' }}
           >
             {loading ? (
-              <span style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.7s linear infinite' }} />
+              <span style={{
+                width: 16, height: 16, border: '2px solid rgba(255,255,255,0.3)',
+                borderTopColor: '#fff', borderRadius: '50%', display: 'inline-block',
+                animation: 'spin 0.7s linear infinite',
+              }} />
             ) : 'Giriş Yap →'}
           </button>
         </form>
@@ -223,179 +135,168 @@ function LoginPage({ onLogin }) {
   )
 }
 
-/* ── Session history panel (shown inside sidebar when on chat tab) ─────────── */
-function SessionHistory({ selectedId, onSelect, refreshTrigger }) {
-  const [sessions, setSessions] = useState([])
-
-  useEffect(() => {
-    api.listSessions(20)
-      .then(setSessions)
-      .catch(() => {})
-  }, [refreshTrigger])
-
-  if (!sessions.length) return null
-
-  return (
-    <div style={{ padding: '0 10px', marginTop: '4px' }}>
-      <div style={{
-        fontSize: '10px', fontWeight: 600, color: 'var(--text-3)',
-        letterSpacing: '0.08em', textTransform: 'uppercase', padding: '4px 6px 6px',
-      }}>
-        Geçmiş Sohbetler
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', maxHeight: 220, overflowY: 'auto' }}>
-        {sessions.map((s) => (
-          <button
-            key={s.id}
-            onClick={() => onSelect(s.id)}
-            className="btn"
-            style={{
-              width: '100%', justifyContent: 'flex-start', textAlign: 'left',
-              padding: '7px 10px', borderRadius: 'var(--radius-md)',
-              background: selectedId === s.id ? 'var(--accent-muted)' : 'transparent',
-              color: selectedId === s.id ? 'var(--accent-hover)' : 'var(--text-2)',
-              fontSize: '12px', fontWeight: selectedId === s.id ? 600 : 400,
-              borderLeft: `2px solid ${selectedId === s.id ? 'var(--accent)' : 'transparent'}`,
-              overflow: 'hidden',
-            }}
-            onMouseEnter={(e) => { if (selectedId !== s.id) e.currentTarget.style.background = 'var(--surface-3)' }}
-            onMouseLeave={(e) => { if (selectedId !== s.id) e.currentTarget.style.background = 'transparent' }}
-          >
-            <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {s.preview}
-            </div>
-            <div style={{ fontSize: '10px', color: 'var(--text-3)', marginTop: '1px' }}>
-              {new Date(s.created_at).toLocaleDateString('tr-TR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-            </div>
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-/* ── Main app layout ───────────────────────────────────── */
+/* ── Main app ──────────────────────────────────────────── */
 export default function App() {
-  const [tenant, setTenant] = useState(null)
+  const [tenant, setTenant] = useState(() => {
+    try {
+      const saved = localStorage.getItem('turkrag_tenant')
+      return saved ? JSON.parse(saved) : null
+    } catch { return null }
+  })
+  const [tenants, setTenants] = useState([])
   const [tab, setTab] = useState('chat')
   const [selectedSession, setSelectedSession] = useState(null)
   const [sessionRefresh, setSessionRefresh] = useState(0)
+  const [sessions, setSessions] = useState([])
+  const [citations, setCitations] = useState([])
+  const [attribution, setAttribution] = useState(null)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [theme, setTheme] = useState(() => localStorage.getItem('turkrag_theme') || 'light')
+
+  /* Apply theme to <html> */
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('turkrag_theme', theme)
+  }, [theme])
+
+  /* Validate restored session — if token expired, force re-login */
+  useEffect(() => {
+    if (!tenant) return
+    api.listSessions(1).catch(() => {
+      setToken('')
+      setTenant(null)
+      localStorage.removeItem('turkrag_tenant')
+    })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* Load tenant list for header switcher */
+  useEffect(() => {
+    if (!tenant) return
+    api.listTenants().then(setTenants).catch(() => {})
+  }, [tenant])
+
+  /* Load session history */
+  useEffect(() => {
+    if (!tenant) return
+    api.listSessions(30).then(setSessions).catch(() => {})
+  }, [tenant, sessionRefresh])
+
+  const handleLogout = () => {
+    setToken('')
+    setTenant(null)
+    localStorage.removeItem('turkrag_tenant')
+    setSessions([])
+    setCitations([])
+    setSelectedSession(null)
+  }
+
+  const handleTenantSwitch = async (t) => {
+    try {
+      const data = await api.getToken(t.id, 'demo-user', 'member')
+      setToken(data.access_token)
+      const next = { slug: t.slug, id: t.id, name: t.name }
+      setTenant(next)
+      localStorage.setItem('turkrag_tenant', JSON.stringify(next))
+      setSelectedSession(null)
+      setCitations([])
+      setSessionRefresh((n) => n + 1)
+    } catch {}
+  }
 
   if (!tenant) {
-    return <LoginPage onLogin={setTenant} />
+    return (
+      <ToastProvider>
+        <LoginPage onLogin={(t) => {
+          setTenant(t)
+          setTenants([t])
+          localStorage.setItem('turkrag_tenant', JSON.stringify(t))
+        }} />
+      </ToastProvider>
+    )
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-      {/* Sidebar */}
-      <aside style={{
-        width: 'var(--sidebar-w)', flexShrink: 0,
-        background: 'var(--surface-1)',
-        borderRight: '1px solid var(--border)',
-        display: 'flex', flexDirection: 'column',
-      }}>
-        <Logo />
+    <ToastProvider>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
 
-        {/* Divider */}
-        <div style={{ height: 1, background: 'var(--border)', margin: '0 16px 16px' }} />
+        {/* ── Header ── */}
+        <Header
+          tenant={tenant}
+          tenants={tenants}
+          onTenantSwitch={handleTenantSwitch}
+          onLogout={handleLogout}
+          theme={theme}
+          onThemeToggle={() => setTheme((t) => t === 'dark' ? 'light' : 'dark')}
+        />
 
-        {/* Nav */}
-        <nav style={{ padding: '0 10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-          <div style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-3)', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '4px 6px 8px' }}>
-            Ana Menü
-          </div>
-          <NavItem icon={<IconChat />} label="Sohbet" active={tab === 'chat'} onClick={() => setTab('chat')} />
-          <NavItem icon={<IconDocs />} label="Belgeler" active={tab === 'documents'} onClick={() => setTab('documents')} />
-          <NavItem icon={<IconAnalytics />} label="Analitik" active={tab === 'analytics'} onClick={() => setTab('analytics')} />
-          <NavItem icon={<IconAdmin />} label="Yönetim" active={tab === 'admin'} onClick={() => setTab('admin')} />
-        </nav>
+        {/* ── Body row ── */}
+        <div style={{ flex: 1, overflow: 'hidden', display: 'flex' }}>
 
-        {/* Session history — only visible on chat tab */}
-        {tab === 'chat' && (
-          <>
-            <div style={{ height: 1, background: 'var(--border)', margin: '10px 16px 6px' }} />
-            <SessionHistory
-              selectedId={selectedSession}
-              onSelect={(id) => { setSelectedSession(id); setTab('chat') }}
-              refreshTrigger={sessionRefresh}
-            />
-          </>
-        )}
+          {/* ── Sidebar ── */}
+          <Sidebar
+            tab={tab}
+            onTabChange={(t) => { setTab(t); if (t !== 'chat') setCitations([]) }}
+            onUploadClick={() => setTab('documents')}
+            collapsed={sidebarCollapsed}
+            onCollapseToggle={() => setSidebarCollapsed((v) => !v)}
+            sessions={sessions}
+            selectedSession={selectedSession}
+            onSessionSelect={(id) => { setSelectedSession(id); setTab('chat') }}
+          />
 
-        {/* Spacer */}
-        <div style={{ flex: 1 }} />
+          {/* ── Main content ── */}
+          <main style={{ flex: 1, overflow: 'hidden', display: 'flex', background: 'var(--bg)' }}>
 
-        {/* Tenant info + logout */}
-        <div style={{ padding: '12px 14px 20px', borderTop: '1px solid var(--border)' }}>
-          <div style={{
-            background: 'var(--surface-2)', border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-md)', padding: '10px 12px',
-            marginBottom: '10px',
-          }}>
-            <div style={{ fontSize: '10px', color: 'var(--text-3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>
-              Çalışma Alanı
+            {/* Chat */}
+            <div style={{
+              display: tab === 'chat' ? 'flex' : 'none',
+              flex: 1, overflow: 'hidden', flexDirection: 'column',
+            }}>
+              <ChatWindow
+                selectedSession={selectedSession}
+                onSessionChange={setSelectedSession}
+                onNewSession={() => setSessionRefresh((n) => n + 1)}
+                onCitationsChange={(cits, attr) => { setCitations(cits); setAttribution(attr || null) }}
+              />
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-              <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--success)', boxShadow: '0 0 6px var(--success)', flexShrink: 0 }} />
-              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-1)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {tenant.slug}
-              </span>
+
+            {/* Documents */}
+            <div style={{
+              display: tab === 'documents' ? 'flex' : 'none',
+              flex: 1, overflowY: 'auto', flexDirection: 'column',
+            }}>
+              <div style={{ padding: '28px', maxWidth: 760, width: '100%', margin: '0 auto' }}>
+                <DocumentUpload />
+              </div>
             </div>
-          </div>
-          <button
-            onClick={() => { setToken(''); setTenant(null) }}
-            className="btn btn-ghost"
-            style={{ width: '100%', justifyContent: 'flex-start', gap: '8px', fontSize: '13px', color: 'var(--text-3)' }}
-          >
-            <IconLogout /> Çıkış Yap
-          </button>
+
+            {/* Analytics */}
+            <div style={{
+              display: tab === 'analytics' ? 'flex' : 'none',
+              flex: 1, overflowY: 'auto', flexDirection: 'column',
+            }}>
+              <div style={{ padding: '28px', maxWidth: 900, width: '100%', margin: '0 auto' }}>
+                <AnalyticsDashboard />
+              </div>
+            </div>
+
+            {/* Admin */}
+            <div style={{
+              display: tab === 'admin' ? 'flex' : 'none',
+              flex: 1, overflowY: 'auto', flexDirection: 'column',
+            }}>
+              <div style={{ padding: '28px', maxWidth: 900, width: '100%', margin: '0 auto' }}>
+                <AdminPanel />
+              </div>
+            </div>
+          </main>
+
+          {/* ── Sources panel — chat tab only ── */}
+          {tab === 'chat' && (
+            <SourcesPanel citations={citations} attribution={attribution} />
+          )}
         </div>
-      </aside>
-
-      {/* Content */}
-      <main style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', background: 'var(--bg)' }}>
-        {/* Top bar */}
-        <header style={{
-          height: 52, flexShrink: 0,
-          borderBottom: '1px solid var(--border)',
-          background: 'var(--surface-1)',
-          display: 'flex', alignItems: 'center',
-          padding: '0 24px', gap: '12px',
-        }}>
-          <h2 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-1)' }}>
-            {{ chat: 'Sohbet', documents: 'Belge Yönetimi', analytics: 'Analitik', admin: 'Yönetim Paneli' }[tab]}
-          </h2>
-          <div style={{ marginLeft: 'auto', fontSize: '12px', color: 'var(--text-3)' }}>
-            {{ chat: 'Belgelerinize akıllı sorular sorun', documents: 'Belgelerinizi yükleyin ve yönetin', analytics: 'Sorgu istatistikleri ve kullanım özeti', admin: 'Sistem yönetimi ve kiracı ayarları' }[tab]}
-          </div>
-        </header>
-
-        {/* Page content — both always mounted to preserve chat history */}
-        <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: tab === 'chat' ? 'flex' : 'none', flex: 1, overflow: 'hidden', flexDirection: 'column' }}>
-            <ChatWindow
-              selectedSession={selectedSession}
-              onSessionChange={setSelectedSession}
-              onNewSession={() => setSessionRefresh((n) => n + 1)}
-            />
-          </div>
-          <div style={{ display: tab === 'documents' ? 'flex' : 'none', flex: 1, overflowY: 'auto', flexDirection: 'column' }}>
-            <div style={{ padding: '24px', maxWidth: 760, width: '100%', margin: '0 auto' }}>
-              <DocumentUpload />
-            </div>
-          </div>
-          <div style={{ display: tab === 'analytics' ? 'flex' : 'none', flex: 1, overflowY: 'auto', flexDirection: 'column' }}>
-            <div style={{ padding: '24px', maxWidth: 900, width: '100%', margin: '0 auto' }}>
-              <AnalyticsDashboard />
-            </div>
-          </div>
-          <div style={{ display: tab === 'admin' ? 'flex' : 'none', flex: 1, overflowY: 'auto', flexDirection: 'column' }}>
-            <div style={{ padding: '24px', maxWidth: 900, width: '100%', margin: '0 auto' }}>
-              <AdminPanel />
-            </div>
-          </div>
-        </div>
-      </main>
-    </div>
+      </div>
+    </ToastProvider>
   )
 }

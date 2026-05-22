@@ -1,0 +1,203 @@
+import React from 'react'
+
+/* ── File type icon ─────────────────────────────────────── */
+function FileIcon({ filename }) {
+  const ext = filename?.split('.').pop()?.toLowerCase() || ''
+  const colors = {
+    pdf:  '#ef4444', docx: '#3b82f6', txt: '#10b981',
+    xlsx: '#16a34a', xls: '#16a34a',  csv: '#f59e0b',
+  }
+  const color = colors[ext] || 'var(--text-3)'
+  return (
+    <div style={{
+      width: 28, height: 28, borderRadius: 6, flexShrink: 0,
+      background: `${color}18`, border: `1px solid ${color}30`,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+    }}>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+      </svg>
+    </div>
+  )
+}
+
+/* ── Relevance pill ─────────────────────────────────────── */
+function RelevancePill({ score }) {
+  if (score == null) return null
+  const pct = Math.round(score * 100)
+  let color, bg
+  if (pct >= 85) { color = 'var(--success)'; bg = 'var(--success-muted)' }
+  else if (pct >= 60) { color = 'var(--warning)'; bg = 'var(--warning-muted)' }
+  else { color = 'var(--error)'; bg = 'var(--error-muted)' }
+
+  return (
+    <span style={{
+      fontSize: '11px', fontWeight: 600,
+      background: bg, color,
+      borderRadius: 20, padding: '1px 7px', flexShrink: 0,
+    }}>
+      {pct}%
+    </span>
+  )
+}
+
+/* ── Single source card ─────────────────────────────────── */
+function SourceCard({ citation, index }) {
+  const [expanded, setExpanded] = React.useState(false)
+
+  return (
+    <div
+      onClick={() => setExpanded((v) => !v)}
+      style={{
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius-lg)',
+        padding: '10px 12px',
+        cursor: 'pointer',
+        background: expanded ? 'var(--surface-2)' : 'var(--bg)',
+        transition: 'background 0.12s',
+      }}
+      onMouseEnter={(e) => { if (!expanded) e.currentTarget.style.background = 'var(--surface-1)' }}
+      onMouseLeave={(e) => { if (!expanded) e.currentTarget.style.background = 'var(--bg)' }}
+    >
+      {/* Top row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <FileIcon filename={citation.filename} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{
+            fontSize: '12px', fontWeight: 600, color: 'var(--text-1)',
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
+            {citation.filename}
+          </div>
+          <div style={{ fontSize: '11px', color: 'var(--text-3)', marginTop: 1 }}>
+            Bölüm {citation.chunk_index}
+          </div>
+        </div>
+        <RelevancePill score={citation.score} />
+      </div>
+
+      {/* Preview snippet */}
+      {citation.text_preview && (
+        <div style={{
+          marginTop: '8px',
+          fontSize: '12px', color: 'var(--text-2)', lineHeight: 1.55,
+          display: '-webkit-box', WebkitLineClamp: expanded ? 999 : 2,
+          WebkitBoxOrient: 'vertical', overflow: 'hidden',
+          fontStyle: 'italic',
+        }}>
+          "{citation.text_preview}{!expanded && citation.text_preview.length >= 119 ? '…' : ''}"
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ── Attribution section ────────────────────────────────── */
+function AttributionSection({ sentences }) {
+  if (!sentences?.length) return null
+
+  return (
+    <div style={{ marginBottom: '12px' }}>
+      <div style={{
+        fontSize: '10px', fontWeight: 700, color: 'var(--text-3)',
+        letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '8px',
+      }}>
+        Cümle Bazlı Atıf (XAI)
+      </div>
+      <div style={{
+        background: 'var(--surface-1)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius-lg)',
+        padding: '10px 12px',
+        fontSize: '12.5px',
+        lineHeight: 1.7,
+        color: 'var(--text-1)',
+      }}>
+        {sentences.map((s, i) => {
+          const isLow = s.sources?.[0]?.low_confidence
+          const hasSource = s.sources?.length > 0
+          let style = {}
+          let title = ''
+          if (hasSource && !isLow) {
+            style = {
+              borderBottom: '2px solid #22c55e',
+              cursor: 'help',
+            }
+            title = `Kaynak: ${s.sources[0].filename} (${Math.round(s.sources[0].score * 100)}%)`
+          } else if (hasSource && isLow) {
+            style = {
+              borderBottom: '2px solid #f59e0b',
+              cursor: 'help',
+            }
+            title = `Düşük güven: ${s.sources[0].filename}`
+          }
+          return (
+            <span key={i} style={style} title={title}>
+              {s.text}{' '}
+            </span>
+          )
+        })}
+      </div>
+      <div style={{ display: 'flex', gap: '12px', marginTop: '6px', fontSize: '11px', color: 'var(--text-3)' }}>
+        <span><span style={{ borderBottom: '2px solid #22c55e', paddingBottom: 1 }}>——</span> Destekleniyor</span>
+        <span><span style={{ borderBottom: '2px solid #f59e0b', paddingBottom: 1 }}>——</span> Düşük güven</span>
+      </div>
+    </div>
+  )
+}
+
+/* ── Panel ──────────────────────────────────────────────── */
+export function SourcesPanel({ citations, attribution }) {
+  return (
+    <aside style={{
+      width: 'var(--sources-w)', flexShrink: 0,
+      borderLeft: '1px solid var(--border)',
+      background: 'var(--bg)',
+      display: 'flex', flexDirection: 'column',
+      height: '100%', overflow: 'hidden',
+    }}>
+      {/* Header */}
+      <div style={{
+        height: 'var(--header-h)', flexShrink: 0,
+        borderBottom: '1px solid var(--border)',
+        display: 'flex', alignItems: 'center',
+        padding: '0 16px', gap: '8px',
+      }}>
+        <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-1)' }}>
+          Alınan Kaynaklar
+        </span>
+        {citations?.length > 0 && (
+          <span className="badge badge-accent">{citations.length}</span>
+        )}
+      </div>
+
+      {/* Content */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
+        <AttributionSection sentences={attribution} />
+        {!citations?.length ? (
+          <div style={{
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            height: '100%', gap: '10px', padding: '32px 16px',
+            textAlign: 'center',
+          }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            <span style={{ fontSize: '13px', color: 'var(--text-3)' }}>
+              Bu yanıt için kaynak bulunamadı
+            </span>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {citations.map((cit, i) => (
+              <SourceCard key={i} citation={cit} index={i} />
+            ))}
+          </div>
+        )}
+      </div>
+    </aside>
+  )
+}

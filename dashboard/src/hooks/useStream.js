@@ -14,6 +14,7 @@ import { api, getToken } from '../api/client.js'
 export function useStream() {
   const [tokens, setTokens] = useState('')
   const [citations, setCitations] = useState([])
+  const [attribution, setAttribution] = useState(null)
   const [queryTime, setQueryTime] = useState(null)
   const [sessionId, setSessionId] = useState(null)
   const [messageId, setMessageId] = useState(null)
@@ -29,6 +30,7 @@ export function useStream() {
   const reset = useCallback(() => {
     setTokens('')
     setCitations([])
+    setAttribution(null)
     setQueryTime(null)
     setMessageId(null)
     setFollowUps([])
@@ -77,6 +79,8 @@ export function useStream() {
         if (frame.session_id) setSessionId(frame.session_id)
         setIsStreaming(false)
         // Don't close yet — follow_ups and message_id frames still coming
+      } else if (frame.type === 'attribution') {
+        if (frame.sentences?.length) setAttribution(frame.sentences)
       } else if (frame.type === 'follow_ups') {
         if (frame.questions?.length) setFollowUps(frame.questions)
         // Don't close yet — message_id frame still coming
@@ -94,6 +98,6 @@ export function useStream() {
     ws.onclose = () => { setIsStreaming(false) }
   }, [reset])
 
-  return { send, abort, tokens, citations, queryTime, sessionId, messageId,
+  return { send, abort, tokens, citations, attribution, queryTime, sessionId, messageId,
            followUps, isStreaming, error, reset, resetSession }
 }
