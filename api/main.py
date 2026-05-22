@@ -46,6 +46,16 @@ async def lifespan(app: FastAPI):
     # Start background ingestion worker
     from ingestion.worker import start_worker, stop_worker
     start_worker()
+    # Eagerly load + warm up LLM in background so first query is fast
+    import threading
+    def _warmup():
+        try:
+            from generation.llm import _get_llm
+            _get_llm()  # loads model + runs warmup token (see llm.py)
+            logger.info("LLM warmup complete.")
+        except Exception as exc:
+            logger.warning("LLM warmup skipped: %s", exc)
+    threading.Thread(target=_warmup, daemon=True).start()
     logger.info("Startup complete. Ready to serve.")
     yield
     logger.info("TurkRAG API shutting down.")

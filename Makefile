@@ -5,8 +5,9 @@ QDRANT_BIN := ./bin/qdrant
 # ── Start all services ────────────────────────────────────────────────────────
 start: infra
 	@echo "Starting API..."
-	@source .venv/bin/activate 2>/dev/null || true; \
-	 python -m uvicorn api.main:app --host 0.0.0.0 --port 8001 --reload \
+	@PYTHON=$$(command -v python3 || command -v python); \
+	 if [ -f .venv/bin/python ]; then PYTHON=.venv/bin/python; fi; \
+	 $$PYTHON -m uvicorn api.main:app --host 0.0.0.0 --port 8001 --reload \
 	 > /tmp/turkrag_api.log 2>&1 & echo $$! > /tmp/turkrag_api.pid
 	@echo "Starting dashboard..."
 	@cd dashboard && npm run dev > /tmp/turkrag_vite.log 2>&1 & echo $$! > /tmp/turkrag_vite.pid
@@ -28,10 +29,14 @@ stop:
 	@cat /tmp/turkrag_vite.pid 2>/dev/null | xargs kill 2>/dev/null || pkill -f "vite" 2>/dev/null || true
 	@cat /tmp/turkrag_qdrant.pid 2>/dev/null | xargs kill 2>/dev/null || pkill -f "qdrant" 2>/dev/null || true
 	@rm -f /tmp/turkrag_*.pid
+	@# Force-clear ports so restart never hits EADDRINUSE
+	@lsof -ti :8001 2>/dev/null | xargs kill -9 2>/dev/null || true
+	@lsof -ti :5173 2>/dev/null | xargs kill -9 2>/dev/null || true
+	@lsof -ti :6333 2>/dev/null | xargs kill -9 2>/dev/null || true
+	@sleep 1
 	@echo "All services stopped."
 
 restart: stop
-	@sleep 1
 	@$(MAKE) start
 
 status:
@@ -51,8 +56,9 @@ logs-api:
 
 # ── Individual dev runners ────────────────────────────────────────────────────
 dev-api:
-	@source .venv/bin/activate 2>/dev/null || true; \
-	 python -m uvicorn api.main:app --host 0.0.0.0 --port 8001 --reload
+	@PYTHON=$$(command -v python3 || command -v python); \
+	 if [ -f .venv/bin/python ]; then PYTHON=.venv/bin/python; fi; \
+	 $$PYTHON -m uvicorn api.main:app --host 0.0.0.0 --port 8001 --reload
 
 dev-ui:
 	@cd dashboard && npm run dev

@@ -14,7 +14,8 @@ class QueryRequest(BaseModel):
 class CitationSource(BaseModel):
     filename: str
     chunk_index: int
-    text_preview: str  # first 120 chars
+    text_preview: str        # first 120 chars
+    score: float | None = None  # reranker score; None for legacy/loaded sessions
 
 
 class QueryResponse(BaseModel):
