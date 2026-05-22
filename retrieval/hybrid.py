@@ -66,8 +66,19 @@ def _hyde_embed(query: str) -> list[float] | None:
         return None
 
 
+RETRIEVAL_MODES = ("sparse", "dense", "hybrid", "hybrid+rerank")
+
+
 class HybridRetriever:
-    """Run hybrid BM25 + dense retrieval with RRF fusion and cross-encoder reranking."""
+    """Run hybrid BM25 + dense retrieval with RRF fusion and cross-encoder reranking.
+
+    Retrieval modes
+    ---------------
+    sparse        — BM25 only (keyword matching baseline)
+    dense         — Qdrant dense vectors only (semantic baseline)
+    hybrid        — RRF fusion of BM25 + dense, no reranker
+    hybrid+rerank — RRF fusion + cross-encoder reranker + MMR (default, full pipeline)
+    """
 
     def retrieve(
         self,
@@ -75,34 +86,69 @@ class HybridRetriever:
         tenant_slug: str,
         top_k: int = 20,
         final_k: int = 5,
+        mode: str = "hybrid+rerank",
     ) -> list[dict]:
-        """Return final_k most relevant chunks for query within the tenant's index.
+        """Return final_k most relevant chunks for *query* within the tenant's index.
 
-        Each result dict contains: text, doc_id, chunk_index, filename, score.
+        Each result dict contains: text, doc_id, chunk_index, filename, score,
+        retrieval_mode.
         """
+        if mode not in RETRIEVAL_MODES:
+            raise ValueError(f"mode must be one of {RETRIEVAL_MODES}, got '{mode}'")
 
         from ingestion.embedder import embed
 
-        logger.info("Hybrid retrieval: query='%s...' tenant=%s top_k=%d final_k=%d",
-                    query[:50], tenant_slug, top_k, final_k)
+        logger.info(
+            "Retrieval [mode=%s]: query='%s...' tenant=%s top_k=%d final_k=%d",
+            mode, query[:50], tenant_slug, top_k, final_k,
+        )
 
-        # Step 1: embed query (+ optional HyDE blend)
-        query_vec_raw = embed([query])[0]
+        # ── Step 1: embed query (needed for dense / hybrid modes) ──────────────
+        if mode in ("dense", "hybrid", "hybrid+rerank"):
+            query_vec_raw = embed([query])[0]
 
-        if HYDE_ENABLED:
-            hyde_vec = _hyde_embed(query)
-            if hyde_vec is not None:
-                # Blend: 50% query + 50% hypothetical answer, then re-normalise
-                blended = (query_vec_raw + np.array(hyde_vec)) / 2.0
-                norm = np.linalg.norm(blended)
-                query_vec = (blended / norm if norm > 0 else blended).tolist()
-                logger.debug("HyDE: using blended query+hypothesis embedding")
+            if HYDE_ENABLED and mode in ("hybrid", "hybrid+rerank"):
+                hyde_vec = _hyde_embed(query)
+                if hyde_vec is not None:
+                    blended = (query_vec_raw + np.array(hyde_vec)) / 2.0
+                    norm = np.linalg.norm(blended)
+                    query_vec = (blended / norm if norm > 0 else blended).tolist()
+                    logger.debug("HyDE: using blended query+hypothesis embedding")
+                else:
+                    query_vec = query_vec_raw.tolist()
             else:
                 query_vec = query_vec_raw.tolist()
         else:
-            query_vec = query_vec_raw.tolist()
+            query_vec = None
 
-        # Step 2 & 3: sparse + dense search — run both in parallel via threads
+        # ── Step 2: retrieve from the selected source(s) ──────────────────────
+        if mode == "sparse":
+            hits = BM25Store(tenant_slug).search(query, top_k)
+            if not hits:
+                logger.warning("BM25 returned no results for tenant '%s'", tenant_slug)
+                return []
+            for h in hits:
+                h["rrf_score"] = h.get("score", 0.0)
+            candidates = hits[:final_k]
+            for c in candidates:
+                c["rerank_score"] = c["rrf_score"]
+                c["_reranker_used"] = False
+            return self._tag(candidates[:final_k], mode)
+
+        if mode == "dense":
+            hits = VectorStore(tenant_slug).search(query_vec, top_k)
+            if not hits:
+                logger.warning("Dense search returned no results for tenant '%s'", tenant_slug)
+                return []
+            for h in hits:
+                h["rrf_score"] = h.get("score", 0.0)
+            candidates = hits[:final_k]
+            for c in candidates:
+                c["rerank_score"] = c["rrf_score"]
+                c["_reranker_used"] = False
+            return self._tag(candidates[:final_k], mode)
+
+        # hybrid / hybrid+rerank: parallel BM25 + dense
         with ThreadPoolExecutor(max_workers=2) as pool:
             bm25_future = pool.submit(BM25Store(tenant_slug).search, query, top_k)
             dense_future = pool.submit(VectorStore(tenant_slug).search, query_vec, top_k)
@@ -113,39 +159,49 @@ class HybridRetriever:
             logger.warning("No results from either BM25 or dense search for tenant '%s'", tenant_slug)
             return []
 
-        # Step 4: RRF fusion
         fused = self._rrf_fusion(bm25_hits, dense_hits)
-
-        # Take top RERANK_CANDIDATES for re-ranking
         candidates = fused[:RERANK_CANDIDATES]
 
-        # Step 5: cross-encoder reranking (falls back to RRF order if model unavailable)
-        if len(candidates) > 1:
+        # ── Step 3: optional cross-encoder reranking ──────────────────────────
+        if mode == "hybrid+rerank" and len(candidates) > 1:
             passages = [c["text"] for c in candidates]
             try:
                 rerank_scores = rerank(query, passages)
                 for c, score in zip(candidates, rerank_scores, strict=False):
                     c["rerank_score"] = score
+                    c["_reranker_used"] = True
                 candidates.sort(key=lambda x: x.get("rerank_score", 0), reverse=True)
             except Exception as exc:
-                logger.warning("Reranker unavailable (%s) — using RRF order", exc)
+                logger.warning("Reranker unavailable (%s) — falling back to RRF order", exc)
                 for c in candidates:
                     c["rerank_score"] = c["rrf_score"]
+                    c["_reranker_used"] = False
         else:
             for c in candidates:
                 c["rerank_score"] = c["rrf_score"]
+                c["_reranker_used"] = False
 
-        # Step 6: confidence gate — drop results when best score is off-topic
-        top_score = candidates[0].get("rerank_score", 0) if candidates else 0
-        if top_score < CONFIDENCE_THRESHOLD:
-            logger.info(
-                "Low confidence (%.2f < %.2f) for query='%s...' tenant=%s — returning empty",
-                top_score, CONFIDENCE_THRESHOLD, query[:40], tenant_slug,
-            )
-            return []
+        # ── Step 4: confidence gate (only for full pipeline) ──────────────────
+        if mode == "hybrid+rerank":
+            top_score = candidates[0].get("rerank_score", 0) if candidates else 0
+            if top_score < CONFIDENCE_THRESHOLD:
+                logger.info(
+                    "Low confidence (%.2f < %.2f) for query='%s...' tenant=%s — returning empty",
+                    top_score, CONFIDENCE_THRESHOLD, query[:40], tenant_slug,
+                )
+                return []
+            results = _mmr(candidates, final_k, lambda_param=0.5)
+        else:
+            results = candidates[:final_k]
 
-        results = _mmr(candidates, final_k, lambda_param=0.5)
-        logger.info("Retrieved %d chunks after MMR (top_score=%.2f)", len(results), top_score)
+        logger.info("Retrieved %d chunks [mode=%s]", len(results), mode)
+        return self._tag(results, mode)
+
+    @staticmethod
+    def _tag(results: list[dict], mode: str) -> list[dict]:
+        """Attach retrieval_mode to every result dict."""
+        for r in results:
+            r["retrieval_mode"] = mode
         return results
 
     def _rrf_fusion(self, bm25_hits: list[dict], dense_hits: list[dict]) -> list[dict]:

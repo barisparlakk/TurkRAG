@@ -1,30 +1,5 @@
 [
   {
-    "question": "Şirketin iade politikası nedir?",
-    "ground_truth": "Ürünler 30 gün içinde iade edilebilir.",
-    "relevant_doc": "musteri_hizmetleri.txt"
-  },
-  {
-    "question": "Uzaktan çalışma kuralları nelerdir?",
-    "ground_truth": "Çalışanlar haftada en fazla üç gün evden çalışabilir ve yönetici onayı gereklidir.",
-    "relevant_doc": "sirket_politikasi.txt"
-  },
-  {
-    "question": "Yıllık izin süresi kaç gündür?",
-    "ground_truth": "İlk iki yılda 14 iş günü, sonrasında 20 iş günü yıllık izin hakkı doğmaktadır.",
-    "relevant_doc": "sirket_politikasi.txt"
-  },
-  {
-    "question": "Ürün kataloğunda hangi ürünler yer almaktadır?",
-    "ground_truth": "Katalogda yazılım çözümleri, danışmanlık hizmetleri ve eğitim paketleri yer almaktadır.",
-    "relevant_doc": "urun_katalogu.txt"
-  },
-  {
-    "question": "Müşteri hizmetlerine nasıl ulaşabilirim?",
-    "ground_truth": "Müşteri hizmetleri telefon, e-posta ve canlı destek kanalları üzerinden ulaşılabilir.",
-    "relevant_doc": "musteri_hizmetleri.txt"
-  },
-  {
     "question": "Ürünleri nasıl iade edebilirim?",
     "ground_truth": "Ürünleri, teslim tarihinden itibaren 30 gün içinde orijinal ambalajında, kullanılmamış ve fatura ile birlikte iade edebilirsiniz. İade talebinizi müşteri hizmetleri e-posta adresimize (iade@techvizyon.com.tr) bildirmeniz yeterlidir; size 1 iş günü içinde dönüş yapılır.",
     "relevant_doc": "musteri_hizmetleri.txt"

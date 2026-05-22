@@ -134,6 +134,181 @@ class TurkishChunker:
         return (" ".join(overlap_sents) + " ") if overlap_sents else ""
 
 
+# ── Alternative chunking strategies ───────────────────────────────────────────
+
+class FixedSizeChunker:
+    """Chunk by fixed character count with configurable overlap.
+
+    Faster than sentence-boundary splitting but may cut mid-sentence.
+    Useful as an ablation baseline.
+    """
+
+    def __init__(self, max_chars: int = 800, overlap_chars: int = 150):
+        self.max_chars = max_chars
+        self.overlap_chars = overlap_chars
+
+    def chunk(self, text: str) -> list[dict]:
+        chunks = []
+        start = 0
+        idx = 0
+        while start < len(text):
+            end = min(start + self.max_chars, len(text))
+            chunk_text = text[start:end].strip()
+            if chunk_text:
+                chunks.append({"text": chunk_text, "chunk_index": idx,
+                                "start_char": start, "end_char": end})
+                idx += 1
+            start = end - self.overlap_chars if end < len(text) else len(text)
+        logger.info("FixedSizeChunker: %d chunks (max_chars=%d, overlap=%d)",
+                    len(chunks), self.max_chars, self.overlap_chars)
+        return chunks
+
+
+class RecursiveChunker:
+    """Hierarchical splitting: paragraph → sentence → fixed-size fallback.
+
+    Tries to keep semantic units intact by progressively using finer
+    separators only when a unit exceeds max_chars.
+    """
+
+    SEPARATORS = ["\n\n", "\n", ". ", "! ", "? ", " ", ""]
+
+    def __init__(self, max_chars: int = 800, overlap_chars: int = 150):
+        self.max_chars = max_chars
+        self.overlap_chars = overlap_chars
+
+    def chunk(self, text: str) -> list[dict]:
+        raw_chunks = self._split(text.strip(), self.SEPARATORS)
+        # Merge small chunks together, add overlap between them
+        merged = self._merge_with_overlap(raw_chunks)
+        result = []
+        pos = 0
+        for idx, t in enumerate(merged):
+            result.append({"text": t, "chunk_index": idx, "start_char": pos, "end_char": pos + len(t)})
+            pos += len(t) - self.overlap_chars
+        logger.info("RecursiveChunker: %d chunks (max_chars=%d)", len(result), self.max_chars)
+        return result
+
+    def _split(self, text: str, separators: list[str]) -> list[str]:
+        if len(text) <= self.max_chars or not separators:
+            return [text] if text else []
+        sep, rest = separators[0], separators[1:]
+        parts = text.split(sep) if sep else list(text)
+        out = []
+        for part in parts:
+            part = part.strip()
+            if not part:
+                continue
+            if len(part) <= self.max_chars:
+                out.append(part)
+            else:
+                out.extend(self._split(part, rest))
+        return out
+
+    def _merge_with_overlap(self, parts: list[str]) -> list[str]:
+        merged: list[str] = []
+        buf = ""
+        for part in parts:
+            if not buf:
+                buf = part
+            elif len(buf) + len(part) + 1 <= self.max_chars:
+                buf = buf + " " + part
+            else:
+                merged.append(buf)
+                # overlap: keep tail of current buf
+                tail = buf[-self.overlap_chars:] if self.overlap_chars else ""
+                buf = (tail + " " + part).strip() if tail else part
+        if buf:
+            merged.append(buf)
+        return merged
+
+
+class ParagraphChunker:
+    """Split on paragraph breaks (double newline), merge short paragraphs.
+
+    Best for documents with clear section structure (reports, legal texts).
+    Falls back to FixedSizeChunker for overly long paragraphs.
+    """
+
+    def __init__(self, max_chars: int = 800, overlap_chars: int = 0, min_chars: int = 100):
+        self.max_chars = max_chars
+        self.overlap_chars = overlap_chars
+        self.min_chars = min_chars
+        self._fixed = FixedSizeChunker(max_chars, overlap_chars)
+
+    def chunk(self, text: str) -> list[dict]:
+        raw_paras = [p.strip() for p in _NEWLINE_RE.split(text) if p.strip()]
+
+        # Merge short consecutive paragraphs
+        merged_paras: list[str] = []
+        buf = ""
+        for para in raw_paras:
+            candidate = (buf + "\n\n" + para).strip() if buf else para
+            if len(candidate) <= self.max_chars:
+                buf = candidate
+            else:
+                if buf:
+                    merged_paras.append(buf)
+                buf = para
+        if buf:
+            merged_paras.append(buf)
+
+        # Split any paragraph still exceeding max_chars
+        result = []
+        idx = 0
+        pos = 0
+        for para in merged_paras:
+            if len(para) <= self.max_chars:
+                result.append({"text": para, "chunk_index": idx,
+                                "start_char": pos, "end_char": pos + len(para)})
+                idx += 1
+                pos += len(para)
+            else:
+                sub_chunks = self._fixed.chunk(para)
+                for sc in sub_chunks:
+                    sc["chunk_index"] = idx
+                    sc["start_char"] += pos
+                    sc["end_char"] += pos
+                    result.append(sc)
+                    idx += 1
+                pos += len(para)
+
+        logger.info("ParagraphChunker: %d chunks from %d paragraphs", len(result), len(merged_paras))
+        return result
+
+
+# ── Factory ────────────────────────────────────────────────────────────────────
+
+CHUNKER_REGISTRY = {
+    "turkish": TurkishChunker,
+    "fixed": FixedSizeChunker,
+    "recursive": RecursiveChunker,
+    "paragraph": ParagraphChunker,
+}
+
+
+def get_chunker(strategy: str = "turkish", **kwargs):
+    """Return a chunker instance by name.
+
+    strategy: one of "turkish" (default), "fixed", "recursive", "paragraph"
+    kwargs:   passed to the chunker constructor (e.g. max_chars=600, overlap_chars=100)
+    """
+    cls = CHUNKER_REGISTRY.get(strategy)
+    if cls is None:
+        raise ValueError(f"Unknown chunker strategy '{strategy}'. "
+                         f"Available: {list(CHUNKER_REGISTRY)}")
+    # TurkishChunker uses class-level attrs; pass kwargs as instance overrides when supported
+    try:
+        return cls(**kwargs) if kwargs else cls()
+    except TypeError:
+        # TurkishChunker has no __init__ params — apply overrides manually
+        obj = cls()
+        for k, v in kwargs.items():
+            if hasattr(obj, k):
+                setattr(obj, k, v)
+        return obj
+
+
 if __name__ == "__main__":
     import sys
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
@@ -151,8 +326,10 @@ if __name__ == "__main__":
         from ingestion.parser import parse_document
         sample = parse_document(sys.argv[1])
 
-    chunker = TurkishChunker()
+    strategy = sys.argv[2] if len(sys.argv) > 2 else "turkish"
+    chunker = get_chunker(strategy)
     result = chunker.chunk(sample)
     for c in result:
-        print(f"\n--- Chunk {c['chunk_index']} (start_char={c['start_char']}, end_char={c['end_char']}) ---")
+        print(f"\n--- Chunk {c['chunk_index']} [{strategy}] "
+              f"(start={c['start_char']}, end={c['end_char']}, len={len(c['text'])}) ---")
         print(c["text"])

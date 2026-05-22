@@ -1,0 +1,101 @@
+{
+  "run_id": "87f6aa60-748c-43bd-96e6-1ac55be57598",
+  "run_label": "dense-top20-final5",
+  "retrieval_mode": "dense",
+  "top_k": 20,
+  "final_k": 5,
+  "tenant_slug": "demo",
+  "n_queries": 5,
+  "evaluated_at": "2026-05-22T13:38:43.524012",
+  "faithfulness": 0.770015360983103,
+  "answer_relevancy": 0.4844805598258972,
+  "context_precision": 0.4,
+  "context_recall": 0.8,
+  "per_query": [
+    {
+      "question": "Şirketin iade politikası nedir?",
+      "answer": "<think>\n\n</think>\n\nŞirketin iade politikasına göre, satın aldığınız ürünleri teslim tarihinden itibaren 30 gün içinde iade edebilirsiniz. İade işlemi için ürünün orijinal ambalajında, kullanılmamış ve fatura ile birlikte iade edilmesi gerekmektedir. İade talebinizi müşteri hizmetleri e-posta adresimize (iade@techvizyon.com.tr) bildirmeniz yeterlidir; size 1 iş günü içinde dönüş yapılır. [Kaynak 1]",
+      "ground_truth": "Ürünler 30 gün içinde iade edilebilir.",
+      "relevant_doc": "musteri_hizmetleri.txt",
+      "retrieved_docs": [
+        "musteri_hizmetleri.txt",
+        "musteri_hizmetleri.txt",
+        "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+        "09_proje_yonetimi_standardi.txt",
+        "08_musteri_basari_ve_destek_sla.txt"
+      ],
+      "faithfulness": 0.9,
+      "answer_relevancy": 0.48340508341789246,
+      "context_precision": 0.4,
+      "context_recall": 1.0
+    },
+    {
+      "question": "Uzaktan çalışma kuralları nelerdir?",
+      "answer": "<think>\n\n</think>\n\nUzaktan çalışma kuralları şu şekildedir:\n\n- Uzaktan çalışma günlerinde çalışanların şirket VPN'ine bağlı olması ve anlık mesajlaşma sistemleri üzerinden erişilebilir durumda bulunması gerekmektedir.  \n- Çalışanların uzaktan çalışma sırasında iş güvenliği protokollerine uyması zorunludur.  \n- Gizli belgeler kişisel cihazlarda depolanamaz.  \n- Uzaktan çalışma hakkını kötüye kullanan veya verimliliği düşen çalışanların uzaktan çalışma izni, yönetim tarafından askıya alınabilir.  \n\n[Kaynak 1]",
+      "ground_truth": "Çalışanlar haftada en fazla üç gün evden çalışabilir ve yönetici onayı gereklidir.",
+      "relevant_doc": "sirket_politikasi.txt",
+      "retrieved_docs": [
+        "sirket_politikasi.txt",
+        "02_bilgi_teknolojileri_kullanim_politikasi.txt",
+        "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+        "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+        "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
+      ],
+      "faithfulness": 0.9285714285714286,
+      "answer_relevancy": 0.5295824408531189,
+      "context_precision": 0.2,
+      "context_recall": 1.0
+    },
+    {
+      "question": "Yıllık izin süresi kaç gündür?",
+      "answer": "<think>\n\n</think>\n\nYıllık izin süresi, çalışanın kıdeme göre farklılık gösterir. 2 yıl kıdeme sahip çalışanlar için 14 iş günü, 5 yıl kıdeme sahip çalışanlar için 20 iş günü, 10 yıl kıdeme sahip çalışanlar için 24 iş günü ve 10 yıl ve üzeri kıdem için 30 iş günüdür. [Kaynak 4]",
+      "ground_truth": "İlk iki yılda 14 iş günü, sonrasında 20 iş günü yıllık izin hakkı doğmaktadır.",
+      "relevant_doc": "sirket_politikasi.txt",
+      "retrieved_docs": [
+        "sirket_politikasi.txt",
+        "sirket_politikasi.txt",
+        "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+        "sirket_politikasi.txt",
+        "01_insan_kaynaklari_el_kitabi.txt"
+      ],
+      "faithfulness": 0.6666666666666666,
+      "answer_relevancy": 0.5393723845481873,
+      "context_precision": 0.6,
+      "context_recall": 1.0
+    },
+    {
+      "question": "Ürün kataloğunda hangi ürünler yer almaktadır?",
+      "answer": "<think>\n\n</think>\n\nBelgede ürün kataloğunda hangi ürünler yer aldığının bilgisi bulunmamaktadır. [Kaynak 1], [Kaynak 2], [Kaynak 3], [Kaynak 4] ve [Kaynak 5] belgeleri, satış süreci, teklif yönetimi, eğitim süreci, pazarlama ve sosyal medya, müşteri destek ve SLA konularını ele almış olsa da, ürün kataloğunda yer alan ürünler hakkında bilgi vermemektedir.",
+      "ground_truth": "Katalogda yazılım çözümleri, danışmanlık hizmetleri ve eğitim paketleri yer almaktadır.",
+      "relevant_doc": "urun_katalogu.txt",
+      "retrieved_docs": [
+        "06_satis_sureci_ve_teklif_yonetimi.txt",
+        "06_satis_sureci_ve_teklif_yonetimi.txt",
+        "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+        "07_pazarlama_ve_sosyal_medya_rehberi.txt",
+        "08_musteri_basari_ve_destek_sla.txt"
+      ],
+      "faithfulness": 0.41935483870967744,
+      "answer_relevancy": 0.45647990703582764,
+      "context_precision": 0.0,
+      "context_recall": 0.0
+    },
+    {
+      "question": "Müşteri hizmetlerine nasıl ulaşabilirim?",
+      "answer": "<think>\n\n</think>\n\nMüşteri hizmetlerine aşağıdaki kanallar aracılığıyla ulaşabilirsiniz:  \n- Telefon: 0850 123 45 67 (Hafta içi 09:00-18:00)  \n- E-posta: destek@techvizyon.com.tr (24 saat içinde yanıt)  \n- Canlı destek: Web sitemizin sağ alt köşesindeki sohbet balonu (Hafta içi 09:00-20:00)  \n- Destek portalı: destek.techvizyon.com.tr (7/24 bilet sistemi) [Kaynak 1]",
+      "ground_truth": "Müşteri hizmetleri telefon, e-posta ve canlı destek kanalları üzerinden ulaşılabilir.",
+      "relevant_doc": "musteri_hizmetleri.txt",
+      "retrieved_docs": [
+        "musteri_hizmetleri.txt",
+        "08_musteri_basari_ve_destek_sla.txt",
+        "musteri_hizmetleri.txt",
+        "musteri_hizmetleri.txt",
+        "musteri_hizmetleri.txt"
+      ],
+      "faithfulness": 0.9354838709677419,
+      "answer_relevancy": 0.41356298327445984,
+      "context_precision": 0.8,
+      "context_recall": 1.0
+    }
+  ]
+}

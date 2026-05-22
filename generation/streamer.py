@@ -42,7 +42,10 @@ async def stream_rag_response(
     t_start = time.monotonic()
 
     async def send(frame: dict[str, Any]):
-        await websocket.send_text(json.dumps(frame, ensure_ascii=False))
+        try:
+            await websocket.send_text(json.dumps(frame, ensure_ascii=False))
+        except RuntimeError:
+            pass  # WebSocket already closed (client disconnected)
 
     try:
         # Retrieval
@@ -109,18 +112,35 @@ async def stream_rag_response(
         })
         logger.info("WS stream complete: %d tokens, %d ms", len(full_response), query_time_ms)
 
+        # Attribution — sentence-level source attribution (XAI), sent after done frame
+        try:
+            from generation.attribution import attribute_answer
+            attr_queue: stdlib_queue.SimpleQueue = stdlib_queue.SimpleQueue()
+
+            def _gen_attribution():
+                attr_queue.put(attribute_answer(response_text, chunks))
+
+            threading.Thread(target=_gen_attribution, daemon=True).start()
+            attr_result = await loop.run_in_executor(None, attr_queue.get)
+            if attr_result and attr_result.get("sentences"):
+                await send({"type": "attribution", "sentences": attr_result["sentences"]})
+        except Exception as exc:
+            logger.warning("Could not compute attribution: %s", exc)
+
         # Generate follow-up questions in a thread (after done frame — no latency to main answer)
         try:
-            from generation.followups import generate_followups
-            followup_queue: stdlib_queue.SimpleQueue = stdlib_queue.SimpleQueue()
+            import os as _os
+            if _os.getenv("FOLLOWUP_ENABLED", "true").lower() == "true":
+                from generation.followups import generate_followups
+                followup_queue: stdlib_queue.SimpleQueue = stdlib_queue.SimpleQueue()
 
-            def _gen_followups():
-                followup_queue.put(generate_followups(query, response_text))
+                def _gen_followups():
+                    followup_queue.put(generate_followups(query, response_text))
 
-            threading.Thread(target=_gen_followups, daemon=True).start()
-            follow_ups = await loop.run_in_executor(None, followup_queue.get)
-            if follow_ups:
-                await send({"type": "follow_ups", "questions": follow_ups})
+                threading.Thread(target=_gen_followups, daemon=True).start()
+                follow_ups = await loop.run_in_executor(None, followup_queue.get)
+                if follow_ups:
+                    await send({"type": "follow_ups", "questions": follow_ups})
         except Exception as exc:
             logger.warning("Could not send follow-up questions: %s", exc)
 

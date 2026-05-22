@@ -1,0 +1,5 @@
+retrieval_mode,run_label,faithfulness,answer_relevancy,context_precision,context_recall,n_queries,top_k,final_k,evaluated_at
+sparse,sparse-top20-final5,0.8657809847198642,0.453163206577301,0.36,1.0,5,20,5,2026-05-22T13:33:29.214260
+dense,dense-top20-final5,0.770015360983103,0.4844805598258972,0.4,0.8,5,20,5,2026-05-22T13:38:43.524012
+hybrid,hybrid-top20-final5,0.8231494057724957,0.4622704446315765,0.36,1.0,5,20,5,2026-05-22T13:44:23.893106
+hybrid+rerank,hybrid+rerank-top20-final5,0.889402538604576,0.4455580234527588,0.36,1.0,5,20,5,2026-05-22T13:48:48.153477

@@ -62,9 +62,13 @@ def _get_llm():
                 n_ctx=N_CTX,
                 n_gpu_layers=N_GPU_LAYERS,
                 n_threads=N_THREADS,
+                use_mmap=False,   # eager load into GPU memory — avoids per-page cold faults on first query
                 verbose=False,
             )
-            logger.info("LLM loaded successfully.")
+            # GPU warmup: one tiny inference to page weights into GPU and JIT Metal shaders
+            logger.info("Warming up GPU...")
+            _llm_instance("a", max_tokens=1)
+            logger.info("LLM loaded and GPU warmed up.")
         except Exception as exc:
             _load_error = f"Failed to load LLM: {exc}"
             raise RuntimeError(_load_error) from exc
