@@ -14,6 +14,8 @@ JWT_ALGORITHM = "HS256"
 JWT_EXPIRY_HOURS = 24
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token", auto_error=True)
+MOCK_ADMIN_EMAIL = os.getenv("MOCK_ADMIN_EMAIL", "baris@dev.com")
+MOCK_ADMIN_PASSWORD = os.getenv("MOCK_ADMIN_PASSWORD", "1234")
 
 
 def create_token(tenant_id: str, user_id: str, role: str) -> str:
@@ -62,3 +64,8 @@ async def require_admin(payload: dict = Depends(get_current_payload)) -> dict:
     if payload.get("role") != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin role required")
     return payload
+
+
+def validate_mock_admin(email: str, password: str) -> bool:
+    """Validate the built-in mock admin credentials used by the dashboard."""
+    return email.strip().lower() == MOCK_ADMIN_EMAIL.lower() and password == MOCK_ADMIN_PASSWORD

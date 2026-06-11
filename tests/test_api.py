@@ -1,6 +1,7 @@
 """API integration tests using FastAPI TestClient — no live DB or LLM required."""
 
 import os
+from unittest.mock import patch
 
 import pytest
 
@@ -66,6 +67,51 @@ class TestAuthEndpoint:
         })
         if resp.status_code == 200:
             assert "access_token" in resp.json()
+
+    def test_mock_admin_login_accepts_expected_credentials(self, client):
+        class FakeCursor:
+            def execute(self, query, params):
+                self.slug = params[0]
+
+            def fetchone(self):
+                if self.slug == "acme-sirket":
+                    return ("00000000-0000-0000-0000-000000000001", "Acme Sirket", "acme-sirket")
+                return None
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+        class FakeConn:
+            def cursor(self):
+                return FakeCursor()
+
+            def close(self):
+                return None
+
+        with patch("api.db.get_conn", return_value=FakeConn()):
+            resp = client.post("/auth/mock-login", json={
+                "tenant_slug": "acme-sirket",
+                "email": "baris@dev.com",
+                "password": "1234",
+            })
+
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["user"]["role"] == "admin"
+        assert body["user"]["email"] == "baris@dev.com"
+        assert body["tenant"]["slug"] == "acme-sirket"
+        assert "access_token" in body
+
+    def test_mock_admin_login_rejects_wrong_password(self, client):
+        resp = client.post("/auth/mock-login", json={
+            "tenant_slug": "acme-sirket",
+            "email": "baris@dev.com",
+            "password": "wrong",
+        })
+        assert resp.status_code == 401
 
 
 class TestTenantEndpointAuth:

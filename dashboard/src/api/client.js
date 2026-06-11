@@ -58,6 +58,8 @@ export const api = {
   // Auth
   getToken: (tenantId, userId = 'user', role = 'member') =>
     request('POST', '/auth/token', { tenant_id: tenantId, user_id: userId, role }),
+  mockLogin: (tenantSlug, email, password) =>
+    request('POST', '/auth/mock-login', { tenant_slug: tenantSlug, email, password }),
 
   // Documents
   listDocuments: () => request('GET', '/documents'),

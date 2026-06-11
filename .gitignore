@@ -9,6 +9,7 @@ indexes/
 node_modules/
 dashboard/dist/
 dashboard/vite.config.js.timestamp-*.mjs
+docs/
 eval/results_*.json
 *.egg-info/
 dist/

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ChatWindow } from './components/ChatWindow.jsx'
 import { DocumentUpload } from './components/DocumentUpload.jsx'
 import { AnalyticsDashboard } from './components/AnalyticsDashboard.jsx'
@@ -7,110 +7,242 @@ import { Header } from './components/Header.jsx'
 import { Sidebar } from './components/Sidebar.jsx'
 import { SourcesPanel } from './components/SourcesPanel.jsx'
 import { ToastProvider } from './components/Toast.jsx'
-import { api, getTokenPayload, setToken } from './api/client.js'
+import { api, getTokenPayload, getToken, setToken } from './api/client.js'
+
+const MOCK_ADMIN_EMAIL = 'baris@dev.com'
+const MOCK_ADMIN_PASSWORD = '1234'
+const AUTH_STORAGE_KEY = 'turkrag_auth'
+
+function loadStoredJSON(key) {
+  try {
+    const raw = localStorage.getItem(key)
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
+function isTokenExpired(payload) {
+  return !payload?.exp || payload.exp * 1000 <= Date.now()
+}
 
 /* ── Login ─────────────────────────────────────────────── */
 function LoginPage({ onLogin }) {
-  const [loginSlug, setLoginSlug] = useState('')
+  const [mode, setMode] = useState('member')
+  const [memberSlug, setMemberSlug] = useState('')
+  const [adminSlug, setAdminSlug] = useState('')
+  const [adminEmail, setAdminEmail] = useState(MOCK_ADMIN_EMAIL)
+  const [adminPassword, setAdminPassword] = useState(MOCK_ADMIN_PASSWORD)
   const [loginError, setLoginError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleLogin = async (e) => {
+  const handleMemberLogin = async (e) => {
     e.preventDefault()
-    const slug = loginSlug.trim()
-    if (!slug) { setLoginError('Lütfen bir çalışma alanı seçiniz'); return }
-    setLoading(true); setLoginError('')
+    const slug = memberSlug.trim()
+    if (!slug) {
+      setLoginError('Kullanıcı girişi için çalışma alanı slug alanı zorunludur.')
+      return
+    }
+
+    setLoading(true)
+    setLoginError('')
     try {
       const tenant = await api.getTenantBySlug(slug)
       const data = await api.getToken(tenant.id, 'demo-user', 'member')
       setToken(data.access_token)
-      onLogin({ slug, id: tenant.id, name: tenant.name || tenant.slug })
+      onLogin({
+        tenant: { slug: tenant.slug, id: tenant.id, name: tenant.name || tenant.slug },
+        auth: {
+          loginMode: 'member',
+          role: 'member',
+          userId: 'demo-user',
+        },
+      })
     } catch (err) {
-      setLoginError(`Giriş başarısız: ${err.message}`)
+      setLoginError(`Kullanıcı girişi başarısız: ${err.message}`)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleAdminLogin = async (e) => {
+    e.preventDefault()
+    const slug = adminSlug.trim()
+    if (!slug) {
+      setLoginError('Admin girişi için yönetilecek çalışma alanı slug alanı zorunludur.')
+      return
+    }
+
+    setLoading(true)
+    setLoginError('')
+    try {
+      const data = await api.mockLogin(slug, adminEmail.trim(), adminPassword)
+      setToken(data.access_token)
+      onLogin({
+        tenant: {
+          slug: data.tenant.slug,
+          id: data.tenant.id,
+          name: data.tenant.name || data.tenant.slug,
+        },
+        auth: {
+          loginMode: 'admin',
+          role: 'admin',
+          userId: data.user.email,
+          email: data.user.email,
+        },
+      })
+    } catch (err) {
+      setLoginError(`Admin girişi başarısız: ${err.message}`)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'var(--bg)',
-      padding: '24px',
-    }}>
-      <div className="fade-up" style={{
-        width: '100%', maxWidth: '400px',
-        background: 'var(--glass-bg)',
-        backdropFilter: 'var(--glass-blur)',
-        WebkitBackdropFilter: 'var(--glass-blur)',
-        border: '1px solid var(--border)',
-        borderRadius: 'var(--radius-xl)',
-        padding: '40px 36px',
-        boxShadow: 'var(--shadow-xl)',
-        position: 'relative', zIndex: 1,
-      }}>
-        {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{ width: 80, height: 80, margin: '0 auto 16px' }}>
-            <img src="/logo-light.png" className="logo-light" style={{ width: 80, height: 80, objectFit: 'contain' }} alt="TurkRAG" />
-            <img src="/logo-dark.png"  className="logo-dark"  style={{ width: 80, height: 80, objectFit: 'contain' }} alt="TurkRAG" />
-          </div>
-          <h1 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--text-1)', letterSpacing: '-0.02em' }}>
-            TurkRAG
-          </h1>
-          <p style={{ fontSize: '13px', color: 'var(--text-2)', marginTop: '6px' }}>
-            Türkçe Kurumsal Belge Asistanı
+    <div className="login-shell">
+      <div className="login-stage fade-up">
+        <section className="login-hero glass">
+          <div className="login-badge">TurkRAG access control</div>
+          <h1>Tek giriş ekranı yerine rol bazlı giriş akışı</h1>
+          <p>
+            Kullanıcılar yalnızca kendi çalışma alanına erişsin, admin ise tenant yönetimi
+            ve operasyon panellerine kontrollü biçimde girebilsin.
           </p>
-        </div>
 
-        <form onSubmit={handleLogin}>
-          <label style={{
-            fontSize: '12px', fontWeight: 600, color: 'var(--text-2)',
-            letterSpacing: '0.04em', textTransform: 'uppercase',
-            display: 'block', marginBottom: '8px',
-          }}>
-            Çalışma Alanı
-          </label>
-          <input
-            type="text"
-            value={loginSlug}
-            onChange={(e) => setLoginSlug(e.target.value)}
-            placeholder="ornek: acme-sirket"
-            className="input-field"
-            style={{ marginBottom: '20px' }}
-          />
-
-          {loginError && (
-            <div style={{
-              background: 'var(--error-muted)', border: '1px solid rgba(239,68,68,0.2)',
-              color: 'var(--error)', fontSize: '13px',
-              borderRadius: 'var(--radius-md)', padding: '10px 12px',
-              marginBottom: '16px',
-            }}>
-              {loginError}
+          <div className="login-highlights">
+            <div className="login-highlight">
+              <span>Üye oturumu</span>
+              <strong>Belge sorgulama, yükleme, sohbet</strong>
             </div>
+            <div className="login-highlight">
+              <span>Admin oturumu</span>
+              <strong>Tenant listeleme, sistem yönetimi, değerlendirme</strong>
+            </div>
+          </div>
+
+          <div className="login-admin-note">
+            <div className="login-admin-note-label">Mock admin credentials</div>
+            <code>{MOCK_ADMIN_EMAIL}</code>
+            <code>{MOCK_ADMIN_PASSWORD}</code>
+          </div>
+        </section>
+
+        <section className="login-panel glass">
+          <div className="login-brand">
+            <div className="login-brand-logo">
+              <img src="/logo-light.png" className="logo-light" alt="TurkRAG" />
+              <img src="/logo-dark.png" className="logo-dark" alt="TurkRAG" />
+            </div>
+            <div>
+              <div className="login-brand-kicker">Türkçe Kurumsal Belge Asistanı</div>
+              <h2>Giriş merkezi</h2>
+            </div>
+          </div>
+
+          <div className="login-mode-switch" role="tablist" aria-label="Giriş modu">
+            <button
+              type="button"
+              className={`login-mode-chip ${mode === 'member' ? 'active' : ''}`}
+              onClick={() => {
+                setMode('member')
+                setLoginError('')
+              }}
+            >
+              Kullanıcı girişi
+            </button>
+            <button
+              type="button"
+              className={`login-mode-chip ${mode === 'admin' ? 'active' : ''}`}
+              onClick={() => {
+                setMode('admin')
+                setLoginError('')
+              }}
+            >
+              Admin girişi
+            </button>
+          </div>
+
+          {mode === 'member' ? (
+            <form onSubmit={handleMemberLogin} className="login-form">
+              <div className="login-form-copy">
+                <h3>Çalışma alanına kullanıcı olarak gir</h3>
+                <p>Bu akış belge yükleme, sohbet ve kaynak inceleme işlemleri için member token üretir.</p>
+              </div>
+
+              <label className="login-label">
+                Çalışma alanı slug
+                <input
+                  type="text"
+                  value={memberSlug}
+                  onChange={(e) => setMemberSlug(e.target.value)}
+                  placeholder="ornek: acme-sirket"
+                  className="input-field"
+                />
+              </label>
+
+              {loginError && <div className="login-error">{loginError}</div>}
+
+              <button type="submit" disabled={loading} className="btn btn-primary login-submit">
+                {loading ? 'Giriş hazırlanıyor...' : 'Kullanıcı olarak devam et'}
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleAdminLogin} className="login-form">
+              <div className="login-form-copy">
+                <h3>Yönetim konsoluna admin olarak gir</h3>
+                <p>Bu akış backend tarafında mock admin doğrulaması yapar ve admin token döndürür.</p>
+              </div>
+
+              <label className="login-label">
+                Yönetilecek çalışma alanı slug
+                <input
+                  type="text"
+                  value={adminSlug}
+                  onChange={(e) => setAdminSlug(e.target.value)}
+                  placeholder="ornek: acme-sirket"
+                  className="input-field"
+                />
+              </label>
+
+              <div className="login-grid-two">
+                <label className="login-label">
+                  Email
+                  <input
+                    type="email"
+                    value={adminEmail}
+                    onChange={(e) => setAdminEmail(e.target.value)}
+                    placeholder={MOCK_ADMIN_EMAIL}
+                    className="input-field"
+                  />
+                </label>
+                <label className="login-label">
+                  Şifre
+                  <input
+                    type="password"
+                    value={adminPassword}
+                    onChange={(e) => setAdminPassword(e.target.value)}
+                    placeholder={MOCK_ADMIN_PASSWORD}
+                    className="input-field"
+                  />
+                </label>
+              </div>
+
+              <div className="login-credential-card">
+                <span>Hazır test hesabı</span>
+                <strong>{MOCK_ADMIN_EMAIL}</strong>
+                <strong>{MOCK_ADMIN_PASSWORD}</strong>
+              </div>
+
+              {loginError && <div className="login-error">{loginError}</div>}
+
+              <button type="submit" disabled={loading} className="btn btn-primary login-submit">
+                {loading ? 'Admin doğrulanıyor...' : 'Admin konsolunu aç'}
+              </button>
+            </form>
           )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn btn-primary"
-            style={{ width: '100%', padding: '12px', fontSize: '14px', borderRadius: 'var(--radius-md)' }}
-          >
-            {loading ? (
-              <span style={{
-                width: 16, height: 16, border: '2px solid rgba(255,255,255,0.3)',
-                borderTopColor: '#fff', borderRadius: '50%', display: 'inline-block',
-                animation: 'spin 0.7s linear infinite',
-              }} />
-            ) : 'Giriş Yap →'}
-          </button>
-        </form>
-
-        <p style={{ textAlign: 'center', fontSize: '11px', color: 'var(--text-3)', marginTop: '24px' }}>
-          KVKK uyumlu · Tamamen şirket içi
-        </p>
+          <p className="login-footer-copy">KVKK uyumlu · şirket içi indeksleme · rol bazlı erişim</p>
+        </section>
       </div>
     </div>
   )
@@ -118,14 +250,10 @@ function LoginPage({ onLogin }) {
 
 /* ── Main app ──────────────────────────────────────────── */
 export default function App() {
-  const [tenant, setTenant] = useState(() => {
-    try {
-      const saved = localStorage.getItem('turkrag_tenant')
-      return saved ? JSON.parse(saved) : null
-    } catch { return null }
-  })
+  const [tenant, setTenant] = useState(() => loadStoredJSON('turkrag_tenant'))
+  const [authSession, setAuthSession] = useState(() => loadStoredJSON(AUTH_STORAGE_KEY))
   const [tenants, setTenants] = useState([])
-  const [role, setRole] = useState(() => getTokenPayload()?.role || '')
+  const [role, setRole] = useState(() => getTokenPayload()?.role || loadStoredJSON(AUTH_STORAGE_KEY)?.role || '')
   const [tab, setTab] = useState('chat')
   const [selectedSession, setSelectedSession] = useState(null)
   const [sessionRefresh, setSessionRefresh] = useState(0)
@@ -135,26 +263,43 @@ export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [theme, setTheme] = useState(() => localStorage.getItem('turkrag_theme') || 'light')
 
+  const clearSessionState = () => {
+    setToken('')
+    setRole('')
+    setAuthSession(null)
+    setTenant(null)
+    setTenants([])
+    setSessions([])
+    setCitations([])
+    setSelectedSession(null)
+    localStorage.removeItem('turkrag_tenant')
+    localStorage.removeItem(AUTH_STORAGE_KEY)
+  }
+
+  const persistSession = (nextTenant, nextAuth) => {
+    setTenant(nextTenant)
+    setAuthSession(nextAuth)
+    setRole(nextAuth.role)
+    setTenants(nextAuth.role === 'admin' ? [] : [nextTenant])
+    localStorage.setItem('turkrag_tenant', JSON.stringify(nextTenant))
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(nextAuth))
+  }
+
   /* Apply theme to <html> */
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
     localStorage.setItem('turkrag_theme', theme)
   }, [theme])
 
-  /* Refresh the dev token on startup so expired localStorage state does not linger. */
+  /* Validate restored token. */
   useEffect(() => {
     if (!tenant) return
-    api.getToken(tenant.id, 'demo-user', 'member')
-      .then((data) => {
-        setToken(data.access_token)
-        setRole(getTokenPayload()?.role || '')
-      })
-      .catch(() => {
-        setToken('')
-        setRole('')
-        setTenant(null)
-        localStorage.removeItem('turkrag_tenant')
-      })
+    const payload = getTokenPayload()
+    if (!getToken() || !payload || isTokenExpired(payload)) {
+      clearSessionState()
+      return
+    }
+    setRole(payload.role || authSession?.role || '')
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   /* Load tenant list for admins; members stay scoped to the current tenant. */
@@ -180,37 +325,34 @@ export default function App() {
   }, [tenant, sessionRefresh])
 
   const handleLogout = () => {
-    setToken('')
-    setRole('')
-    setTenant(null)
-    localStorage.removeItem('turkrag_tenant')
-    setSessions([])
-    setCitations([])
-    setSelectedSession(null)
+    clearSessionState()
   }
 
   const handleTenantSwitch = async (t) => {
+    if (!authSession) return
     try {
-      const data = await api.getToken(t.id, 'demo-user', 'member')
+      const nextRole = authSession.role || 'member'
+      const userId = authSession.userId || (nextRole === 'admin' ? MOCK_ADMIN_EMAIL : 'demo-user')
+      const data = await api.getToken(t.id, userId, nextRole)
       setToken(data.access_token)
-      setRole(getTokenPayload()?.role || '')
-      const next = { slug: t.slug, id: t.id, name: t.name }
-      setTenant(next)
-      localStorage.setItem('turkrag_tenant', JSON.stringify(next))
+      setRole(getTokenPayload()?.role || nextRole)
+      const nextTenant = { slug: t.slug, id: t.id, name: t.name }
+      setTenant(nextTenant)
+      localStorage.setItem('turkrag_tenant', JSON.stringify(nextTenant))
       setSelectedSession(null)
       setCitations([])
       setSessionRefresh((n) => n + 1)
     } catch {}
   }
 
-  if (!tenant) {
+  if (!tenant || !authSession || !role) {
     return (
       <ToastProvider>
-        <LoginPage onLogin={(t) => {
-          setTenant(t)
-          setTenants([t])
-          localStorage.setItem('turkrag_tenant', JSON.stringify(t))
-        }} />
+        <LoginPage
+          onLogin={({ tenant: nextTenant, auth: nextAuth }) => {
+            persistSession(nextTenant, nextAuth)
+          }}
+        />
       </ToastProvider>
     )
   }
@@ -219,7 +361,6 @@ export default function App() {
     <ToastProvider>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
 
-        {/* ── Header ── */}
         <Header
           tenant={tenant}
           tenants={tenants}
@@ -229,10 +370,7 @@ export default function App() {
           onThemeToggle={() => setTheme((t) => t === 'dark' ? 'light' : 'dark')}
         />
 
-        {/* ── Body row ── */}
         <div style={{ flex: 1, overflow: 'hidden', display: 'flex' }}>
-
-          {/* ── Sidebar ── */}
           <Sidebar
             tab={tab}
             onTabChange={(t) => { setTab(t); if (t !== 'chat') setCitations([]) }}
@@ -245,10 +383,7 @@ export default function App() {
             showAdmin={role === 'admin'}
           />
 
-          {/* ── Main content ── */}
           <main style={{ flex: 1, overflow: 'hidden', display: 'flex', background: 'var(--bg)' }}>
-
-            {/* Chat */}
             <div style={{
               display: tab === 'chat' ? 'flex' : 'none',
               flex: 1, overflow: 'hidden', flexDirection: 'column',
@@ -261,41 +396,31 @@ export default function App() {
               />
             </div>
 
-            {/* Documents */}
             <div style={{
-              display: tab === 'documents' ? 'flex' : 'none',
-              flex: 1, overflowY: 'auto', flexDirection: 'column',
+              display: tab === 'documents' ? 'block' : 'none',
+              flex: 1, overflow: 'auto', padding: '20px',
             }}>
-              <div style={{ padding: '28px', maxWidth: 760, width: '100%', margin: '0 auto' }}>
-                <DocumentUpload />
-              </div>
+              <DocumentUpload />
             </div>
 
-            {/* Analytics */}
             <div style={{
-              display: tab === 'analytics' ? 'flex' : 'none',
-              flex: 1, overflowY: 'auto', flexDirection: 'column',
+              display: tab === 'analytics' ? 'block' : 'none',
+              flex: 1, overflow: 'auto', padding: '20px',
             }}>
-              <div style={{ padding: '28px', maxWidth: 900, width: '100%', margin: '0 auto' }}>
-                <AnalyticsDashboard />
-              </div>
+              <AnalyticsDashboard />
             </div>
 
-            {/* Admin */}
             <div style={{
               display: tab === 'admin' && role === 'admin' ? 'flex' : 'none',
-              flex: 1, overflowY: 'auto', flexDirection: 'column',
+              flex: 1, overflow: 'auto', padding: '20px',
             }}>
-              <div style={{ padding: '28px', maxWidth: 900, width: '100%', margin: '0 auto' }}>
-                <AdminPanel />
-              </div>
+              <AdminPanel />
             </div>
-          </main>
 
-          {/* ── Sources panel — chat tab only ── */}
-          {tab === 'chat' && (
-            <SourcesPanel citations={citations} attribution={attribution} />
-          )}
+            {tab === 'chat' && (
+              <SourcesPanel citations={citations} attribution={attribution} />
+            )}
+          </main>
         </div>
       </div>
     </ToastProvider>

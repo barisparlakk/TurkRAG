@@ -8,12 +8,12 @@ import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request, status
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
-from api.auth import create_token
+from api.auth import create_token, validate_mock_admin
 from api.middleware import setup_middleware
 from api.routers import analytics, chat, documents, evaluation, export, health, permissions, sessions, tenants
 
@@ -252,6 +252,44 @@ async def get_token(request: Request):
         role=body.get("role", "member"),
     )
     return {"access_token": token, "token_type": "bearer"}
+
+
+@app.post("/auth/mock-login", tags=["auth"])
+async def mock_login(request: Request):
+    """Issue a mock admin JWT after checking the built-in dashboard credentials."""
+    from api.db import get_conn
+
+    body = await request.json()
+    email = str(body.get("email", "")).strip()
+    password = str(body.get("password", ""))
+    tenant_slug = str(body.get("tenant_slug", "")).strip()
+
+    if not tenant_slug:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="tenant_slug is required")
+    if not validate_mock_admin(email, password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid admin credentials")
+
+    conn = get_conn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, name, slug FROM tenants WHERE slug=%s", (tenant_slug,))
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail=f"Tenant '{tenant_slug}' not found")
+    finally:
+        conn.close()
+
+    token = create_token(
+        tenant_id=str(row[0]),
+        user_id=email,
+        role="admin",
+    )
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "tenant": {"id": str(row[0]), "name": row[1], "slug": row[2]},
+        "user": {"email": email, "role": "admin"},
+    }
 
 
 if __name__ == "__main__":
