@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 MODES = ["sparse", "dense", "hybrid", "hybrid+rerank"]
 METRICS = ["faithfulness", "answer_relevancy", "context_precision", "context_recall"]
+LATENCY_FIELDS = ["retrieval_latency_ms", "generation_latency_ms", "total_latency_ms"]
 
 
 def main():
@@ -72,7 +73,12 @@ def main():
     try:
         import csv
         csv_path = output_dir / f"experiment_{timestamp}.csv"
-        fieldnames = ["retrieval_mode", "run_label"] + METRICS + ["n_queries", "top_k", "final_k", "evaluated_at"]
+        fieldnames = (
+            ["retrieval_mode", "run_label"]
+            + METRICS
+            + LATENCY_FIELDS
+            + ["n_queries", "top_k", "final_k", "evaluated_at"]
+        )
         with csv_path.open("w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
             writer.writeheader()

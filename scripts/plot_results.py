@@ -35,6 +35,7 @@ MODE_COLORS = {
     "hybrid": "#6BAF8E",
     "hybrid+rerank": "#8E6BAF",
 }
+LATENCY_KEYS = ("retrieval_latency_ms", "generation_latency_ms", "total_latency_ms")
 
 
 def load_results(input_path: str) -> list[dict]:
@@ -79,7 +80,7 @@ def plot_metrics_comparison(results: list[dict], output_dir: Path) -> None:
         values = [_to_float(r.get(metric, 0)) for r in valid]
         offset = (i - n_metrics / 2 + 0.5) * width
         bars = ax.bar(x + offset, values, width, label=METRIC_LABELS[metric], alpha=0.85)
-        for bar, val in zip(bars, values):
+        for bar, val in zip(bars, values, strict=False):
             if val is not None:
                 ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.01,
                         f"{val:.2f}", ha="center", va="bottom", fontsize=7)
@@ -114,7 +115,7 @@ def plot_radar(results: list[dict], output_dir: Path) -> None:
     angles = np.linspace(0, 2 * np.pi, len(METRICS), endpoint=False).tolist()
     angles += angles[:1]
 
-    fig, ax = plt.subplots(figsize=(7, 7), subplot_kw=dict(polar=True))
+    fig, ax = plt.subplots(figsize=(7, 7), subplot_kw={"polar": True})
 
     for r in valid:
         mode = r["retrieval_mode"]
@@ -147,7 +148,7 @@ def plot_recall_at_k(recall_data: list[dict], output_dir: Path) -> None:
     fig, ax = plt.subplots(figsize=(8, 5))
     for entry in recall_data:
         mode = entry.get("retrieval_mode", "unknown")
-        ks = sorted(int(k) for k in entry.get("recall_at_k", {}).keys())
+        ks = sorted(int(k) for k in entry.get("recall_at_k", {}))
         vals = [entry["recall_at_k"][str(k)] for k in ks]
         color = MODE_COLORS.get(mode, "#666666")
         ax.plot(ks, vals, marker="o", linewidth=2, label=mode, color=color)
@@ -161,6 +162,80 @@ def plot_recall_at_k(recall_data: list[dict], output_dir: Path) -> None:
     ax.spines[["top", "right"]].set_visible(False)
 
     out = output_dir / "recall_at_k.png"
+    fig.tight_layout()
+    fig.savefig(out, dpi=150)
+    plt.close(fig)
+    logger.info("Saved: %s", out)
+
+
+def collect_latency_series(results: list[dict]) -> dict[str, list[float]]:
+    """Extract per-query total latency series keyed by retrieval mode."""
+    series: dict[str, list[float]] = {}
+    for result in results:
+        mode = result.get("retrieval_mode")
+        if not mode:
+            continue
+        per_query = result.get("per_query", [])
+        latencies = [
+            _to_float(entry.get("total_latency_ms"))
+            for entry in per_query
+            if _to_float(entry.get("total_latency_ms")) is not None
+        ]
+        if latencies:
+            series[mode] = latencies
+    return series
+
+
+def load_latency_results(input_path: str) -> list[dict]:
+    """Load mode JSON files that match an experiment CSV or a direct JSON input."""
+    p = Path(input_path)
+    if p.suffix == ".json":
+        return load_results(input_path)
+
+    if p.suffix != ".csv":
+        return []
+
+    if not p.stem.startswith("experiment_"):
+        return []
+
+    timestamp = p.stem.removeprefix("experiment_")
+    matches = sorted(p.parent.glob(f"{timestamp}_*.json"))
+    if not matches:
+        logger.info("No per-mode JSON files found for latency plot")
+        return []
+
+    loaded: list[dict] = []
+    for match in matches:
+        loaded.extend(load_results(str(match)))
+    return loaded
+
+
+def plot_latency_distribution(latency_results: list[dict], output_dir: Path) -> None:
+    """Per-mode total latency box plot from eval per_query payloads."""
+    import matplotlib.pyplot as plt
+
+    latency_series = collect_latency_series(latency_results)
+    if not latency_series:
+        logger.info("No latency data available — skipping latency plot")
+        return
+
+    modes = list(latency_series.keys())
+    values = [latency_series[mode] for mode in modes]
+    colors = [MODE_COLORS.get(mode, "#666666") for mode in modes]
+
+    fig, ax = plt.subplots(figsize=(9, 5))
+    box = ax.boxplot(values, patch_artist=True, labels=modes)
+    for patch, color in zip(box["boxes"], colors, strict=False):
+        patch.set_facecolor(color)
+        patch.set_alpha(0.6)
+
+    ax.set_xlabel("Retrieval Mode", fontsize=12)
+    ax.set_ylabel("Total Latency (ms)", fontsize=12)
+    ax.set_title("TurkRAG — Query Latency Distribution", fontsize=14, fontweight="bold")
+    ax.grid(axis="y", alpha=0.3)
+    ax.spines[["top", "right"]].set_visible(False)
+
+    out = output_dir / "latency_distribution.png"
     fig.tight_layout()
     fig.savefig(out, dpi=150)
     plt.close(fig)
@@ -195,6 +270,7 @@ def main():
 
     plot_metrics_comparison(results, output_dir)
     plot_radar(results, output_dir)
+    plot_latency_distribution(load_latency_results(input_path), output_dir)
 
     if args.recall_input:
         raw = json.loads(Path(args.recall_input).read_text(encoding="utf-8"))

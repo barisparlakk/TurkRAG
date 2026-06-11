@@ -2,7 +2,7 @@
 
 import pytest
 
-from ingestion.chunker import TurkishChunker
+from ingestion.chunker import TurkishChunker, get_chunker
 
 REQUIRED_KEYS = {"text", "chunk_index", "start_char", "end_char"}
 
@@ -95,3 +95,21 @@ class TestChunkBoundaries:
             last_words = chunks[0]["text"].split()[-5:]
             assert any(w in chunks[1]["text"] for w in last_words), \
                 "overlap missing between chunks"
+
+
+class TestChunkerFactory:
+    def test_turkish_chunker_uses_snake_case_overrides(self):
+        chunker = get_chunker("turkish", max_chars=120, overlap_chars=30, min_sentence_chars=10)
+
+        assert isinstance(chunker, TurkishChunker)
+        assert chunker.MAX_CHARS == 120
+        assert chunker.OVERLAP_CHARS == 30
+        assert chunker.MIN_SENTENCE_CHARS == 10
+
+    def test_turkish_chunker_override_changes_chunk_count(self):
+        text = "Bu cümle yeterince uzundur ve deney konfigürasyonunu test eder. " * 12
+
+        default_chunks = get_chunker("turkish").chunk(text)
+        tuned_chunks = get_chunker("turkish", max_chars=120, overlap_chars=0).chunk(text)
+
+        assert len(tuned_chunks) > len(default_chunks)

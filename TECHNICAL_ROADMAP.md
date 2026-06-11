@@ -63,6 +63,9 @@ Giriş: results/*.csv
   figures/recall_at_k.png          → Recall@K eğrisi
 ```
 
+Not: `eval/ragas_eval.py` artık per-query ve aggregate latency değerlerini persist ettiği için
+`latency_distribution.png` gerçek deney verisiyle üretilebiliyor.
+
 ---
 
 ## Faz 2 — Ground-Truth Eval Set
@@ -239,11 +242,11 @@ Cevap üretildikten sonra:
 | `scripts/generate_eval_set.py` | 2.2 | ✅ Mevcut |
 | `eval/retrieval_metrics.py` | 2.3 | ✅ Mevcut |
 | `eval/error_analysis.py` | 3.1 | ✅ Mevcut |
-| `ingestion/chunker.py` (ek chunkerlar) | 4.1 | Mevcut dosya güncellenir |
-| `scripts/chunking_experiments.py` | 4.2 | Yeni |
-| `ingestion/embedder.py` (env var) | 4.3 | Mevcut dosya güncellenir |
-| `scripts/embedder_experiments.py` | 4.4 | Yeni |
-| `scripts/hyperparameter_sweep.py` | 5.1 | Yeni |
+| `ingestion/chunker.py` (ek chunkerlar) | 4.1 | ✅ Mevcut; Türkçe chunker override'ları deney scriptleriyle uyumlu |
+| `scripts/chunking_experiments.py` | 4.2 | ✅ Mevcut |
+| `ingestion/embedder.py` (env var) | 4.3 | ✅ Mevcut |
+| `scripts/embedder_experiments.py` | 4.4 | ✅ Mevcut |
+| `scripts/hyperparameter_sweep.py` | 5.1 | ✅ Mevcut |
 | `generation/attribution.py` | 6.1 | ✅ Mevcut |
 | `figures/` dizini | 1.4+ | ✅ Mevcut |
 | `results/` dizini | 1.3+ | ✅ Mevcut |

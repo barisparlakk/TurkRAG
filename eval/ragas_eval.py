@@ -17,6 +17,7 @@ import json
 import logging
 import os
 import re
+import time
 import uuid
 from datetime import datetime
 from pathlib import Path
@@ -27,6 +28,11 @@ logger = logging.getLogger(__name__)
 
 POSTGRES_URL = os.getenv("POSTGRES_URL", "postgresql://turkrag:turkrag_secret@localhost/turkrag")
 METRICS = ["faithfulness", "answer_relevancy", "context_precision", "context_recall"]
+LATENCY_FIELDS = [
+    "retrieval_latency_ms",
+    "generation_latency_ms",
+    "total_latency_ms",
+]
 
 
 # ── Metric implementations ─────────────────────────────────────────────────────
@@ -106,19 +112,26 @@ def run_eval(
         relevant_doc = item.get("relevant_doc", "")
         logger.info("[%d/%d] %s", i + 1, len(test_queries), question[:70])
 
+        query_started_at = time.perf_counter()
+        retrieval_started_at = query_started_at
         chunks = retriever.retrieve(question, tenant_slug, top_k=top_k, final_k=final_k, mode=retrieval_mode)
+        retrieval_latency_ms = (time.perf_counter() - retrieval_started_at) * 1000
         context_texts = [c.get("text", "") for c in chunks]
         retrieved_docs = [c.get("filename", "") for c in chunks]
 
+        generation_latency_ms = 0.0
         if is_available() and chunks:
             prompt = build_prompt(question, chunks)
+            generation_started_at = time.perf_counter()
             answer = generate(prompt)
+            generation_latency_ms = (time.perf_counter() - generation_started_at) * 1000
             logger.info("  Answer: %s…", answer[:80])
         elif not chunks:
             answer = "İlgili belge bulunamadı."
             logger.warning("  No chunks retrieved")
         else:
             answer = "LLM modeli mevcut değil."
+        total_latency_ms = (time.perf_counter() - query_started_at) * 1000
 
         per_query.append({
             "question": question,
@@ -126,6 +139,9 @@ def run_eval(
             "ground_truth": ground_truth,
             "relevant_doc": relevant_doc,
             "retrieved_docs": retrieved_docs,
+            "retrieval_latency_ms": retrieval_latency_ms,
+            "generation_latency_ms": generation_latency_ms,
+            "total_latency_ms": total_latency_ms,
             "faithfulness":       compute_faithfulness(answer, context_texts),
             "answer_relevancy":   compute_answer_relevancy(question, answer),
             "context_precision":  compute_context_precision(retrieved_docs, relevant_doc),
@@ -146,6 +162,9 @@ def run_eval(
         "answer_relevancy":   sum(q["answer_relevancy"]  for q in per_query) / n if n else 0.0,
         "context_precision":  sum(q["context_precision"] for q in per_query) / n if n else 0.0,
         "context_recall":     sum(q["context_recall"]    for q in per_query) / n if n else 0.0,
+        "retrieval_latency_ms": sum(q["retrieval_latency_ms"] for q in per_query) / n if n else 0.0,
+        "generation_latency_ms": sum(q["generation_latency_ms"] for q in per_query) / n if n else 0.0,
+        "total_latency_ms": sum(q["total_latency_ms"] for q in per_query) / n if n else 0.0,
         "per_query":          per_query,
     }
     return scores
@@ -167,7 +186,7 @@ def save_to_db(scores: dict) -> None:
             scores["tenant_slug"],
             scores["run_label"],
             json.dumps({k: scores[k] for k in ("retrieval_mode", "top_k", "final_k")}),
-            json.dumps({k: scores[k] for k in METRICS}),
+            json.dumps({k: scores[k] for k in METRICS + LATENCY_FIELDS}),
         ))
         conn.commit()
         cur.close()

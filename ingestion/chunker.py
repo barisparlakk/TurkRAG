@@ -286,6 +286,12 @@ CHUNKER_REGISTRY = {
     "paragraph": ParagraphChunker,
 }
 
+_TURKISH_ATTR_ALIASES = {
+    "max_chars": "MAX_CHARS",
+    "overlap_chars": "OVERLAP_CHARS",
+    "min_sentence_chars": "MIN_SENTENCE_CHARS",
+}
+
 
 def get_chunker(strategy: str = "turkish", **kwargs):
     """Return a chunker instance by name.
@@ -301,11 +307,14 @@ def get_chunker(strategy: str = "turkish", **kwargs):
     try:
         return cls(**kwargs) if kwargs else cls()
     except TypeError:
-        # TurkishChunker has no __init__ params — apply overrides manually
+        # TurkishChunker has no __init__ params — apply overrides manually.
+        # Accept the script-facing snake_case names so experiments actually
+        # modify the chunking behaviour instead of silently using defaults.
         obj = cls()
         for k, v in kwargs.items():
-            if hasattr(obj, k):
-                setattr(obj, k, v)
+            attr_name = _TURKISH_ATTR_ALIASES.get(k, k)
+            if hasattr(obj, attr_name):
+                setattr(obj, attr_name, v)
         return obj
 
 
