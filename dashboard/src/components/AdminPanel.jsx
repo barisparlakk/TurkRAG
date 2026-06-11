@@ -21,10 +21,7 @@ const IconRefresh = () => (
 /* ── Section title ──────────────────────────────────────────────────────────── */
 function SectionTitle({ children }) {
   return (
-    <div style={{
-      fontSize: '11px', fontWeight: 700, color: 'var(--text-3)',
-      letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '12px',
-    }}>
+    <div className="section-label">
       {children}
     </div>
   )
@@ -112,7 +109,6 @@ function TenantSection({ onCreated }) {
     }}>
       <SectionTitle>Kiracı Yönetimi</SectionTitle>
 
-      {/* Tenant list */}
       {tenants.length > 0 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
           {tenants.map((t) => (
@@ -128,7 +124,6 @@ function TenantSection({ onCreated }) {
         </div>
       )}
 
-      {/* Create form */}
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <input
@@ -155,7 +150,7 @@ function TenantSection({ onCreated }) {
             className="btn btn-primary"
             style={{ padding: '8px 16px', fontSize: '13px', flexShrink: 0 }}
           >
-            {loading ? '…' : '+ Oluştur'}
+            {loading ? '...' : 'Oluştur'}
           </button>
         </div>
 
@@ -174,7 +169,7 @@ function TenantSection({ onCreated }) {
             color: 'var(--success)', fontSize: '12px',
             borderRadius: 'var(--radius-md)', padding: '8px 12px',
           }}>
-            ✓ {success}
+            {success}
           </div>
         )}
       </form>
@@ -206,14 +201,13 @@ function DocumentsSection() {
       background: 'var(--surface-1)', border: '1px solid var(--border)',
       borderRadius: 'var(--radius-lg)', overflow: 'hidden',
     }}>
-      {/* Header */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '16px 20px', borderBottom: '1px solid var(--border)',
         background: 'var(--surface-2)',
       }}>
         <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-          Tüm Belgeler ({docs.length})
+          Belgeler ({docs.length})
         </div>
         <button onClick={load} disabled={loading} className="btn" style={{
           fontSize: '11px', padding: '4px 10px', border: '1px solid var(--border)',
@@ -221,13 +215,13 @@ function DocumentsSection() {
           display: 'flex', alignItems: 'center', gap: '5px',
           opacity: loading ? 0.5 : 1,
         }}>
-          <IconRefresh /> Yenile
+          <IconRefresh />
         </button>
       </div>
 
       {loading ? (
         <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-3)', fontSize: '13px' }}>
-          Yükleniyor…
+          Yükleniyor
         </div>
       ) : docs.length === 0 ? (
         <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-3)', fontSize: '13px' }}>
@@ -235,7 +229,6 @@ function DocumentsSection() {
         </div>
       ) : (
         <>
-          {/* Table header */}
           <div style={{
             display: 'grid', gridTemplateColumns: '1fr 80px 60px 100px',
             padding: '8px 20px', borderBottom: '1px solid var(--border)',
@@ -324,9 +317,6 @@ function ConfigSection() {
           </div>
         ))}
       </div>
-      <div style={{ fontSize: '11px', color: 'var(--text-3)', marginTop: '12px' }}>
-        Değerleri değiştirmek için <code style={{ fontFamily: 'monospace', color: 'var(--accent-hover)' }}>.env</code> dosyasını düzenleyin ve API'yi yeniden başlatın.
-      </div>
     </div>
   )
 }
@@ -347,28 +337,15 @@ export default function AdminPanel() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      {/* Page header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div>
-          <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-1)', marginBottom: '4px' }}>
-            Yönetim Paneli
-          </h2>
-          <p style={{ fontSize: '13px', color: 'var(--text-2)' }}>
-            Sistem durumu, kiracı yönetimi ve konfigürasyon
-          </p>
-        </div>
+      <div className="view-header">
+        <h2>Yönetim</h2>
         <button
           onClick={() => { load(); setRefreshKey((n) => n + 1) }}
           disabled={loading}
-          className="btn"
-          style={{
-            fontSize: '12px', padding: '6px 14px',
-            border: '1px solid var(--border)', borderRadius: 'var(--radius-md)',
-            color: 'var(--text-2)', opacity: loading ? 0.5 : 1,
-            display: 'flex', alignItems: 'center', gap: '6px',
-          }}
+          className="btn btn-outline"
+          style={{ opacity: loading ? 0.5 : 1 }}
         >
-          <IconRefresh /> {loading ? 'Yükleniyor…' : 'Yenile'}
+          <IconRefresh /> {loading ? '...' : 'Yenile'}
         </button>
       </div>
 

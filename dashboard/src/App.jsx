@@ -364,13 +364,14 @@ export default function App() {
         <Header
           tenant={tenant}
           tenants={tenants}
+          role={role}
           onTenantSwitch={handleTenantSwitch}
           onLogout={handleLogout}
           theme={theme}
           onThemeToggle={() => setTheme((t) => t === 'dark' ? 'light' : 'dark')}
         />
 
-        <div style={{ flex: 1, overflow: 'hidden', display: 'flex' }}>
+        <div className="dashboard-body">
           <Sidebar
             tab={tab}
             onTabChange={(t) => { setTab(t); if (t !== 'chat') setCitations([]) }}
@@ -383,7 +384,7 @@ export default function App() {
             showAdmin={role === 'admin'}
           />
 
-          <main style={{ flex: 1, overflow: 'hidden', display: 'flex', background: 'var(--bg)' }}>
+          <main className="main-stage">
             <div style={{
               display: tab === 'chat' ? 'flex' : 'none',
               flex: 1, overflow: 'hidden', flexDirection: 'column',
@@ -400,21 +401,27 @@ export default function App() {
               display: tab === 'documents' ? 'block' : 'none',
               flex: 1, overflow: 'auto', padding: '20px',
             }}>
-              <DocumentUpload />
+              <div className="view-pane">
+                <DocumentUpload />
+              </div>
             </div>
 
             <div style={{
               display: tab === 'analytics' ? 'block' : 'none',
               flex: 1, overflow: 'auto', padding: '20px',
             }}>
-              <AnalyticsDashboard />
+              <div className="view-pane">
+                <AnalyticsDashboard />
+              </div>
             </div>
 
             <div style={{
               display: tab === 'admin' && role === 'admin' ? 'flex' : 'none',
               flex: 1, overflow: 'auto', padding: '20px',
             }}>
-              <AdminPanel />
+              <div className="view-pane">
+                <AdminPanel />
+              </div>
             </div>
 
             {tab === 'chat' && (

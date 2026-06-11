@@ -95,49 +95,26 @@ export function DocumentUpload() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      {/* Page title */}
-      <div>
-        <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-1)', marginBottom: '4px' }}>
-          Belge Yönetimi
-        </h2>
-        <p style={{ fontSize: '13px', color: 'var(--text-2)' }}>
-          PDF, DOCX, TXT, Excel (XLSX) ve CSV formatında dosyalar yükleyin.
-        </p>
+      <div className="view-header">
+        <h2>Belgeler</h2>
+        <span>{documents.length}</span>
       </div>
 
-      {/* Drop zone */}
       <div
+        className={`upload-zone ${dragging ? 'dragging' : ''}`}
         onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
         onDragLeave={() => setDragging(false)}
         onDrop={(e) => { e.preventDefault(); setDragging(false); handleFiles(e.dataTransfer.files) }}
         onClick={() => fileInputRef.current?.click()}
-        style={{
-          border: `2px dashed ${dragging ? 'var(--accent)' : 'var(--border)'}`,
-          borderRadius: 'var(--radius-lg)',
-          padding: '40px 24px',
-          textAlign: 'center',
-          cursor: 'pointer',
-          background: dragging ? 'var(--accent-muted)' : 'var(--surface-1)',
-          transition: 'all 0.15s',
-          boxShadow: dragging ? '0 0 0 4px var(--accent-glow)' : 'none',
-        }}
       >
-        <div style={{
-          width: 48, height: 48, margin: '0 auto 14px',
-          background: dragging ? 'var(--accent-muted)' : 'var(--surface-2)',
-          border: '1px solid ' + (dragging ? 'rgba(99,102,241,0.4)' : 'var(--border)'),
-          borderRadius: 14,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: dragging ? 'var(--accent)' : 'var(--text-3)',
-          transition: 'all 0.15s',
-        }}>
+        <div className="upload-icon">
           <IconUpload />
         </div>
-        <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-1)', marginBottom: '4px' }}>
-          {dragging ? 'Bırakın' : 'Dosyaları buraya sürükleyin'}
+        <div className="upload-title">
+          {dragging ? 'Bırakın' : 'Dosya bırakın'}
         </div>
-        <div style={{ fontSize: '12px', color: 'var(--text-3)' }}>
-          veya <span style={{ color: 'var(--accent-hover)', fontWeight: 500 }}>tıklayarak seçin</span> · PDF, DOCX, TXT, XLSX, CSV
+        <div className="upload-meta">
+          PDF · DOCX · TXT · XLSX · CSV
         </div>
         <input
           ref={fileInputRef}
@@ -149,7 +126,6 @@ export function DocumentUpload() {
         />
       </div>
 
-      {/* Progress */}
       {uploading && (
         <div style={{
           background: 'var(--surface-1)', border: '1px solid var(--border)',
@@ -169,7 +145,6 @@ export function DocumentUpload() {
         </div>
       )}
 
-      {/* Error */}
       {error && (
         <div style={{
           background: 'var(--error-muted)', border: '1px solid rgba(239,68,68,0.2)',
@@ -180,14 +155,9 @@ export function DocumentUpload() {
         </div>
       )}
 
-      {/* Document list */}
       <div>
-        <div style={{
-          fontSize: '11px', fontWeight: 700, color: 'var(--text-3)',
-          letterSpacing: '0.08em', textTransform: 'uppercase',
-          marginBottom: '10px',
-        }}>
-          Yüklü Belgeler {documents.length > 0 && `(${documents.length})`}
+        <div className="section-label">
+          Liste
         </div>
 
         {documents.length === 0 ? (
@@ -196,7 +166,7 @@ export function DocumentUpload() {
             borderRadius: 'var(--radius-md)', padding: '28px',
             textAlign: 'center', color: 'var(--text-3)', fontSize: '13px',
           }}>
-            Henüz yüklenmiş belge yok
+            Belge yok
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>

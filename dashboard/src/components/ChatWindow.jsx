@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useStream } from '../hooks/useStream.js'
-import { SourcesPanel } from './SourcesPanel.jsx'
 import { api } from '../api/client.js'
 
 /* ── Icons ─────────────────────────────────────────────── */
@@ -61,41 +60,20 @@ const EXAMPLE_QUESTIONS = [
 
 function EmptyState({ onSend }) {
   return (
-    <div style={{
-      flex: 1, display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center',
-      padding: '40px 24px', gap: '24px',
-    }}>
-      <div style={{ width: 72, height: 72 }}>
-        <img src="/logo-light.png" className="logo-light" style={{ width: 72, height: 72, objectFit: 'contain' }} alt="" />
-        <img src="/logo-dark.png"  className="logo-dark"  style={{ width: 72, height: 72, objectFit: 'contain' }} alt="" />
+    <div className="chat-empty">
+      <div className="chat-empty-logo">
+        <img src="/logo-light.png" className="logo-light" alt="" />
+        <img src="/logo-dark.png" className="logo-dark" alt="" />
       </div>
 
-      <div style={{ textAlign: 'center', maxWidth: 400 }}>
-        <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-1)', marginBottom: '8px' }}>
-          Belgeleriniz hakkında soru sorun
-        </h2>
-        <p style={{ fontSize: '13px', color: 'var(--text-2)', lineHeight: 1.6 }}>
-          Yüklediğiniz belgelerden yanıtlar alın. Türkçe sorular sorabilirsiniz.
-        </p>
-      </div>
+      <h2>Belgeye sor</h2>
 
-      {/* Example chips */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center', maxWidth: 480 }}>
+      <div className="prompt-chips">
         {EXAMPLE_QUESTIONS.map((q, i) => (
           <button
             key={i}
             onClick={() => onSend(q)}
-            className="btn"
-            style={{
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--radius-lg)',
-              padding: '8px 14px',
-              fontSize: '13px', color: 'var(--text-1)',
-              background: 'var(--surface-1)',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)' }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-1)' }}
+            className="prompt-chip"
           >
             {q}
           </button>
@@ -155,7 +133,7 @@ function Message({ msg, isLast, onRegenerate, onFollowUp, isStreaming }) {
   }
 
   return (
-    <div className="fade-up" style={{
+    <div className={`message-row fade-up ${isUser ? 'user' : 'assistant'}`} style={{
       display: 'flex',
       justifyContent: isUser ? 'flex-end' : 'flex-start',
       marginBottom: '20px',
@@ -163,29 +141,15 @@ function Message({ msg, isLast, onRegenerate, onFollowUp, isStreaming }) {
     }}>
       {/* Avatar — assistant only; user has no avatar */}
       {!isUser && (
-        <div style={{ width: 28, height: 28, flexShrink: 0, marginTop: 2 }}>
-          <img src="/logo-light.png" className="logo-light" style={{ width: 28, height: 28, objectFit: 'contain' }} alt="" />
-          <img src="/logo-dark.png"  className="logo-dark"  style={{ width: 28, height: 28, objectFit: 'contain' }} alt="" />
+        <div className="message-avatar">
+          <img src="/logo-light.png" className="logo-light" alt="" />
+          <img src="/logo-dark.png" className="logo-dark" alt="" />
         </div>
       )}
 
       <div style={{ maxWidth: '72%', minWidth: 60 }}>
-        {/* Bubble */}
-        <div style={{
-          padding: '12px 16px',
-          borderRadius: isUser
-            ? 'var(--radius-lg) var(--radius-lg) var(--radius-sm) var(--radius-lg)'
-            : 'var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-sm)',
-          background: isUser ? 'var(--user-bubble-bg)' : 'var(--asst-bubble-bg)',
-          color: isUser ? 'var(--user-bubble-text)' : 'var(--asst-bubble-text)',
-          border: isUser ? '1px solid transparent' : '1px solid var(--border)',
-          boxShadow: isUser ? 'var(--shadow-md)' : 'var(--shadow-xs)',
-          fontSize: '14px', lineHeight: 1.7,
-          whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+        <div className={`message-bubble ${isUser ? 'user' : 'assistant'}`} style={{
           minHeight: msg.streaming && !content ? 38 : undefined,
-          position: 'relative',
-          backdropFilter: isUser ? 'none' : 'blur(8px)',
-          WebkitBackdropFilter: isUser ? 'none' : 'blur(8px)',
         }}>
           {msg.isError
             ? <span style={{ color: 'var(--error)', fontSize: '13px' }}>{msg.content}</span>
@@ -199,12 +163,7 @@ function Message({ msg, isLast, onRegenerate, onFollowUp, isStreaming }) {
           )}
         </div>
 
-        {/* Timestamp + elapsed */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: '6px',
-          marginTop: '4px',
-          justifyContent: isUser ? 'flex-end' : 'flex-start',
-        }}>
+        <div className={`message-meta ${isUser ? 'right' : ''}`}>
           {ts && <span style={{ fontSize: '11px', color: 'var(--text-3)' }}>{ts}</span>}
           {!isUser && msg.streaming && (
             <span style={{ fontSize: '11px', color: 'var(--text-3)' }}>⏱ {msg.elapsed ?? 0}s…</span>
@@ -216,7 +175,6 @@ function Message({ msg, isLast, onRegenerate, onFollowUp, isStreaming }) {
           )}
         </div>
 
-        {/* Action bar */}
         {!isUser && !msg.streaming && !msg.isError && (
           <div style={{ display: 'flex', gap: '2px', marginTop: '4px' }}>
             <ActionBtn onClick={handleCopy} title={copied ? 'Kopyalandı' : 'Kopyala'} active={copied}>
@@ -240,25 +198,13 @@ function Message({ msg, isLast, onRegenerate, onFollowUp, isStreaming }) {
           </div>
         )}
 
-        {/* Follow-up chips */}
         {!isUser && isLast && msg.followUps?.length > 0 && !msg.streaming && (
-          <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div className="followup-list">
             {msg.followUps.map((q, i) => (
               <button
                 key={i}
                 onClick={() => onFollowUp?.(q)}
-                className="btn"
-                style={{
-                  fontSize: '12px', padding: '6px 12px',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius-lg)',
-                  color: 'var(--text-2)', background: 'var(--surface-1)',
-                  textAlign: 'left', width: '100%',
-                  whiteSpace: 'normal', justifyContent: 'flex-start',
-                  lineHeight: 1.4,
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)' }}
-                onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-2)' }}
+                className="followup-chip"
               >
                 {q}
               </button>
@@ -455,16 +401,10 @@ export function ChatWindow({ selectedSession, onSessionChange, onNewSession, onC
   const lastAsstMsg = [...messages].reverse().find((m) => m.role === 'assistant' && !m.streaming)
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      {/* Top bar — only when messages exist */}
+    <div className="chat-shell">
       {hasMessages && (
-        <div style={{
-          flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 20px', height: 44,
-          borderBottom: '1px solid var(--border)',
-          background: 'var(--bg)',
-        }}>
-          <span style={{ fontSize: '12px', color: 'var(--text-3)' }}>
+        <div className="chat-topbar">
+          <span>
             {sessionIdRef.current ? `Oturum #${sessionIdRef.current.slice(0, 8)}` : 'Yeni sohbet'}
           </span>
           <div style={{ display: 'flex', gap: '6px' }}>
@@ -472,30 +412,22 @@ export function ChatWindow({ selectedSession, onSessionChange, onNewSession, onC
               onClick={handleExport}
               disabled={!messages.length}
               className="btn btn-ghost"
-              style={{ fontSize: '12px', padding: '4px 10px' }}
               title="Markdown olarak indir"
             >
-              <IconExport /> Dışa Aktar
+              <IconExport /> İndir
             </button>
             <button
               onClick={handleNewChat}
               disabled={isStreaming}
               className="btn btn-ghost"
-              style={{ fontSize: '12px', padding: '4px 10px' }}
             >
-              <IconPlus /> Yeni Sohbet
+              <IconPlus /> Yeni
             </button>
           </div>
         </div>
       )}
 
-      {/* Message list */}
-      <div style={{
-        flex: 1, overflowY: 'auto',
-        padding: hasMessages ? '28px 24px' : 0,
-        display: 'flex', flexDirection: 'column',
-        maxWidth: 760, width: '100%', margin: '0 auto', alignSelf: 'stretch',
-      }}>
+      <div className={`message-list ${hasMessages ? 'has-messages' : ''}`}>
         {!hasMessages
           ? <EmptyState onSend={handleSend} />
           : messages.map((msg) => (
@@ -512,24 +444,8 @@ export function ChatWindow({ selectedSession, onSessionChange, onNewSession, onC
         <div ref={bottomRef} />
       </div>
 
-      {/* Input area */}
-      <div style={{
-        flexShrink: 0,
-        borderTop: '1px solid var(--border)',
-        padding: '12px 20px 16px',
-        background: 'var(--glass-bg)',
-        backdropFilter: 'var(--glass-blur)',
-        WebkitBackdropFilter: 'var(--glass-blur)',
-        maxWidth: 760, width: '100%', margin: '0 auto', alignSelf: 'stretch',
-      }}>
-        <div style={{
-          display: 'flex', gap: '8px', alignItems: 'flex-end',
-          border: '1px solid var(--border-strong)',
-          borderRadius: 'var(--radius-lg)',
-          padding: '8px 8px 8px 14px',
-          background: 'var(--bg)',
-          transition: 'border-color 0.12s, box-shadow 0.12s',
-        }}
+      <div className="composer-shell">
+        <div className="composer"
           onFocusCapture={(e) => {
             e.currentTarget.style.borderColor = 'var(--accent)'
             e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-muted)'
@@ -563,14 +479,11 @@ export function ChatWindow({ selectedSession, onSessionChange, onNewSession, onC
             onClick={isStreaming ? abort : () => handleSend()}
             disabled={!isStreaming && !input.trim()}
             className="btn btn-primary"
-            style={{ padding: '7px 12px', borderRadius: 'var(--radius-md)', flexShrink: 0, alignSelf: 'flex-end' }}
+            style={{ padding: '7px 12px', flexShrink: 0, alignSelf: 'flex-end' }}
           >
             {isStreaming ? <IconStop /> : <IconSend />}
           </button>
         </div>
-        <p style={{ textAlign: 'center', fontSize: '11px', color: 'var(--text-3)', marginTop: '8px' }}>
-          Yanıtlar yalnızca yüklenen belgelerden üretilir
-        </p>
       </div>
     </div>
   )

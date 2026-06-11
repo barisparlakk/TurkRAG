@@ -56,19 +56,7 @@ function NavItem({ item, active, collapsed, onClick }) {
     <button
       onClick={onClick}
       title={collapsed ? item.label : undefined}
-      className="btn"
-      style={{
-        width: '100%', justifyContent: collapsed ? 'center' : 'flex-start',
-        padding: collapsed ? '9px 0' : '9px 12px',
-        borderRadius: 'var(--radius-md)',
-        background: active ? 'var(--accent-muted)' : 'transparent',
-        color: active ? 'var(--accent)' : 'var(--text-2)',
-        fontSize: '13px', fontWeight: active ? 600 : 400,
-        gap: collapsed ? 0 : '10px',
-        transition: 'background 0.12s, color 0.12s',
-      }}
-      onMouseEnter={(e) => { if (!active) { e.currentTarget.style.background = 'var(--surface-2)'; e.currentTarget.style.color = 'var(--text-1)' } }}
-      onMouseLeave={(e) => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-2)' } }}
+      className={`sidebar-nav-item ${active ? 'active' : ''} ${collapsed ? 'collapsed' : ''}`}
     >
       <span style={{ flexShrink: 0 }}>{item.icon}</span>
       {!collapsed && <span>{item.label}</span>}
@@ -90,23 +78,8 @@ export function Sidebar({
   const navItems = showAdmin ? NAV_ITEMS : NAV_ITEMS.filter((item) => item.key !== 'admin')
 
   return (
-    <aside style={{
-      width: collapsed ? 'var(--sidebar-w-collapsed)' : 'var(--sidebar-w)',
-      flexShrink: 0,
-      background: 'var(--glass-bg)',
-      backdropFilter: 'var(--glass-blur)',
-      WebkitBackdropFilter: 'var(--glass-blur)',
-      borderRight: '1px solid var(--border)',
-      display: 'flex', flexDirection: 'column',
-      transition: 'width 0.25s cubic-bezier(0.16,1,0.3,1)',
-      overflow: 'hidden',
-    }}>
-      {/* Nav items */}
-      <nav style={{
-        flex: 1, padding: '12px 8px',
-        display: 'flex', flexDirection: 'column', gap: '2px',
-        overflowY: 'auto', overflowX: 'hidden',
-      }}>
+    <aside className={`app-sidebar ${collapsed ? 'collapsed' : ''}`}>
+      <nav className="sidebar-nav">
         {navItems.map((item) => (
           <NavItem
             key={item.key}
@@ -117,40 +90,21 @@ export function Sidebar({
           />
         ))}
 
-        {/* Session history — chat tab only, not collapsed */}
         {tab === 'chat' && !collapsed && sessions?.length > 0 && (
           <>
             <div className="divider" style={{ margin: '8px 4px' }} />
-            <div style={{
-              fontSize: '10px', fontWeight: 700, color: 'var(--text-3)',
-              letterSpacing: '0.08em', textTransform: 'uppercase',
-              padding: '4px 8px 4px',
-            }}>
-              Geçmiş Sohbetler
-            </div>
+            <div className="sidebar-section-label">Geçmiş</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
               {sessions.map((s) => (
                 <button
                   key={s.id}
                   onClick={() => onSessionSelect?.(s.id)}
-                  className="btn"
-                  style={{
-                    width: '100%', justifyContent: 'flex-start', textAlign: 'left',
-                    padding: '7px 10px', borderRadius: 'var(--radius-md)',
-                    background: selectedSession === s.id ? 'var(--accent-muted)' : 'transparent',
-                    color: selectedSession === s.id ? 'var(--accent)' : 'var(--text-2)',
-                    fontSize: '12px', flexDirection: 'column', alignItems: 'flex-start', gap: '1px',
-                  }}
-                  onMouseEnter={(e) => { if (selectedSession !== s.id) e.currentTarget.style.background = 'var(--surface-2)' }}
-                  onMouseLeave={(e) => { if (selectedSession !== s.id) e.currentTarget.style.background = 'transparent' }}
+                  className={`session-row ${selectedSession === s.id ? 'active' : ''}`}
                 >
-                  <div style={{
-                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                    width: '100%', fontWeight: selectedSession === s.id ? 600 : 400,
-                  }}>
+                  <div className="session-title">
                     {s.preview || 'Sohbet'}
                   </div>
-                  <div style={{ fontSize: '10px', color: 'var(--text-3)' }}>
+                  <div className="session-date">
                     {new Date(s.created_at).toLocaleDateString('tr-TR', { month: 'short', day: 'numeric' })}
                   </div>
                 </button>
@@ -160,31 +114,21 @@ export function Sidebar({
         )}
       </nav>
 
-      {/* Bottom: upload + collapse */}
-      <div style={{
-        padding: '8px', borderTop: '1px solid var(--border)',
-        display: 'flex', flexDirection: 'column', gap: '4px',
-      }}>
+      <div className="sidebar-footer">
         {!collapsed && (
           <button
             onClick={onUploadClick}
-            className="btn btn-outline"
-            style={{ width: '100%', fontSize: '12px', padding: '8px 12px' }}
+            className="btn btn-outline sidebar-upload"
           >
-            <IconUpload /> Belge Yükle
+            <IconUpload /> Yükle
           </button>
         )}
         <button
           onClick={onCollapseToggle}
-          className="btn btn-ghost"
-          style={{
-            width: '100%', fontSize: '11px', color: 'var(--text-3)',
-            justifyContent: collapsed ? 'center' : 'flex-end',
-            padding: '6px',
-          }}
+          className="sidebar-collapse"
           title={collapsed ? 'Genişlet' : 'Daralt'}
         >
-          {collapsed ? <IconExpand /> : <><IconCollapse /><span>Daralt</span></>}
+          {collapsed ? <IconExpand /> : <IconCollapse />}
         </button>
       </div>
     </aside>

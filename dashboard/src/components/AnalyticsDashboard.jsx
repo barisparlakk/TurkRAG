@@ -28,10 +28,7 @@ function StatCard({ label, value, sub, color = 'var(--accent)' }) {
 /* ── Section header ────────────────────────────────────────────────────────── */
 function SectionTitle({ children }) {
   return (
-    <div style={{
-      fontSize: '11px', fontWeight: 700, color: 'var(--text-3)',
-      letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px',
-    }}>
+    <div className="section-label">
       {children}
     </div>
   )
@@ -79,27 +76,15 @@ export function AnalyticsDashboard() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div>
-          <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-1)', marginBottom: '4px' }}>
-            Analitik
-          </h2>
-          <p style={{ fontSize: '13px', color: 'var(--text-2)' }}>
-            Sorgu istatistikleri ve kullanım özeti
-          </p>
-        </div>
+      <div className="view-header">
+        <h2>Analitik</h2>
         <button
           onClick={load}
           disabled={loading}
-          className="btn"
-          style={{
-            fontSize: '12px', padding: '6px 14px',
-            border: '1px solid var(--border)', borderRadius: 'var(--radius-md)',
-            color: 'var(--text-2)', opacity: loading ? 0.5 : 1,
-          }}
+          className="btn btn-outline"
+          style={{ opacity: loading ? 0.5 : 1 }}
         >
-          {loading ? 'Yükleniyor…' : '↻ Yenile'}
+          {loading ? '...' : 'Yenile'}
         </button>
       </div>
 
@@ -109,11 +94,10 @@ export function AnalyticsDashboard() {
           color: 'var(--error)', fontSize: '13px',
           borderRadius: 'var(--radius-md)', padding: '10px 14px',
         }}>
-          Veriler yüklenirken hata: {error}
+          Hata: {error}
         </div>
       )}
 
-      {/* Stat cards */}
       <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
         <StatCard
           label="Toplam Sorgu"
@@ -134,9 +118,7 @@ export function AnalyticsDashboard() {
         />
       </div>
 
-      {/* Top queries + top docs side by side */}
       <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-        {/* Top questions */}
         <div style={{
           flex: '1 1 280px',
           background: 'var(--surface-1)', border: '1px solid var(--border)',
@@ -157,7 +139,6 @@ export function AnalyticsDashboard() {
           )}
         </div>
 
-        {/* Top documents */}
         <div style={{
           flex: '1 1 280px',
           background: 'var(--surface-1)', border: '1px solid var(--border)',
@@ -190,7 +171,6 @@ export function AnalyticsDashboard() {
         </div>
       </div>
 
-      {/* Recent queries table */}
       <div>
         <SectionTitle>Son Sorgular</SectionTitle>
         {recent.length === 0 ? (

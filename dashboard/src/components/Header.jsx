@@ -27,74 +27,37 @@ const IconLogout = () => (
   </svg>
 )
 
-export function Header({ tenant, tenants = [], onTenantSwitch, onLogout, theme, onThemeToggle }) {
+export function Header({ tenant, tenants = [], role, onTenantSwitch, onLogout, theme, onThemeToggle }) {
   const [userOpen, setUserOpen] = useState(false)
   const [tenantOpen, setTenantOpen] = useState(false)
 
   return (
-    <header style={{
-      height: 'var(--header-h)', flexShrink: 0,
-      borderBottom: '1px solid var(--border)',
-      background: 'var(--glass-bg)',
-      backdropFilter: 'var(--glass-blur)',
-      WebkitBackdropFilter: 'var(--glass-blur)',
-      display: 'flex', alignItems: 'center',
-      padding: '0 16px', gap: '0',
-      position: 'sticky', top: 0, zIndex: 100,
-    }}>
-      {/* Logo */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: '8px',
-        width: 'var(--sidebar-w)', flexShrink: 0,
-        paddingRight: '16px',
-      }}>
-        <div style={{ width: 30, height: 30, flexShrink: 0 }}>
-          <img src="/logo-light.png" className="logo-light" style={{ width: 30, height: 30, objectFit: 'contain' }} alt="" />
-          <img src="/logo-dark.png"  className="logo-dark"  style={{ width: 30, height: 30, objectFit: 'contain' }} alt="" />
+    <header className="app-header">
+      <div className="app-brand">
+        <div className="app-brand-logo">
+          <img src="/logo-light.png" className="logo-light" alt="" />
+          <img src="/logo-dark.png" className="logo-dark" alt="" />
         </div>
-        <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-1)', letterSpacing: '-0.01em' }}>
-          TurkRAG
-        </span>
+        <span>TurkRAG</span>
       </div>
 
-      {/* Tenant selector */}
       <div style={{ position: 'relative' }}>
         <button
           onClick={() => setTenantOpen((v) => !v)}
-          className="btn"
-          style={{
-            border: '1px solid var(--border)', borderRadius: 'var(--radius-md)',
-            padding: '5px 10px', fontSize: '13px', color: 'var(--text-1)',
-            gap: '6px',
-          }}
+          className="tenant-switch"
         >
-          <span style={{
-            width: 6, height: 6, borderRadius: '50%',
-            background: 'var(--success)', flexShrink: 0,
-          }} />
-          {tenant?.name || tenant?.slug || 'Kiracı seç'}
+          <span className="status-dot" />
+          <span>{tenant?.name || tenant?.slug || 'Kiracı'}</span>
           <IconChevron />
         </button>
 
         {tenantOpen && tenants.length > 1 && (
-          <div className="fade-in" style={{
-            position: 'absolute', top: '100%', left: 0, marginTop: 4,
-            background: 'var(--bg)', border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-lg)',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-            minWidth: 180, zIndex: 200, overflow: 'hidden',
-          }}>
+          <div className="header-menu fade-in">
             {tenants.map((t) => (
               <button
                 key={t.id}
                 onClick={() => { onTenantSwitch?.(t); setTenantOpen(false) }}
-                className="btn"
-                style={{
-                  width: '100%', justifyContent: 'flex-start',
-                  padding: '9px 14px', borderRadius: 0,
-                  fontWeight: t.id === tenant?.id ? 600 : 400,
-                  color: t.id === tenant?.id ? 'var(--accent)' : 'var(--text-1)',
-                }}
+                className={`menu-row ${t.id === tenant?.id ? 'active' : ''}`}
               >
                 {t.name}
               </button>
@@ -105,59 +68,40 @@ export function Header({ tenant, tenants = [], onTenantSwitch, onLogout, theme, 
 
       <div style={{ flex: 1 }} />
 
-      {/* Theme toggle */}
+      <span className="role-chip">{role === 'admin' ? 'Admin' : 'Member'}</span>
+
       <button
         onClick={onThemeToggle}
-        className="btn btn-ghost"
-        style={{ width: 36, height: 36, padding: 0, borderRadius: 'var(--radius-md)' }}
+        className="icon-btn"
         title={theme === 'dark' ? 'Açık mod' : 'Koyu mod'}
       >
         {theme === 'dark' ? <IconSun /> : <IconMoon />}
       </button>
 
-      {/* User menu */}
       <div style={{ position: 'relative', marginLeft: 4 }}>
         <button
           onClick={() => setUserOpen((v) => !v)}
-          style={{
-            width: 32, height: 32, borderRadius: '50%',
-            background: 'var(--accent-muted)',
-            border: '1px solid var(--border)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer', color: 'var(--accent)', fontSize: '12px', fontWeight: 700,
-          }}
+          className="avatar-btn"
         >
           {(tenant?.slug?.[0] || 'U').toUpperCase()}
         </button>
 
         {userOpen && (
-          <div className="fade-in" onClick={() => setUserOpen(false)} style={{
-            position: 'absolute', top: '100%', right: 0, marginTop: 4,
-            background: 'var(--bg)', border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-lg)',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-            minWidth: 160, zIndex: 200, overflow: 'hidden',
-          }}>
-            <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border)' }}>
-              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-1)' }}>{tenant?.name}</div>
-              <div style={{ fontSize: '11px', color: 'var(--text-3)', marginTop: 2, fontFamily: 'monospace' }}>{tenant?.slug}</div>
+          <div className="header-menu user-menu fade-in" onClick={() => setUserOpen(false)}>
+            <div className="menu-meta">
+              <strong>{tenant?.name}</strong>
+              <span>{tenant?.slug}</span>
             </div>
             <button
               onClick={onLogout}
-              className="btn btn-ghost"
-              style={{
-                width: '100%', justifyContent: 'flex-start',
-                padding: '9px 14px', borderRadius: 0, color: 'var(--error)',
-                gap: '8px',
-              }}
+              className="menu-row danger"
             >
-              <IconLogout /> Çıkış Yap
+              <IconLogout /> Çıkış
             </button>
           </div>
         )}
       </div>
 
-      {/* Click-outside overlay */}
       {(userOpen || tenantOpen) && (
         <div
           style={{ position: 'fixed', inset: 0, zIndex: 150 }}

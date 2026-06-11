@@ -99,12 +99,7 @@ function AttributionSection({ sentences }) {
 
   return (
     <div style={{ marginBottom: '12px' }}>
-      <div style={{
-        fontSize: '10px', fontWeight: 700, color: 'var(--text-3)',
-        letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '8px',
-      }}>
-        Cümle Bazlı Atıf (XAI)
-      </div>
+      <div className="section-label">Atıf</div>
       <div style={{
         background: 'var(--surface-1)',
         border: '1px solid var(--border)',
@@ -140,8 +135,8 @@ function AttributionSection({ sentences }) {
         })}
       </div>
       <div style={{ display: 'flex', gap: '12px', marginTop: '6px', fontSize: '11px', color: 'var(--text-3)' }}>
-        <span><span style={{ borderBottom: '2px solid #22c55e', paddingBottom: 1 }}>——</span> Destekleniyor</span>
-        <span><span style={{ borderBottom: '2px solid #f59e0b', paddingBottom: 1 }}>——</span> Düşük güven</span>
+        <span><span style={{ borderBottom: '2px solid #22c55e', paddingBottom: 1 }}>--</span> Net</span>
+        <span><span style={{ borderBottom: '2px solid #f59e0b', paddingBottom: 1 }}>--</span> Zayıf</span>
       </div>
     </div>
   )
@@ -150,29 +145,14 @@ function AttributionSection({ sentences }) {
 /* ── Panel ──────────────────────────────────────────────── */
 export function SourcesPanel({ citations, attribution }) {
   return (
-    <aside style={{
-      width: 'var(--sources-w)', flexShrink: 0,
-      borderLeft: '1px solid var(--border)',
-      background: 'var(--bg)',
-      display: 'flex', flexDirection: 'column',
-      height: '100%', overflow: 'hidden',
-    }}>
-      {/* Header */}
-      <div style={{
-        height: 'var(--header-h)', flexShrink: 0,
-        borderBottom: '1px solid var(--border)',
-        display: 'flex', alignItems: 'center',
-        padding: '0 16px', gap: '8px',
-      }}>
-        <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-1)' }}>
-          Alınan Kaynaklar
-        </span>
+    <aside className="sources-panel">
+      <div className="sources-header">
+        <span>Kaynaklar</span>
         {citations?.length > 0 && (
           <span className="badge badge-accent">{citations.length}</span>
         )}
       </div>
 
-      {/* Content */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
         <AttributionSection sentences={attribution} />
         {!citations?.length ? (
@@ -186,9 +166,7 @@ export function SourcesPanel({ citations, attribution }) {
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
               <polyline points="14 2 14 8 20 8"/>
             </svg>
-            <span style={{ fontSize: '13px', color: 'var(--text-3)' }}>
-              Bu yanıt için kaynak bulunamadı
-            </span>
+            <span style={{ fontSize: '13px', color: 'var(--text-3)' }}>Kaynak yok</span>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
