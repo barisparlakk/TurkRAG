@@ -18,6 +18,19 @@ export function getToken() {
   return _token
 }
 
+export function getTokenPayload() {
+  if (!_token) return null
+  try {
+    const [, payload] = _token.split('.')
+    if (!payload) return null
+    const normalized = payload.replace(/-/g, '+').replace(/_/g, '/')
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=')
+    return JSON.parse(atob(padded))
+  } catch {
+    return null
+  }
+}
+
 function authHeaders() {
   return _token ? { Authorization: `Bearer ${_token}` } : {}
 }

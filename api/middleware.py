@@ -1,6 +1,7 @@
 """Request middleware: inject tenant context, CORS, and request logging."""
 
 import logging
+import os
 import time
 
 from fastapi import FastAPI, Request
@@ -8,6 +9,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
 logger = logging.getLogger(__name__)
+
+
+def _get_cors_origins() -> list[str]:
+    """Return configured CORS origins from env, defaulting to '*' for local dev."""
+    raw_origins = os.getenv("CORS_ORIGINS", "*").strip()
+    if not raw_origins:
+        return ["*"]
+    return [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
 
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
@@ -29,11 +38,13 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
 
 def setup_middleware(app: FastAPI) -> None:
     """Attach all middleware to the FastAPI app."""
+    cors_origins = _get_cors_origins()
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],  # Restrict in production to dashboard origin
+        allow_origins=cors_origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    logger.info("CORS origins configured: %s", cors_origins)
     app.add_middleware(RequestLoggingMiddleware)

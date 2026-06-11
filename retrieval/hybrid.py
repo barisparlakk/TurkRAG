@@ -16,7 +16,6 @@ from concurrent.futures import ThreadPoolExecutor
 import numpy as np
 
 from retrieval.bm25_store import BM25Store
-from retrieval.reranker import rerank
 from retrieval.vector_store import VectorStore
 
 logger = logging.getLogger(__name__)
@@ -164,6 +163,8 @@ class HybridRetriever:
 
         # ── Step 3: optional cross-encoder reranking ──────────────────────────
         if mode == "hybrid+rerank" and len(candidates) > 1:
+            from retrieval.reranker import rerank
+
             passages = [c["text"] for c in candidates]
             try:
                 rerank_scores = rerank(query, passages)
@@ -262,12 +263,12 @@ def _mmr(candidates: list[dict], k: int, lambda_param: float = 0.5) -> list[dict
             # MMR score = λ * relevance − (1−λ) * max_similarity_to_selected
             selected_tokens = [_token_set(s["text"]) for s in selected]
 
-            def _mmr_score(c):
+            def _mmr_score(c, current_selected_tokens=selected_tokens):
                 rel = c.get("rerank_score", 0)
                 c_tokens = _token_set(c["text"])
                 max_sim = max(
                     len(c_tokens & s) / max(len(c_tokens | s), 1)
-                    for s in selected_tokens
+                    for s in current_selected_tokens
                 )
                 return lambda_param * rel - (1 - lambda_param) * max_sim
 

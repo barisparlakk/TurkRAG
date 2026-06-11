@@ -8,6 +8,7 @@ indexes/
 /tmp/uploads/
 node_modules/
 dashboard/dist/
+dashboard/vite.config.js.timestamp-*.mjs
 eval/results_*.json
 *.egg-info/
 dist/

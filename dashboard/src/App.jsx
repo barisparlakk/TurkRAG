@@ -7,18 +7,13 @@ import { Header } from './components/Header.jsx'
 import { Sidebar } from './components/Sidebar.jsx'
 import { SourcesPanel } from './components/SourcesPanel.jsx'
 import { ToastProvider } from './components/Toast.jsx'
-import { api, setToken } from './api/client.js'
+import { api, getTokenPayload, setToken } from './api/client.js'
 
 /* ── Login ─────────────────────────────────────────────── */
 function LoginPage({ onLogin }) {
   const [loginSlug, setLoginSlug] = useState('')
   const [loginError, setLoginError] = useState('')
-  const [tenants, setTenants] = useState([])
   const [loading, setLoading] = useState(false)
-
-  useEffect(() => {
-    api.listTenants().then(setTenants).catch(() => setTenants([]))
-  }, [])
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -77,28 +72,14 @@ function LoginPage({ onLogin }) {
           }}>
             Çalışma Alanı
           </label>
-          {tenants.length > 0 ? (
-            <select
-              value={loginSlug}
-              onChange={(e) => setLoginSlug(e.target.value)}
-              className="input-field"
-              style={{ marginBottom: '20px', appearance: 'none' }}
-            >
-              <option value="">— Çalışma alanı seçin —</option>
-              {tenants.map((t) => (
-                <option key={t.id} value={t.slug}>{t.name} · {t.slug}</option>
-              ))}
-            </select>
-          ) : (
-            <input
-              type="text"
-              value={loginSlug}
-              onChange={(e) => setLoginSlug(e.target.value)}
-              placeholder="ornek: acme-sirket"
-              className="input-field"
-              style={{ marginBottom: '20px' }}
-            />
-          )}
+          <input
+            type="text"
+            value={loginSlug}
+            onChange={(e) => setLoginSlug(e.target.value)}
+            placeholder="ornek: acme-sirket"
+            className="input-field"
+            style={{ marginBottom: '20px' }}
+          />
 
           {loginError && (
             <div style={{
@@ -144,6 +125,7 @@ export default function App() {
     } catch { return null }
   })
   const [tenants, setTenants] = useState([])
+  const [role, setRole] = useState(() => getTokenPayload()?.role || '')
   const [tab, setTab] = useState('chat')
   const [selectedSession, setSelectedSession] = useState(null)
   const [sessionRefresh, setSessionRefresh] = useState(0)
@@ -159,21 +141,37 @@ export default function App() {
     localStorage.setItem('turkrag_theme', theme)
   }, [theme])
 
-  /* Validate restored session — if token expired, force re-login */
+  /* Refresh the dev token on startup so expired localStorage state does not linger. */
   useEffect(() => {
     if (!tenant) return
-    api.listSessions(1).catch(() => {
-      setToken('')
-      setTenant(null)
-      localStorage.removeItem('turkrag_tenant')
-    })
+    api.getToken(tenant.id, 'demo-user', 'member')
+      .then((data) => {
+        setToken(data.access_token)
+        setRole(getTokenPayload()?.role || '')
+      })
+      .catch(() => {
+        setToken('')
+        setRole('')
+        setTenant(null)
+        localStorage.removeItem('turkrag_tenant')
+      })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  /* Load tenant list for header switcher */
+  /* Load tenant list for admins; members stay scoped to the current tenant. */
   useEffect(() => {
     if (!tenant) return
-    api.listTenants().then(setTenants).catch(() => {})
-  }, [tenant])
+    if (role !== 'admin') {
+      setTenants([tenant])
+      return
+    }
+    api.listTenants().then(setTenants).catch(() => setTenants([tenant]))
+  }, [tenant, role])
+
+  useEffect(() => {
+    if (tab === 'admin' && role !== 'admin') {
+      setTab('chat')
+    }
+  }, [role, tab])
 
   /* Load session history */
   useEffect(() => {
@@ -183,6 +181,7 @@ export default function App() {
 
   const handleLogout = () => {
     setToken('')
+    setRole('')
     setTenant(null)
     localStorage.removeItem('turkrag_tenant')
     setSessions([])
@@ -194,6 +193,7 @@ export default function App() {
     try {
       const data = await api.getToken(t.id, 'demo-user', 'member')
       setToken(data.access_token)
+      setRole(getTokenPayload()?.role || '')
       const next = { slug: t.slug, id: t.id, name: t.name }
       setTenant(next)
       localStorage.setItem('turkrag_tenant', JSON.stringify(next))
@@ -242,6 +242,7 @@ export default function App() {
             sessions={sessions}
             selectedSession={selectedSession}
             onSessionSelect={(id) => { setSelectedSession(id); setTab('chat') }}
+            showAdmin={role === 'admin'}
           />
 
           {/* ── Main content ── */}
@@ -282,7 +283,7 @@ export default function App() {
 
             {/* Admin */}
             <div style={{
-              display: tab === 'admin' ? 'flex' : 'none',
+              display: tab === 'admin' && role === 'admin' ? 'flex' : 'none',
               flex: 1, overflowY: 'auto', flexDirection: 'column',
             }}>
               <div style={{ padding: '28px', maxWidth: 900, width: '100%', margin: '0 auto' }}>

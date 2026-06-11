@@ -44,7 +44,7 @@ def _get_llm():
             raise RuntimeError(_load_error)
 
         model_path = Path(LLM_MODEL_PATH)
-        if not model_path.exists():
+        if not model_path.exists() or not model_path.is_file():
             _load_error = (
                 f"LLM model file not found at '{model_path}'. "
                 "Download it with:\n"
@@ -78,7 +78,8 @@ def _get_llm():
 
 def is_available() -> bool:
     """Return True if the LLM model file exists and can be loaded."""
-    return Path(LLM_MODEL_PATH).exists()
+    model_path = Path(LLM_MODEL_PATH)
+    return model_path.exists() and model_path.is_file()
 
 
 def generate_stream(prompt: str, max_tokens: int = MAX_TOKENS) -> Generator[str, None, None]:

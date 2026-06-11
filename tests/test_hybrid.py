@@ -93,6 +93,7 @@ class TestRerankerFallback:
         fake_vec = np.zeros(768, dtype="float32")
 
         with (
+            patch("retrieval.hybrid.HYDE_ENABLED", False),
             patch("ingestion.embedder.embed", return_value=fake_vec.reshape(1, -1)),
             patch("retrieval.bm25_store.BM25Store.search", return_value=chunks),
             patch("retrieval.vector_store.VectorStore.search", return_value=chunks),

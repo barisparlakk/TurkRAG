@@ -41,7 +41,7 @@
 - Sonuçları `eval_runs` tablosuna yaz: config JSON + 4 RAGAS metriği
 - Her run'a UUID `run_id` ata
 
-### 1.3 `scripts/run_experiments.py` — Oluşturulacak
+### 1.3 `scripts/run_experiments.py` — Mevcut
 
 ```
 4 mode × eval seti → eval_runs tablosu
@@ -53,7 +53,7 @@
 - Her mode için `ragas_eval.py` çağrısı
 - Pandas DataFrame → CSV + DB
 
-### 1.4 `scripts/plot_results.py` — Oluşturulacak
+### 1.4 `scripts/plot_results.py` — Mevcut
 
 ```
 Giriş: results/*.csv
@@ -74,7 +74,7 @@ Giriş: results/*.csv
 - Mevcut dosyadaki soru sayısını ve ground truth formatını doğrula
 - Ground truth yoksa Faz 2.2'ye geç
 
-### 2.2 `scripts/generate_eval_set.py` — Oluşturulacak
+### 2.2 `scripts/generate_eval_set.py` — Mevcut
 
 - BM25 index'teki her chunk için LLM ile 1-2 soru üret (synthetic Q generation)
 - Format:
@@ -88,7 +88,7 @@ Giriş: results/*.csv
   ```
 - Manuel doğrulama için `eval/eval_set.csv` export
 
-### 2.3 `eval/retrieval_metrics.py` — Oluşturulacak
+### 2.3 `eval/retrieval_metrics.py` — Mevcut
 
 RAGAS (end-to-end) yanına retrieval-only metrikler:
 
@@ -106,7 +106,7 @@ Mevcut `eval/ragas_eval.py` ile entegre edilecek, aynı run'da hesaplanacak.
 
 **Hedef:** Sistematik failure case kategorizasyonu (proje-oneri §9: "hangi örneklerde hata yapıldı").
 
-### 3.1 `eval/error_analysis.py` — Oluşturulacak
+### 3.1 `eval/error_analysis.py` — Mevcut
 
 Her eval sorusu için kategori tespiti:
 
@@ -196,7 +196,7 @@ Taranacak aralıklar:
 
 **Hedef:** "Açıklanabilir yapay zeka" katkısı — cevabın hangi cümlesinin hangi chunk'tan geldiğini göster.
 
-### 6.1 `generation/attribution.py` — Oluşturulacak
+### 6.1 `generation/attribution.py` — Mevcut
 
 ```
 Cevap üretildikten sonra:
@@ -234,16 +234,16 @@ Cevap üretildikten sonra:
 |-------|-----|-------|
 | `retrieval/hybrid.py` (mode param) | 1.1 | Mevcut dosya güncellenir |
 | `eval/ragas_eval.py` (CLI args) | 1.2 | Mevcut dosya güncellenir |
-| `scripts/run_experiments.py` | 1.3 | Yeni |
-| `scripts/plot_results.py` | 1.4 | Yeni |
-| `scripts/generate_eval_set.py` | 2.2 | Yeni |
-| `eval/retrieval_metrics.py` | 2.3 | Yeni |
-| `eval/error_analysis.py` | 3.1 | Yeni |
+| `scripts/run_experiments.py` | 1.3 | ✅ Mevcut |
+| `scripts/plot_results.py` | 1.4 | ✅ Mevcut |
+| `scripts/generate_eval_set.py` | 2.2 | ✅ Mevcut |
+| `eval/retrieval_metrics.py` | 2.3 | ✅ Mevcut |
+| `eval/error_analysis.py` | 3.1 | ✅ Mevcut |
 | `ingestion/chunker.py` (ek chunkerlar) | 4.1 | Mevcut dosya güncellenir |
 | `scripts/chunking_experiments.py` | 4.2 | Yeni |
 | `ingestion/embedder.py` (env var) | 4.3 | Mevcut dosya güncellenir |
 | `scripts/embedder_experiments.py` | 4.4 | Yeni |
 | `scripts/hyperparameter_sweep.py` | 5.1 | Yeni |
-| `generation/attribution.py` | 6.1 | Yeni |
-| `figures/` dizini | 1.4+ | Yeni |
-| `results/` dizini | 1.3+ | Yeni |
+| `generation/attribution.py` | 6.1 | ✅ Mevcut |
+| `figures/` dizini | 1.4+ | ✅ Mevcut |
+| `results/` dizini | 1.3+ | ✅ Mevcut |

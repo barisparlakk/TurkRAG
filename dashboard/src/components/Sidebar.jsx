@@ -76,7 +76,19 @@ function NavItem({ item, active, collapsed, onClick }) {
   )
 }
 
-export function Sidebar({ tab, onTabChange, onUploadClick, collapsed, onCollapseToggle, sessions, selectedSession, onSessionSelect }) {
+export function Sidebar({
+  tab,
+  onTabChange,
+  onUploadClick,
+  collapsed,
+  onCollapseToggle,
+  sessions,
+  selectedSession,
+  onSessionSelect,
+  showAdmin = false,
+}) {
+  const navItems = showAdmin ? NAV_ITEMS : NAV_ITEMS.filter((item) => item.key !== 'admin')
+
   return (
     <aside style={{
       width: collapsed ? 'var(--sidebar-w-collapsed)' : 'var(--sidebar-w)',
@@ -95,7 +107,7 @@ export function Sidebar({ tab, onTabChange, onUploadClick, collapsed, onCollapse
         display: 'flex', flexDirection: 'column', gap: '2px',
         overflowY: 'auto', overflowX: 'hidden',
       }}>
-        {NAV_ITEMS.map((item) => (
+        {navItems.map((item) => (
           <NavItem
             key={item.key}
             item={item}

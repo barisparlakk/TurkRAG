@@ -148,16 +148,30 @@ python -m eval.ragas_eval --tenant demo
 
 Metrics: `faithfulness`, `answer_relevancy`, `context_precision`, `context_recall`
 
+Additional evaluation utilities already in the repo:
+
+```bash
+python scripts/run_experiments.py --tenant demo
+python -m eval.retrieval_metrics --tenant demo
+python -m eval.error_analysis --tenant demo
+python scripts/plot_results.py
+python scripts/generate_eval_set.py --tenant demo --max-chunks 20
+```
+
 ### Evaluation Results
 
-| Metric | Score |
-|--------|-------|
-| Faithfulness | — |
-| Answer Relevancy | — |
-| Context Precision | — |
-| Context Recall | — |
+Recent generated artifacts in [`/Users/barisparlak/Desktop/TurkRAG/results`](/Users/barisparlak/Desktop/TurkRAG/results) and [`/Users/barisparlak/Desktop/TurkRAG/figures`](/Users/barisparlak/Desktop/TurkRAG/figures):
 
-*Run the evaluation pipeline to populate this table.*
+| Artifact | Purpose |
+|----------|---------|
+| `results/experiment_*.csv` | Multi-mode experiment summary from `scripts/run_experiments.py` |
+| `results/*_hybrid*.json`, `results/*_dense.json`, `results/*_sparse.json` | Per-mode RAGAS run outputs |
+| `results/retrieval_metrics*.json` | Retrieval-only metrics such as Recall@K, MRR, and nDCG |
+| `figures/metrics_comparison.png` | RAGAS comparison chart across retrieval modes |
+| `figures/recall_at_k.png` | Retrieval recall visualization |
+| `figures/metrics_radar.png` | Radar overview of the main RAGAS metrics |
+
+Run the commands above to refresh those artifacts for the current dataset or tenant.
 
 ---
 
@@ -175,6 +189,7 @@ Metrics: `faithfulness`, `answer_relevancy`, `context_precision`, `context_recal
 | `TURKISH_EMBEDDER_PATH` | `models/turkish-embedder` | Local SentenceTransformer directory |
 | `QDRANT_URL` | `http://localhost:6333` | Qdrant vector DB URL |
 | `JWT_SECRET` | *(required)* | Secret for signing JWTs |
+| `CORS_ORIGINS` | `*` | Comma-separated allowed origins for the dashboard/API |
 | `UPLOAD_DIR` | `/tmp/uploads` | Temporary file upload path |
 | `BM25_INDEX_DIR` | `indexes` | BM25 index persistence directory |
 
@@ -200,7 +215,7 @@ Metrics: `faithfulness`, `answer_relevancy`, `context_precision`, `context_recal
 | Vector DB | Qdrant |
 | Sparse index | BM25s |
 | Reranker | ms-marco-MiniLM-L-6-v2 |
-| API | FastAPI + asyncpg |
+| API | FastAPI + psycopg2 |
 | Database | PostgreSQL 16 |
 | Frontend | React 18 + Vite |
 | Evaluation | RAGAS |
