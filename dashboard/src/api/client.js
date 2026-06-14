@@ -56,10 +56,12 @@ async function request(method, path, body = null, isFormData = false) {
 
 export const api = {
   // Auth
-  getToken: (tenantId, userId = 'user', role = 'member') =>
-    request('POST', '/auth/token', { tenant_id: tenantId, user_id: userId, role }),
+  getToken: (tenantId, userId = 'user') =>
+    request('POST', '/auth/token', { tenant_id: tenantId, user_id: userId }),
   mockLogin: (tenantSlug, email, password) =>
     request('POST', '/auth/mock-login', { tenant_slug: tenantSlug, email, password }),
+  switchAdminTenant: (tenantSlug) =>
+    request('POST', '/auth/admin/switch-tenant', { tenant_slug: tenantSlug }),
 
   // Documents
   listDocuments: () => request('GET', '/documents'),

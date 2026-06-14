@@ -332,8 +332,10 @@ export default function App() {
     if (!authSession) return
     try {
       const nextRole = authSession.role || 'member'
-      const userId = authSession.userId || (nextRole === 'admin' ? MOCK_ADMIN_EMAIL : 'demo-user')
-      const data = await api.getToken(t.id, userId, nextRole)
+      const userId = authSession.userId || 'demo-user'
+      const data = nextRole === 'admin'
+        ? await api.switchAdminTenant(t.slug)
+        : await api.getToken(t.id, userId)
       setToken(data.access_token)
       setRole(getTokenPayload()?.role || nextRole)
       const nextTenant = { slug: t.slug, id: t.id, name: t.name }

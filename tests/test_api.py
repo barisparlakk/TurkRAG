@@ -55,18 +55,21 @@ class TestAuthEndpoint:
         resp = client.post("/auth/token", json={
             "tenant_id": "00000000-0000-0000-0000-000000000001",
             "user_id": "test",
-            "role": "admin",
         })
-        assert resp.status_code in (200, 422, 500)
+        assert resp.status_code == 200
 
-    def test_token_endpoint_returns_access_token_on_success(self, client):
+    def test_token_endpoint_returns_member_access_token_on_success(self, client):
         resp = client.post("/auth/token", json={
             "tenant_id": "00000000-0000-0000-0000-000000000001",
             "user_id": "test",
-            "role": "admin",
         })
-        if resp.status_code == 200:
-            assert "access_token" in resp.json()
+        assert "access_token" in resp.json()
+
+    def test_token_endpoint_rejects_missing_user_id(self, client):
+        resp = client.post("/auth/token", json={
+            "tenant_id": "00000000-0000-0000-0000-000000000001",
+        })
+        assert resp.status_code == 422
 
     def test_mock_admin_login_accepts_expected_credentials(self, client):
         class FakeCursor:
@@ -113,6 +116,60 @@ class TestAuthEndpoint:
         })
         assert resp.status_code == 401
 
+    def test_admin_switch_tenant_requires_admin_token(self, client):
+        member_token = client.post("/auth/token", json={
+            "tenant_id": "00000000-0000-0000-0000-000000000001",
+            "user_id": "member-user",
+        }).json()["access_token"]
+
+        resp = client.post(
+            "/auth/admin/switch-tenant",
+            json={"tenant_slug": "acme-sirket"},
+            headers={"Authorization": f"Bearer {member_token}"},
+        )
+        assert resp.status_code == 403
+
+    def test_admin_switch_tenant_returns_new_admin_token(self, client):
+        class FakeCursor:
+            def execute(self, query, params):
+                self.slug = params[0]
+
+            def fetchone(self):
+                if self.slug == "acme-sirket":
+                    return ("00000000-0000-0000-0000-000000000001", "Acme Sirket", "acme-sirket")
+                return None
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+        class FakeConn:
+            def cursor(self):
+                return FakeCursor()
+
+            def close(self):
+                return None
+
+        with patch("api.db.get_conn", return_value=FakeConn()):
+            admin_token = client.post("/auth/mock-login", json={
+                "tenant_slug": "acme-sirket",
+                "email": "baris@dev.com",
+                "password": "1234",
+            }).json()["access_token"]
+            resp = client.post(
+                "/auth/admin/switch-tenant",
+                json={"tenant_slug": "acme-sirket"},
+                headers={"Authorization": f"Bearer {admin_token}"},
+            )
+
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["user"]["role"] == "admin"
+        assert body["tenant"]["slug"] == "acme-sirket"
+        assert "access_token" in body
+
 
 class TestTenantEndpointAuth:
     def test_tenants_without_token_returns_401_or_403(self, client):
@@ -146,7 +203,6 @@ class TestDocumentUploadValidation:
         token_resp = client.post("/auth/token", json={
             "tenant_id": "00000000-0000-0000-0000-000000000001",
             "user_id": "test",
-            "role": "member",
         })
         if token_resp.status_code != 200:
             pytest.skip("Token endpoint unavailable")

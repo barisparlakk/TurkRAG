@@ -60,6 +60,21 @@ class TenantResponse(BaseModel):
     created_at: str
 
 
+class DevTokenRequest(BaseModel):
+    tenant_id: str = Field(..., min_length=1)
+    user_id: str = Field(..., min_length=1)
+
+
+class MockAdminLoginRequest(BaseModel):
+    tenant_slug: str = Field(..., min_length=1)
+    email: str = Field(..., min_length=1)
+    password: str = Field(..., min_length=1)
+
+
+class AdminTenantSwitchRequest(BaseModel):
+    tenant_slug: str = Field(..., min_length=1)
+
+
 class HealthResponse(BaseModel):
     status: str
     qdrant: str

@@ -1,6 +1,6 @@
 # TurkRAG TODO
 
-Last reviewed: 2026-06-11
+Last reviewed: 2026-06-14
 
 ## Requirement analysis
 
@@ -12,11 +12,12 @@ Last reviewed: 2026-06-11
 - [x] `api/routers/tenants.py` and `dashboard/src/App.jsx`: review existing changes and remove the accidental public-admin escalation path.
 - [x] `ingestion/chunker.py`: make `get_chunker("turkish", max_chars=..., overlap_chars=...)` apply experiment overrides instead of silently using defaults.
 - [x] `eval/ragas_eval.py`, `scripts/run_experiments.py`, and `scripts/plot_results.py`: persist latency metrics so experiment artifacts can generate the advertised latency distribution plot.
+- [x] `api/main.py` and `dashboard/src/api/client.js`: remove public caller-controlled admin role minting from `/auth/token`; use an authenticated admin tenant-switch endpoint instead.
 
 ## Current gaps
 
-- [ ] Proper authentication/authorization: `/auth/token` is still a dev convenience endpoint that trusts caller-supplied roles; production auth is still missing.
-- [ ] Dashboard role-awareness is minimal: admin-only views are hidden for member tokens, but there is still no first-class authenticated admin flow.
+- [ ] Proper authentication/authorization: auth is still demo-only (`/auth/token` member minting + `/auth/mock-login` fixed credentials); production identity verification is still missing.
+- [ ] Dashboard role-awareness is still tenant-scoped: admin flows can switch tenant context safely now, but there is still no real user directory or session-backed admin identity.
 
 ## Deferred work
 

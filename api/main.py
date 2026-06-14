@@ -8,14 +8,15 @@ import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Request, status
+from fastapi import Depends, FastAPI, HTTPException, Request, status
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
-from api.auth import create_token, validate_mock_admin
+from api.auth import create_token, require_admin, validate_mock_admin
 from api.middleware import setup_middleware
 from api.routers import analytics, chat, documents, evaluation, export, health, permissions, sessions, tenants
+from api.schemas import AdminTenantSwitchRequest, DevTokenRequest, MockAdminLoginRequest
 
 logging.basicConfig(
     level=logging.INFO,
@@ -243,29 +244,24 @@ app.include_router(permissions.router)
 
 # Simple token creation endpoint (dev convenience — replace with proper auth in production)
 @app.post("/auth/token", tags=["auth"])
-async def get_token(request: Request):
-    """Issue a JWT for dev/testing. Body: {tenant_id, user_id, role}."""
-    body = await request.json()
+async def get_token(body: DevTokenRequest):
+    """Issue a member JWT for dev/testing."""
     token = create_token(
-        tenant_id=body.get("tenant_id", ""),
-        user_id=body.get("user_id", ""),
-        role=body.get("role", "member"),
+        tenant_id=body.tenant_id,
+        user_id=body.user_id,
+        role="member",
     )
     return {"access_token": token, "token_type": "bearer"}
 
 
 @app.post("/auth/mock-login", tags=["auth"])
-async def mock_login(request: Request):
+async def mock_login(body: MockAdminLoginRequest):
     """Issue a mock admin JWT after checking the built-in dashboard credentials."""
     from api.db import get_conn
 
-    body = await request.json()
-    email = str(body.get("email", "")).strip()
-    password = str(body.get("password", ""))
-    tenant_slug = str(body.get("tenant_slug", "")).strip()
-
-    if not tenant_slug:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="tenant_slug is required")
+    email = body.email.strip()
+    password = body.password
+    tenant_slug = body.tenant_slug.strip()
     if not validate_mock_admin(email, password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid admin credentials")
 
@@ -279,6 +275,36 @@ async def mock_login(request: Request):
     finally:
         conn.close()
 
+    token = create_token(
+        tenant_id=str(row[0]),
+        user_id=email,
+        role="admin",
+    )
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "tenant": {"id": str(row[0]), "name": row[1], "slug": row[2]},
+        "user": {"email": email, "role": "admin"},
+    }
+
+
+@app.post("/auth/admin/switch-tenant", tags=["auth"])
+async def switch_admin_tenant(body: AdminTenantSwitchRequest, payload: dict = Depends(require_admin)):
+    """Issue a new admin JWT for another tenant after authenticating the current admin token."""
+    from api.db import get_conn
+
+    tenant_slug = body.tenant_slug.strip()
+    conn = get_conn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, name, slug FROM tenants WHERE slug=%s", (tenant_slug,))
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail=f"Tenant '{tenant_slug}' not found")
+    finally:
+        conn.close()
+
+    email = str(payload.get("user_id", "")).strip() or "admin"
     token = create_token(
         tenant_id=str(row[0]),
         user_id=email,
