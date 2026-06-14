@@ -7,6 +7,7 @@ Frame protocol:
 """
 
 import asyncio
+import contextlib
 import json
 import logging
 import queue as stdlib_queue
@@ -42,10 +43,8 @@ async def stream_rag_response(
     t_start = time.monotonic()
 
     async def send(frame: dict[str, Any]):
-        try:
+        with contextlib.suppress(RuntimeError):
             await websocket.send_text(json.dumps(frame, ensure_ascii=False))
-        except RuntimeError:
-            pass  # WebSocket already closed (client disconnected)
 
     try:
         # Retrieval

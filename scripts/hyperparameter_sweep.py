@@ -29,7 +29,6 @@ import argparse
 import itertools
 import json
 import logging
-import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -43,6 +42,7 @@ logger = logging.getLogger(__name__)
 def _rechunk_and_index(tenant: str, temp_slug: str, chunk_size: int, overlap: int) -> None:
     """Rebuild BM25 + Qdrant indexes for a given chunk_size/overlap pair."""
     import pickle
+
     from ingestion.chunker import get_chunker
     from ingestion.embedder import embed
     from retrieval.bm25_store import BM25Store
@@ -54,7 +54,7 @@ def _rechunk_and_index(tenant: str, temp_slug: str, chunk_size: int, overlap: in
 
     # Reconstruct full doc texts
     docs: dict[str, dict] = {}
-    for text, payload in zip(data["texts"], data["payloads"]):
+    for text, payload in zip(data["texts"], data["payloads"], strict=False):
         doc_id = payload.get("doc_id", "")
         if doc_id not in docs:
             docs[doc_id] = {"chunks": [], "payload": payload}
@@ -62,7 +62,7 @@ def _rechunk_and_index(tenant: str, temp_slug: str, chunk_size: int, overlap: in
 
     chunker = get_chunker("turkish", max_chars=chunk_size, overlap_chars=overlap)
     all_texts, all_payloads = [], []
-    for doc_id, doc in docs.items():
+    for _doc_id, doc in docs.items():
         ordered = sorted(doc["chunks"], key=lambda x: x[0])
         full_text = "\n\n".join(t for _, t in ordered)
         for chunk in chunker.chunk(full_text):

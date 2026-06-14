@@ -259,6 +259,114 @@ body::before {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
+
+/* ── Admin operations ───────────────────────────────────── */
+.admin-section {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  animation: fadeUp 0.2s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+.admin-inline-form {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(150px, 0.8fr) 120px auto;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.admin-table {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.admin-row {
+  display: grid;
+  grid-template-columns: minmax(160px, 1.4fr) minmax(80px, 0.6fr) minmax(90px, 0.7fr) minmax(160px, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-height: 44px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12.5px;
+}
+
+.admin-row:last-child { border-bottom: 0; }
+.admin-row > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-row-head {
+  min-height: 34px;
+  background: var(--surface-2);
+  color: var(--text-3);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.admin-empty {
+  padding: 20px;
+  color: var(--text-3);
+  font-size: 13px;
+  text-align: center;
+}
+
+.admin-success,
+.admin-error {
+  border-radius: var(--radius-md);
+  padding: 8px 11px;
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+.admin-success {
+  background: var(--success-muted);
+  color: var(--success);
+  border: 1px solid rgba(16,185,129,0.18);
+}
+.admin-error {
+  background: var(--error-muted);
+  color: var(--error);
+  border: 1px solid rgba(239,68,68,0.18);
+}
+
+.admin-status-ok,
+.admin-status-warn {
+  font-weight: 700;
+}
+.admin-status-ok { color: var(--success); }
+.admin-status-warn { color: var(--error); }
+
+@media (max-width: 760px) {
+  .admin-inline-form {
+    grid-template-columns: 1fr;
+  }
+  .admin-row {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 5px;
+  }
+  .admin-row-head {
+    display: none;
+  }
+  .admin-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
 .login-shell {
   min-height: 100vh;
   display: flex;

@@ -1,6 +1,5 @@
 """PostgreSQL-based async ingestion job queue."""
 
-import json
 import logging
 
 logger = logging.getLogger(__name__)

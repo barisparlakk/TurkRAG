@@ -13,10 +13,33 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
-from api.auth import create_token, require_admin, validate_mock_admin
+from api.auth import (
+    APP_ENV,
+    ENABLE_DEV_AUTH,
+    create_token,
+    require_admin,
+    validate_mock_admin,
+    verify_password,
+)
 from api.middleware import setup_middleware
-from api.routers import analytics, chat, documents, evaluation, export, health, permissions, sessions, tenants
-from api.schemas import AdminTenantSwitchRequest, DevTokenRequest, MockAdminLoginRequest
+from api.routers import (
+    analytics,
+    chat,
+    documents,
+    evaluation,
+    export,
+    health,
+    permissions,
+    sessions,
+    tenants,
+    users,
+)
+from api.schemas import (
+    AdminTenantSwitchRequest,
+    DevTokenRequest,
+    LoginRequest,
+    MockAdminLoginRequest,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -33,7 +56,10 @@ BM25_INDEX_DIR = Path(os.getenv("BM25_INDEX_DIR", "indexes"))
 async def lifespan(app: FastAPI):
     """Run startup tasks and yield to serve requests."""
     logger.info("TurkRAG API starting up…")
-    if os.getenv("JWT_SECRET", "change_this_in_production") == "change_this_in_production":
+    jwt_secret = os.getenv("JWT_SECRET", "change_this_in_production")
+    if APP_ENV == "production" and jwt_secret == "change_this_in_production":
+        raise RuntimeError("JWT_SECRET must be set before running in production")
+    if jwt_secret == "change_this_in_production":
         logger.warning(
             "JWT_SECRET is the default insecure value. "
             "Set JWT_SECRET env var before deploying to production."
@@ -103,7 +129,10 @@ def _init_postgres():
                         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                         tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
                         email TEXT NOT NULL,
-                        role TEXT DEFAULT 'member',
+                        password_hash TEXT,
+                        role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('admin', 'member')),
+                        is_active BOOLEAN NOT NULL DEFAULT true,
+                        updated_at TIMESTAMPTZ DEFAULT NOW(),
                         created_at TIMESTAMPTZ DEFAULT NOW()
                     );
 
@@ -150,7 +179,10 @@ def _init_postgres():
                     CREATE TABLE IF NOT EXISTS eval_runs (
                         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                         tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+                        run_label TEXT,
+                        config_json JSONB,
                         metrics_json JSONB,
+                        per_query_json JSONB,
                         num_queries INT,
                         avg_score NUMERIC(5,4),
                         created_at TIMESTAMPTZ DEFAULT NOW()
@@ -181,6 +213,12 @@ def _init_postgres():
 
                     ALTER TABLE documents ADD COLUMN IF NOT EXISTS version INT DEFAULT 1;
                     ALTER TABLE documents ADD COLUMN IF NOT EXISTS parent_id UUID REFERENCES documents(id);
+                    ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash TEXT;
+                    ALTER TABLE users ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT true;
+                    ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+                    ALTER TABLE eval_runs ADD COLUMN IF NOT EXISTS run_label TEXT;
+                    ALTER TABLE eval_runs ADD COLUMN IF NOT EXISTS config_json JSONB;
+                    ALTER TABLE eval_runs ADD COLUMN IF NOT EXISTS per_query_json JSONB;
 
                     CREATE INDEX IF NOT EXISTS idx_sessions_tenant ON sessions(tenant_id);
                     CREATE INDEX IF NOT EXISTS idx_messages_session ON messages(session_id);
@@ -190,6 +228,8 @@ def _init_postgres():
                     CREATE INDEX IF NOT EXISTS idx_doc_permissions_doc ON document_permissions(document_id);
                     CREATE INDEX IF NOT EXISTS idx_ingestion_jobs_status ON ingestion_jobs(status);
                     CREATE INDEX IF NOT EXISTS idx_eval_runs_tenant ON eval_runs(tenant_id);
+                    CREATE UNIQUE INDEX IF NOT EXISTS idx_users_tenant_email_lower
+                        ON users (tenant_id, lower(email));
                 """)
         logger.info("PostgreSQL schema ready.")
     except Exception as exc:
@@ -240,18 +280,57 @@ app.include_router(sessions.router)
 app.include_router(evaluation.router)
 app.include_router(export.router)
 app.include_router(permissions.router)
+app.include_router(users.router)
 
 
 # Simple token creation endpoint (dev convenience — replace with proper auth in production)
 @app.post("/auth/token", tags=["auth"])
 async def get_token(body: DevTokenRequest):
     """Issue a member JWT for dev/testing."""
+    if not ENABLE_DEV_AUTH:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Development auth is disabled")
     token = create_token(
         tenant_id=body.tenant_id,
         user_id=body.user_id,
         role="member",
+        email=body.user_id,
+        dev=True,
     )
     return {"access_token": token, "token_type": "bearer"}
+
+
+@app.post("/auth/login", tags=["auth"])
+async def login(body: LoginRequest):
+    """Authenticate a tenant user with email/password."""
+    from api.db import get_conn
+
+    tenant_slug = body.tenant_slug.strip()
+    email = body.email.strip().lower()
+    conn = get_conn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                """SELECT u.id, u.tenant_id, u.email, u.password_hash, u.role, u.is_active,
+                          t.name, t.slug
+                   FROM users u
+                   JOIN tenants t ON t.id = u.tenant_id
+                   WHERE t.slug=%s AND lower(u.email)=lower(%s)""",
+                (tenant_slug, email),
+            )
+            row = cur.fetchone()
+    finally:
+        conn.close()
+
+    if not row or not row[5] or not row[3] or not verify_password(body.password, row[3]):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
+
+    token = create_token(tenant_id=str(row[1]), user_id=str(row[0]), role=row[4], email=row[2])
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "tenant": {"id": str(row[1]), "name": row[6], "slug": row[7]},
+        "user": {"id": str(row[0]), "email": row[2], "role": row[4], "is_active": bool(row[5])},
+    }
 
 
 @app.post("/auth/mock-login", tags=["auth"])
@@ -259,6 +338,8 @@ async def mock_login(body: MockAdminLoginRequest):
     """Issue a mock admin JWT after checking the built-in dashboard credentials."""
     from api.db import get_conn
 
+    if not ENABLE_DEV_AUTH:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Development auth is disabled")
     email = body.email.strip()
     password = body.password
     tenant_slug = body.tenant_slug.strip()
@@ -279,6 +360,8 @@ async def mock_login(body: MockAdminLoginRequest):
         tenant_id=str(row[0]),
         user_id=email,
         role="admin",
+        email=email,
+        dev=True,
     )
     return {
         "access_token": token,
@@ -294,6 +377,7 @@ async def switch_admin_tenant(body: AdminTenantSwitchRequest, payload: dict = De
     from api.db import get_conn
 
     tenant_slug = body.tenant_slug.strip()
+    user_row = None
     conn = get_conn()
     try:
         with conn.cursor() as cur:
@@ -301,14 +385,26 @@ async def switch_admin_tenant(body: AdminTenantSwitchRequest, payload: dict = De
             row = cur.fetchone()
             if not row:
                 raise HTTPException(status_code=404, detail=f"Tenant '{tenant_slug}' not found")
+            if not payload.get("dev"):
+                cur.execute(
+                    """SELECT id, email, role, is_active FROM users
+                       WHERE tenant_id=%s AND lower(email)=lower(%s)""",
+                    (row[0], payload.get("email", "")),
+                )
+                user_row = cur.fetchone()
+                if not user_row or not user_row[3] or user_row[2] != "admin":
+                    raise HTTPException(status_code=403, detail="Admin is not active in destination tenant")
     finally:
         conn.close()
 
-    email = str(payload.get("user_id", "")).strip() or "admin"
+    email = str(payload.get("email") or payload.get("user_id", "")).strip() or "admin"
+    user_id = str(user_row[0]) if user_row else email
     token = create_token(
         tenant_id=str(row[0]),
-        user_id=email,
+        user_id=user_id,
         role="admin",
+        email=email,
+        dev=bool(payload.get("dev")),
     )
     return {
         "access_token": token,

@@ -13,11 +13,17 @@ Last reviewed: 2026-06-14
 - [x] `ingestion/chunker.py`: make `get_chunker("turkish", max_chars=..., overlap_chars=...)` apply experiment overrides instead of silently using defaults.
 - [x] `eval/ragas_eval.py`, `scripts/run_experiments.py`, and `scripts/plot_results.py`: persist latency metrics so experiment artifacts can generate the advertised latency distribution plot.
 - [x] `api/main.py` and `dashboard/src/api/client.js`: remove public caller-controlled admin role minting from `/auth/token`; use an authenticated admin tenant-switch endpoint instead.
+- [x] `api/auth.py`, `api/main.py`, `api/routers/users.py`, and `dashboard`: add tenant-scoped local email/password login, active user validation, admin user management, and dev-auth gating.
+- [x] `api/routers/sessions.py`, `api/routers/export.py`, and `api/routers/chat.py`: make sessions and exports user-aware while preserving admin tenant visibility.
+- [x] `api/routers/documents.py` and `dashboard`: return ingestion `job_id`, track job states, expose job history, and show upload/job feedback in the UI.
+- [x] `eval/ragas_eval.py`, `eval/auto_eval.py`, `api/routers/evaluation.py`, and `scripts/run_experiments.py`: align `eval_runs` persistence and include retrieval-only metrics in experiments.
+- [x] `api/middleware.py`, `api/routers/health.py`, and `README.md`: add production safety checks for JWT/CORS and richer health details.
 
 ## Current gaps
 
-- [ ] Proper authentication/authorization: auth is still demo-only (`/auth/token` member minting + `/auth/mock-login` fixed credentials); production identity verification is still missing.
-- [ ] Dashboard role-awareness is still tenant-scoped: admin flows can switch tenant context safely now, but there is still no real user directory or session-backed admin identity.
+- [ ] Document-level permissions are still not enforced in retrieval/listing/chat; current access model is tenant-level member access plus admin controls.
+- [ ] Existing deployments need a one-time admin bootstrap before disabling dev auth in production.
+- [ ] Generated historical eval artifacts may still contain model scratchpad text; newly generated artifacts are cleaned, but old committed artifacts were not rewritten.
 
 ## Deferred work
 

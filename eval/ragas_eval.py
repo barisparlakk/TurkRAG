@@ -176,17 +176,28 @@ def save_to_db(scores: dict) -> None:
         import psycopg2
         conn = psycopg2.connect(POSTGRES_URL)
         cur = conn.cursor()
+        cur.execute("SELECT id FROM tenants WHERE slug=%s", (scores["tenant_slug"],))
+        row = cur.fetchone()
+        if not row:
+            raise ValueError(f"Tenant not found: {scores['tenant_slug']}")
+        tenant_id = row[0]
+        metrics = {k: scores[k] for k in METRICS + LATENCY_FIELDS}
+        avg_score = sum(scores[k] for k in METRICS) / len(METRICS)
         cur.execute("""
             INSERT INTO eval_runs
-                (id, tenant_slug, run_label, config, results, created_at)
-            VALUES (%s, %s, %s, %s, %s, NOW())
+                (id, tenant_id, run_label, config_json, metrics_json, per_query_json,
+                 num_queries, avg_score, created_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
             ON CONFLICT DO NOTHING
         """, (
             scores["run_id"],
-            scores["tenant_slug"],
+            tenant_id,
             scores["run_label"],
             json.dumps({k: scores[k] for k in ("retrieval_mode", "top_k", "final_k")}),
-            json.dumps({k: scores[k] for k in METRICS + LATENCY_FIELDS}),
+            json.dumps(metrics),
+            json.dumps(scores.get("per_query", [])),
+            scores["n_queries"],
+            avg_score,
         ))
         conn.commit()
         cur.close()

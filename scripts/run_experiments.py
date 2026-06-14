@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 MODES = ["sparse", "dense", "hybrid", "hybrid+rerank"]
 METRICS = ["faithfulness", "answer_relevancy", "context_precision", "context_recall"]
+RETRIEVAL_METRICS = ["mean_mrr", "mean_ap", "recall@5", "ndcg@5"]
 LATENCY_FIELDS = ["retrieval_latency_ms", "generation_latency_ms", "total_latency_ms"]
 
 
@@ -39,6 +40,7 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     from eval.ragas_eval import run_eval, save_to_db
+    from eval.retrieval_metrics import evaluate_retrieval
 
     all_results = []
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -56,6 +58,21 @@ def main():
                 final_k=args.final_k,
                 run_label=f"{mode}-top{args.top_k}-final{args.final_k}",
             )
+            try:
+                retrieval_scores = evaluate_retrieval(
+                    tenant_slug=args.tenant,
+                    queries_path=args.queries,
+                    mode=mode,
+                    ks=[5],
+                    top_k=args.top_k,
+                    final_k=max(args.final_k, 5),
+                )["aggregate"]
+                scores["mean_mrr"] = retrieval_scores.get("mean_mrr", 0.0)
+                scores["mean_ap"] = retrieval_scores.get("mean_ap", 0.0)
+                scores["recall@5"] = retrieval_scores.get("recall_at_k", {}).get("5", 0.0)
+                scores["ndcg@5"] = retrieval_scores.get("ndcg_at_k", {}).get("5", 0.0)
+            except Exception as exc:
+                logger.warning("Retrieval-only metrics failed for mode '%s': %s", mode, exc)
             all_results.append(scores)
 
             if args.save_db:
@@ -76,6 +93,7 @@ def main():
         fieldnames = (
             ["retrieval_mode", "run_label"]
             + METRICS
+            + RETRIEVAL_METRICS
             + LATENCY_FIELDS
             + ["n_queries", "top_k", "final_k", "evaluated_at"]
         )

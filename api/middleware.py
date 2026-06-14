@@ -13,9 +13,14 @@ logger = logging.getLogger(__name__)
 
 def _get_cors_origins() -> list[str]:
     """Return configured CORS origins from env, defaulting to '*' for local dev."""
+    app_env = os.getenv("APP_ENV", "development").lower()
     raw_origins = os.getenv("CORS_ORIGINS", "*").strip()
     if not raw_origins:
+        if app_env == "production":
+            raise RuntimeError("CORS_ORIGINS must be set when APP_ENV=production")
         return ["*"]
+    if app_env == "production" and raw_origins == "*":
+        raise RuntimeError("CORS_ORIGINS='*' is not allowed when APP_ENV=production")
     return [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
 
 

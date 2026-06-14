@@ -16,24 +16,32 @@ POSTGRES_URL = os.getenv("POSTGRES_URL", "postgresql://turkrag:turkrag_secret@lo
 QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 
 
-def create_tenant(name: str, slug: str) -> dict:
+def create_tenant(name: str, slug: str, admin_email: str | None = None, admin_password: str | None = None) -> dict:
     """Create tenant in PostgreSQL and provision Qdrant collection."""
     import psycopg2
 
     conn = psycopg2.connect(POSTGRES_URL)
     try:
         with conn, conn.cursor() as cur:
-                cur.execute("SELECT id FROM tenants WHERE slug=%s", (slug,))
-                if cur.fetchone():
-                    print(f"✗ Tenant slug '{slug}' already exists.")
-                    sys.exit(1)
+            cur.execute("SELECT id FROM tenants WHERE slug=%s", (slug,))
+            if cur.fetchone():
+                print(f"✗ Tenant slug '{slug}' already exists.")
+                sys.exit(1)
 
-                tenant_id = str(uuid.uuid4())
+            tenant_id = str(uuid.uuid4())
+            cur.execute(
+                "INSERT INTO tenants (id, name, slug) VALUES (%s, %s, %s) RETURNING id, name, slug, created_at",
+                (tenant_id, name, slug),
+            )
+            row = cur.fetchone()
+            if admin_email and admin_password:
+                from api.auth import hash_password
                 cur.execute(
-                    "INSERT INTO tenants (id, name, slug) VALUES (%s, %s, %s) RETURNING id, name, slug, created_at",
-                    (tenant_id, name, slug),
+                    """INSERT INTO users (tenant_id, email, password_hash, role, is_active)
+                       VALUES (%s, %s, %s, 'admin', true)
+                       ON CONFLICT DO NOTHING""",
+                    (tenant_id, admin_email.strip().lower(), hash_password(admin_password)),
                 )
-                row = cur.fetchone()
     finally:
         conn.close()
 
@@ -57,11 +65,10 @@ def create_tenant(name: str, slug: str) -> dict:
     except Exception as exc:
         print(f"  Warning: Could not create Qdrant collection: {exc}")
 
-    # Print a dev JWT for this tenant
-    from api.auth import create_token
-    token = create_token(tenant_id=str(row[0]), user_id="admin", role="admin")
-    print(f"\n✓ Admin JWT (expires 24h):\n  {token}\n")
-    print("Use this token as: Authorization: Bearer <token>")
+    if admin_email and admin_password:
+        print(f"✓ Initial admin user created: {admin_email.strip().lower()}")
+    else:
+        print("  No admin user created. Pass --admin-email and --admin-password to bootstrap login.")
 
     return {"id": str(row[0]), "name": row[1], "slug": row[2]}
 
@@ -72,7 +79,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Create a new TurkRAG tenant")
     parser.add_argument("--name", required=True, help="Tenant display name")
     parser.add_argument("--slug", required=True, help="Tenant slug (lowercase alphanumeric + hyphens)")
+    parser.add_argument("--admin-email", default="", help="Initial admin email")
+    parser.add_argument("--admin-password", default="", help="Initial admin password")
     args = parser.parse_args()
 
-    result = create_tenant(args.name, args.slug)
+    result = create_tenant(args.name, args.slug, args.admin_email or None, args.admin_password or None)
     print(f"\nDone. Tenant '{result['name']}' is ready.")

@@ -119,7 +119,7 @@ def attribute_answer(
     attributed_sentences = []
     all_cited = set()
 
-    for sent_idx, (sent, sent_vec) in enumerate(zip(sentences, sent_vecs)):
+    for sent_idx, (sent, sent_vec) in enumerate(zip(sentences, sent_vecs, strict=False)):
         sims = [
             _cosine_sim(sent_vec, chunk_embeddings[i])
             for i in range(len(chunks))

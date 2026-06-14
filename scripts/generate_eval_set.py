@@ -23,6 +23,18 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s — %(
 logger = logging.getLogger(__name__)
 
 
+def _clean_generated_text(text: str) -> str:
+    """Remove model scratchpad/reasoning residue from generated eval artifacts."""
+    import re
+
+    from generation.citations import strip_think_tags
+
+    cleaned = strip_think_tags(text)
+    cleaned = re.sub(r"(?is)<think>.*?(</think>|$)", "", cleaned)
+    cleaned = re.sub(r"(?im)^(okay|let me|first,|the text|so,).*$", "", cleaned)
+    return cleaned.strip()
+
+
 def load_chunks_from_bm25(tenant_slug: str) -> list[dict]:
     """Read all indexed chunks from the BM25 pickle for a tenant."""
     bm25_path = Path("indexes") / f"bm25_{tenant_slug}.pkl"
@@ -35,7 +47,7 @@ def load_chunks_from_bm25(tenant_slug: str) -> list[dict]:
     texts = data["texts"]
     payloads = data["payloads"]
     chunks = []
-    for text, payload in zip(texts, payloads):
+    for text, payload in zip(texts, payloads, strict=False):
         chunks.append({
             "text": text,
             "filename": payload.get("filename", ""),
@@ -76,7 +88,6 @@ SORU: {question}<|im_end|>
 
 def generate_qa_for_chunk(chunk: dict, n: int) -> list[dict]:
     """Call LLM to generate n questions and answers for a chunk."""
-    from generation.citations import strip_think_tags
     from generation.llm import generate, is_available
 
     if not is_available():
@@ -85,7 +96,7 @@ def generate_qa_for_chunk(chunk: dict, n: int) -> list[dict]:
 
     # Generate questions
     q_prompt = QUESTION_PROMPT.format(text=chunk["text"][:600], n=n)
-    raw_questions = strip_think_tags(generate(q_prompt, max_tokens=300)).strip()
+    raw_questions = _clean_generated_text(generate(q_prompt, max_tokens=300))
     # Filter: only lines that look like real Turkish questions (end with ? or are >20 chars Turkish)
     import re as _re
     questions = []
@@ -105,7 +116,7 @@ def generate_qa_for_chunk(chunk: dict, n: int) -> list[dict]:
     pairs = []
     for question in questions:
         a_prompt = ANSWER_PROMPT.format(text=chunk["text"][:600], question=question)
-        answer = strip_think_tags(generate(a_prompt, max_tokens=150)).strip()
+        answer = _clean_generated_text(generate(a_prompt, max_tokens=150))
         if question and answer:
             pairs.append({
                 "question": question,

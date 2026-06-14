@@ -1,9 +1,10 @@
 """Session history and message feedback endpoints."""
 
 import logging
+
 from fastapi import APIRouter, Depends, HTTPException
 
-from api.auth import get_tenant_id
+from api.auth import get_current_user
 from api.db import get_conn
 
 logger = logging.getLogger(__name__)
@@ -11,7 +12,7 @@ router = APIRouter(prefix="/sessions", tags=["sessions"])
 
 
 @router.get("")
-async def list_sessions(limit: int = 30, tenant_id: str = Depends(get_tenant_id)):
+async def list_sessions(limit: int = 30, user: dict = Depends(get_current_user)):
     """Return recent sessions for the tenant, newest first.
 
     Each entry includes a preview (first user message truncated to 80 chars)
@@ -21,21 +22,28 @@ async def list_sessions(limit: int = 30, tenant_id: str = Depends(get_tenant_id)
     conn = get_conn()
     try:
         with conn.cursor() as cur:
+            params = [user["tenant_id"]]
+            owner_filter = ""
+            if user.get("role") != "admin":
+                owner_filter = "AND s.user_id = %s"
+                params.append(user["id"])
+            params.append(limit)
             cur.execute(
-                """
+                f"""
                 SELECT
                     s.id,
                     s.created_at,
+                    s.user_id,
                     COUNT(m.id)                                    AS message_count,
                     MIN(m.content) FILTER (WHERE m.role = 'user') AS preview
                 FROM sessions s
                 LEFT JOIN messages m ON m.session_id = s.id
-                WHERE s.tenant_id = %s
+                WHERE s.tenant_id = %s {owner_filter}
                 GROUP BY s.id
                 ORDER BY s.created_at DESC
                 LIMIT %s
                 """,
-                (tenant_id, limit),
+                tuple(params),
             )
             rows = cur.fetchall()
     finally:
@@ -45,15 +53,16 @@ async def list_sessions(limit: int = 30, tenant_id: str = Depends(get_tenant_id)
         {
             "id": str(r[0]),
             "created_at": str(r[1]),
-            "message_count": r[2],
-            "preview": (r[3] or "")[:80] if r[3] else "Boş oturum",
+            "user_id": r[2],
+            "message_count": r[3],
+            "preview": (r[4] or "")[:80] if r[4] else "Boş oturum",
         }
         for r in rows
     ]
 
 
 @router.get("/{session_id}/messages")
-async def get_session_messages(session_id: str, tenant_id: str = Depends(get_tenant_id)):
+async def get_session_messages(session_id: str, user: dict = Depends(get_current_user)):
     """Return all messages in a session, oldest first.
 
     Verifies the session belongs to the requesting tenant.
@@ -62,9 +71,14 @@ async def get_session_messages(session_id: str, tenant_id: str = Depends(get_ten
     try:
         with conn.cursor() as cur:
             # Ownership check
+            params = [session_id, user["tenant_id"]]
+            owner_filter = ""
+            if user.get("role") != "admin":
+                owner_filter = "AND user_id = %s"
+                params.append(user["id"])
             cur.execute(
-                "SELECT id FROM sessions WHERE id=%s AND tenant_id=%s",
-                (session_id, tenant_id),
+                f"SELECT id FROM sessions WHERE id=%s AND tenant_id=%s {owner_filter}",
+                tuple(params),
             )
             if not cur.fetchone():
                 raise HTTPException(status_code=404, detail="Session not found")
@@ -95,7 +109,7 @@ async def get_session_messages(session_id: str, tenant_id: str = Depends(get_ten
 async def submit_feedback(
     message_id: str,
     body: dict,
-    tenant_id: str = Depends(get_tenant_id),
+    user: dict = Depends(get_current_user),
 ):
     """Store thumbs-up (1) or thumbs-down (-1) feedback for an assistant message.
 
@@ -110,11 +124,16 @@ async def submit_feedback(
     try:
         with conn, conn.cursor() as cur:
             # Verify message exists, is assistant role, and belongs to this tenant
+            params = [message_id, user["tenant_id"]]
+            owner_filter = ""
+            if user.get("role") != "admin":
+                owner_filter = "AND s.user_id = %s"
+                params.append(user["id"])
             cur.execute(
-                """SELECT m.id FROM messages m
+                f"""SELECT m.id FROM messages m
                    JOIN sessions s ON s.id = m.session_id
-                   WHERE m.id=%s AND m.role='assistant' AND s.tenant_id=%s""",
-                (message_id, tenant_id),
+                   WHERE m.id=%s AND m.role='assistant' AND s.tenant_id=%s {owner_filter}""",
+                tuple(params),
             )
             if not cur.fetchone():
                 raise HTTPException(status_code=404, detail="Message not found")

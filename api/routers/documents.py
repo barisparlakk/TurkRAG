@@ -68,10 +68,18 @@ async def upload_document(
     except Exception as exc:
         logger.warning("Cache invalidation failed: %s", exc)
 
-    # Trigger background ingestion
-    background_tasks.add_task(_ingest_document, document_id, str(save_path), file.filename, tenant_id)
+    from ingestion.queue import enqueue_job
 
-    return DocumentUploadResponse(document_id=document_id, filename=file.filename, status="processing")
+    conn = get_conn()
+    try:
+        job_id = enqueue_job(tenant_id, document_id, file.filename, str(save_path), conn)
+    finally:
+        conn.close()
+
+    # Trigger background ingestion
+    background_tasks.add_task(_ingest_document, document_id, str(save_path), file.filename, tenant_id, job_id)
+
+    return DocumentUploadResponse(document_id=document_id, job_id=job_id, filename=file.filename, status="processing")
 
 
 @router.get("", response_model=list[DocumentListItem])
@@ -149,7 +157,41 @@ async def get_job_status(job_id: str, tenant_id: str = Depends(get_tenant_id)):
     return result
 
 
-def _ingest_document(document_id: str, file_path: str, filename: str, tenant_id: str):
+@router.get("/jobs")
+async def list_jobs(limit: int = 30, tenant_id: str = Depends(get_tenant_id)):
+    """List recent ingestion jobs for the current tenant."""
+    limit = min(max(limit, 1), 100)
+    conn = get_conn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                """SELECT id, tenant_id, document_id, filename, status, error_message,
+                          created_at, started_at, completed_at
+                   FROM ingestion_jobs
+                   WHERE tenant_id=%s
+                   ORDER BY created_at DESC LIMIT %s""",
+                (tenant_id, limit),
+            )
+            rows = cur.fetchall()
+    finally:
+        conn.close()
+    return [
+        {
+            "id": str(r[0]),
+            "tenant_id": str(r[1]),
+            "document_id": str(r[2]) if r[2] else None,
+            "filename": r[3],
+            "status": r[4],
+            "error_message": r[5],
+            "created_at": str(r[6]) if r[6] else None,
+            "started_at": str(r[7]) if r[7] else None,
+            "completed_at": str(r[8]) if r[8] else None,
+        }
+        for r in rows
+    ]
+
+
+def _ingest_document(document_id: str, file_path: str, filename: str, tenant_id: str, job_id: str | None = None):
     """Background task: parse → chunk → embed → index."""
     logger.info("Background ingestion started: doc=%s file=%s", document_id, file_path)
 
@@ -160,6 +202,13 @@ def _ingest_document(document_id: str, file_path: str, filename: str, tenant_id:
         with conn.cursor() as cur:
             cur.execute("SELECT slug FROM tenants WHERE id=%s", (tenant_id,))
             row = cur.fetchone()
+        if job_id:
+            # Mark this specific background task as processing without competing for queue workers.
+            with conn, conn.cursor() as cur:
+                cur.execute(
+                    "UPDATE ingestion_jobs SET status='processing', started_at=NOW() WHERE id=%s",
+                    (job_id,),
+                )
     except Exception as exc:
         logger.error("DB error resolving tenant for doc %s: %s", document_id, exc)
     finally:
@@ -182,6 +231,13 @@ def _ingest_document(document_id: str, file_path: str, filename: str, tenant_id:
         logger.info("Doc %s: %d chars → %d chunks", document_id, len(text), len(chunks))
 
         TenantIndexer().ingest(document_id, tenant_slug, filename, chunks)
+        if job_id:
+            conn = get_conn()
+            try:
+                from ingestion.queue import complete_job
+                complete_job(job_id, conn)
+            finally:
+                conn.close()
         logger.info("Ingestion complete: doc=%s", document_id)
     except Exception as exc:
         logger.exception("Ingestion failed for doc %s: %s", document_id, exc)
@@ -189,5 +245,8 @@ def _ingest_document(document_id: str, file_path: str, filename: str, tenant_id:
         try:
             with conn, conn.cursor() as cur:
                 cur.execute("UPDATE documents SET status='error' WHERE id=%s", (document_id,))
+            if job_id:
+                from ingestion.queue import fail_job
+                fail_job(job_id, str(exc), conn)
         finally:
             conn.close()

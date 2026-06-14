@@ -9,8 +9,6 @@ import { SourcesPanel } from './components/SourcesPanel.jsx'
 import { ToastProvider } from './components/Toast.jsx'
 import { api, getTokenPayload, getToken, setToken } from './api/client.js'
 
-const MOCK_ADMIN_EMAIL = 'baris@dev.com'
-const MOCK_ADMIN_PASSWORD = '1234'
 const AUTH_STORAGE_KEY = 'turkrag_auth'
 
 function loadStoredJSON(key) {
@@ -28,55 +26,24 @@ function isTokenExpired(payload) {
 
 /* ── Login ─────────────────────────────────────────────── */
 function LoginPage({ onLogin }) {
-  const [mode, setMode] = useState('member')
-  const [memberSlug, setMemberSlug] = useState('')
-  const [adminSlug, setAdminSlug] = useState('')
-  const [adminEmail, setAdminEmail] = useState(MOCK_ADMIN_EMAIL)
-  const [adminPassword, setAdminPassword] = useState(MOCK_ADMIN_PASSWORD)
+  const [tenantSlug, setTenantSlug] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleMemberLogin = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
-    const slug = memberSlug.trim()
-    if (!slug) {
-      setLoginError('Kullanıcı girişi için çalışma alanı slug alanı zorunludur.')
+    const slug = tenantSlug.trim()
+    if (!slug || !email.trim() || !password) {
+      setLoginError('Çalışma alanı, email ve şifre zorunludur.')
       return
     }
 
     setLoading(true)
     setLoginError('')
     try {
-      const tenant = await api.getTenantBySlug(slug)
-      const data = await api.getToken(tenant.id, 'demo-user', 'member')
-      setToken(data.access_token)
-      onLogin({
-        tenant: { slug: tenant.slug, id: tenant.id, name: tenant.name || tenant.slug },
-        auth: {
-          loginMode: 'member',
-          role: 'member',
-          userId: 'demo-user',
-        },
-      })
-    } catch (err) {
-      setLoginError(`Kullanıcı girişi başarısız: ${err.message}`)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleAdminLogin = async (e) => {
-    e.preventDefault()
-    const slug = adminSlug.trim()
-    if (!slug) {
-      setLoginError('Admin girişi için yönetilecek çalışma alanı slug alanı zorunludur.')
-      return
-    }
-
-    setLoading(true)
-    setLoginError('')
-    try {
-      const data = await api.mockLogin(slug, adminEmail.trim(), adminPassword)
+      const data = await api.login(slug, email.trim(), password)
       setToken(data.access_token)
       onLogin({
         tenant: {
@@ -85,14 +52,14 @@ function LoginPage({ onLogin }) {
           name: data.tenant.name || data.tenant.slug,
         },
         auth: {
-          loginMode: 'admin',
-          role: 'admin',
-          userId: data.user.email,
+          loginMode: 'password',
+          role: data.user.role,
+          userId: data.user.id,
           email: data.user.email,
         },
       })
     } catch (err) {
-      setLoginError(`Admin girişi başarısız: ${err.message}`)
+      setLoginError(`Giriş başarısız: ${err.message}`)
     } finally {
       setLoading(false)
     }
@@ -103,10 +70,10 @@ function LoginPage({ onLogin }) {
       <div className="login-stage fade-up">
         <section className="login-hero glass">
           <div className="login-badge">TurkRAG access control</div>
-          <h1>Tek giriş ekranı yerine rol bazlı giriş akışı</h1>
+          <h1>Kurumsal belgeler için güvenli tenant girişi</h1>
           <p>
-            Kullanıcılar yalnızca kendi çalışma alanına erişsin, admin ise tenant yönetimi
-            ve operasyon panellerine kontrollü biçimde girebilsin.
+            Kullanıcılar tenant, email ve şifre ile doğrulanır; admin araçları yalnızca
+            yetkili hesaplara açılır.
           </p>
 
           <div className="login-highlights">
@@ -121,9 +88,9 @@ function LoginPage({ onLogin }) {
           </div>
 
           <div className="login-admin-note">
-            <div className="login-admin-note-label">Mock admin credentials</div>
-            <code>{MOCK_ADMIN_EMAIL}</code>
-            <code>{MOCK_ADMIN_PASSWORD}</code>
+            <div className="login-admin-note-label">Güvenli oturum</div>
+            <code>tenant scoped</code>
+            <code>role aware</code>
           </div>
         </section>
 
@@ -139,66 +106,18 @@ function LoginPage({ onLogin }) {
             </div>
           </div>
 
-          <div className="login-mode-switch" role="tablist" aria-label="Giriş modu">
-            <button
-              type="button"
-              className={`login-mode-chip ${mode === 'member' ? 'active' : ''}`}
-              onClick={() => {
-                setMode('member')
-                setLoginError('')
-              }}
-            >
-              Kullanıcı girişi
-            </button>
-            <button
-              type="button"
-              className={`login-mode-chip ${mode === 'admin' ? 'active' : ''}`}
-              onClick={() => {
-                setMode('admin')
-                setLoginError('')
-              }}
-            >
-              Admin girişi
-            </button>
-          </div>
-
-          {mode === 'member' ? (
-            <form onSubmit={handleMemberLogin} className="login-form">
+            <form onSubmit={handleLogin} className="login-form">
               <div className="login-form-copy">
-                <h3>Çalışma alanına kullanıcı olarak gir</h3>
-                <p>Bu akış belge yükleme, sohbet ve kaynak inceleme işlemleri için member token üretir.</p>
+                <h3>Çalışma alanına giriş yap</h3>
+                <p>Hesabınızın rolüne göre sohbet, belge ve yönetim panelleri açılır.</p>
               </div>
 
               <label className="login-label">
                 Çalışma alanı slug
                 <input
                   type="text"
-                  value={memberSlug}
-                  onChange={(e) => setMemberSlug(e.target.value)}
-                  placeholder="ornek: acme-sirket"
-                  className="input-field"
-                />
-              </label>
-
-              {loginError && <div className="login-error">{loginError}</div>}
-
-              <button type="submit" disabled={loading} className="btn btn-primary login-submit">
-                {loading ? 'Giriş hazırlanıyor...' : 'Kullanıcı olarak devam et'}
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleAdminLogin} className="login-form">
-              <div className="login-form-copy">
-                <h3>Yönetim konsoluna admin olarak gir</h3>
-                <p>Bu akış backend tarafında mock admin doğrulaması yapar ve admin token döndürür.</p>
-              </div>
-
-              <label className="login-label">
-                Yönetilecek çalışma alanı slug
-                <input
-                  type="text"
-                  value={adminSlug}
-                  onChange={(e) => setAdminSlug(e.target.value)}
+                  value={tenantSlug}
+                  onChange={(e) => setTenantSlug(e.target.value)}
                   placeholder="ornek: acme-sirket"
                   className="input-field"
                 />
@@ -209,9 +128,9 @@ function LoginPage({ onLogin }) {
                   Email
                   <input
                     type="email"
-                    value={adminEmail}
-                    onChange={(e) => setAdminEmail(e.target.value)}
-                    placeholder={MOCK_ADMIN_EMAIL}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="admin@acme.com"
                     className="input-field"
                   />
                 </label>
@@ -219,27 +138,20 @@ function LoginPage({ onLogin }) {
                   Şifre
                   <input
                     type="password"
-                    value={adminPassword}
-                    onChange={(e) => setAdminPassword(e.target.value)}
-                    placeholder={MOCK_ADMIN_PASSWORD}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
                     className="input-field"
                   />
                 </label>
               </div>
 
-              <div className="login-credential-card">
-                <span>Hazır test hesabı</span>
-                <strong>{MOCK_ADMIN_EMAIL}</strong>
-                <strong>{MOCK_ADMIN_PASSWORD}</strong>
-              </div>
-
               {loginError && <div className="login-error">{loginError}</div>}
 
               <button type="submit" disabled={loading} className="btn btn-primary login-submit">
-                {loading ? 'Admin doğrulanıyor...' : 'Admin konsolunu aç'}
+                {loading ? 'Oturum doğrulanıyor...' : 'Giriş yap'}
               </button>
             </form>
-          )}
 
           <p className="login-footer-copy">KVKK uyumlu · şirket içi indeksleme · rol bazlı erişim</p>
         </section>

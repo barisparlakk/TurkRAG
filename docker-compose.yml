@@ -42,6 +42,9 @@ services:
       QDRANT_URL: http://qdrant:6333
       POSTGRES_URL: postgresql://turkrag:${POSTGRES_PASSWORD:-turkrag_secret}@postgres/turkrag
       JWT_SECRET: ${JWT_SECRET:-change_this_in_production}
+      APP_ENV: ${APP_ENV:-development}
+      ENABLE_DEV_AUTH: ${ENABLE_DEV_AUTH:-true}
+      CORS_ORIGINS: ${CORS_ORIGINS:-*}
       LLM_MODEL_PATH: /models/qwen3-8b-instruct-q4_k_m.gguf
       LLM_N_GPU_LAYERS: "0"        # CPU-only in Docker; set to -1 for GPU host
       LLM_MAX_TOKENS: "512"

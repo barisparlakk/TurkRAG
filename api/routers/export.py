@@ -4,9 +4,9 @@ import json
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import PlainTextResponse, JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 
-from api.auth import get_tenant_id
+from api.auth import get_current_user
 from api.db import get_conn
 
 logger = logging.getLogger(__name__)
@@ -14,15 +14,20 @@ router = APIRouter(prefix="/export", tags=["export"])
 
 
 @router.get("/sessions/{session_id}/txt")
-async def export_session_txt(session_id: str, tenant_id: str = Depends(get_tenant_id)):
+async def export_session_txt(session_id: str, user: dict = Depends(get_current_user)):
     """Export a chat session as plain text."""
     conn = get_conn()
     try:
         with conn.cursor() as cur:
+            params = [session_id, user["tenant_id"]]
+            owner_filter = ""
+            if user.get("role") != "admin":
+                owner_filter = "AND s.user_id = %s"
+                params.append(user["id"])
             cur.execute(
-                """SELECT s.id FROM sessions s
-                   WHERE s.id=%s AND s.tenant_id=%s""",
-                (session_id, tenant_id),
+                f"""SELECT s.id FROM sessions s
+                   WHERE s.id=%s AND s.tenant_id=%s {owner_filter}""",
+                tuple(params),
             )
             if not cur.fetchone():
                 raise HTTPException(status_code=404, detail="Session not found")
@@ -51,14 +56,19 @@ async def export_session_txt(session_id: str, tenant_id: str = Depends(get_tenan
 
 
 @router.get("/sessions/{session_id}/json")
-async def export_session_json(session_id: str, tenant_id: str = Depends(get_tenant_id)):
+async def export_session_json(session_id: str, user: dict = Depends(get_current_user)):
     """Export a chat session as JSON."""
     conn = get_conn()
     try:
         with conn.cursor() as cur:
+            params = [session_id, user["tenant_id"]]
+            owner_filter = ""
+            if user.get("role") != "admin":
+                owner_filter = "AND user_id = %s"
+                params.append(user["id"])
             cur.execute(
-                "SELECT id FROM sessions WHERE id=%s AND tenant_id=%s",
-                (session_id, tenant_id),
+                f"SELECT id FROM sessions WHERE id=%s AND tenant_id=%s {owner_filter}",
+                tuple(params),
             )
             if not cur.fetchone():
                 raise HTTPException(status_code=404, detail="Session not found")
@@ -91,7 +101,7 @@ async def export_session_json(session_id: str, tenant_id: str = Depends(get_tena
 
 
 @router.get("/analytics/report")
-async def export_analytics_report(tenant_id: str = Depends(get_tenant_id)):
+async def export_analytics_report(user: dict = Depends(get_current_user)):
     """Summary report: query stats, response times, feedback."""
     conn = get_conn()
     try:
@@ -100,7 +110,7 @@ async def export_analytics_report(tenant_id: str = Depends(get_tenant_id)):
                 """SELECT COUNT(*), AVG(query_time_ms), MAX(query_time_ms),
                           AVG(num_citations), AVG(answer_length)
                    FROM query_logs WHERE tenant_id=%s""",
-                (tenant_id,),
+                (user["tenant_id"],),
             )
             row = cur.fetchone()
             total_queries = row[0] or 0
@@ -114,20 +124,20 @@ async def export_analytics_report(tenant_id: str = Depends(get_tenant_id)):
                    WHERE session_id IN (SELECT id FROM sessions WHERE tenant_id=%s)
                    AND feedback IS NOT NULL
                    GROUP BY feedback""",
-                (tenant_id,),
+                (user["tenant_id"],),
             )
             feedback = {str(r[0]): r[1] for r in cur.fetchall()}
 
             cur.execute(
                 "SELECT COUNT(*) FROM documents WHERE tenant_id=%s AND status='ready'",
-                (tenant_id,),
+                (user["tenant_id"],),
             )
             doc_count = cur.fetchone()[0] or 0
     finally:
         conn.close()
 
     return {
-        "tenant_id": tenant_id,
+        "tenant_id": user["tenant_id"],
         "total_queries": total_queries,
         "avg_response_time_ms": avg_time,
         "max_response_time_ms": max_time,

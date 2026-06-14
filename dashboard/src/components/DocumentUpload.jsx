@@ -58,6 +58,7 @@ export function DocumentUpload() {
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [error, setError] = useState(null)
+  const [lastJob, setLastJob] = useState(null)
   const fileInputRef = useRef()
   const pollRef = useRef()
 
@@ -77,7 +78,8 @@ export function DocumentUpload() {
     for (let i = 0; i < files.length; i++) {
       try {
         setUploadProgress(Math.round(((i + 0.5) / files.length) * 100))
-        await api.uploadDocument(files[i])
+        const result = await api.uploadDocument(files[i])
+        if (result?.job_id) setLastJob(result)
         setUploadProgress(Math.round(((i + 1) / files.length) * 100))
       } catch (e) { setError(`Yükleme hatası: ${e.message}`) }
     }
@@ -142,6 +144,12 @@ export function DocumentUpload() {
               borderRadius: 2, transition: 'width 0.3s ease',
             }} />
           </div>
+        </div>
+      )}
+
+      {lastJob && !uploading && (
+        <div className="admin-success">
+          İşleme alındı: {lastJob.filename} · job {lastJob.job_id.slice(0, 8)}
         </div>
       )}
 

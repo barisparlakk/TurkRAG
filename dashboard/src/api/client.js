@@ -56,6 +56,8 @@ async function request(method, path, body = null, isFormData = false) {
 
 export const api = {
   // Auth
+  login: (tenantSlug, email, password) =>
+    request('POST', '/auth/login', { tenant_slug: tenantSlug, email, password }),
   getToken: (tenantId, userId = 'user') =>
     request('POST', '/auth/token', { tenant_id: tenantId, user_id: userId }),
   mockLogin: (tenantSlug, email, password) =>
@@ -80,6 +82,13 @@ export const api = {
   createTenant: (name, slug) => request('POST', '/tenants', { name, slug }),
   getTenantBySlug: (slug) => request('GET', `/tenants/by-slug/${slug}`),
 
+  // Users
+  listUsers: () => request('GET', '/users'),
+  createUser: (email, password, role = 'member') =>
+    request('POST', '/users', { email, password, role }),
+  updateUser: (userId, patch) => request('PATCH', `/users/${userId}`, patch),
+  deactivateUser: (userId) => request('DELETE', `/users/${userId}`),
+
   // Sessions
   listSessions: (limit = 30) => request('GET', `/sessions?limit=${limit}`),
   getSessionMessages: (sessionId) => request('GET', `/sessions/${sessionId}/messages`),
@@ -103,7 +112,8 @@ export const api = {
   getEvalHistory: () => request('GET', '/eval/history'),
 
   // Jobs
-  getJobStatus: (jobId) => request('GET', `/jobs/${jobId}`),
+  listJobs: (limit = 30) => request('GET', `/documents/jobs?limit=${limit}`),
+  getJobStatus: (jobId) => request('GET', `/documents/jobs/${jobId}`),
 
   // WebSocket URL
   wsUrl: () => `${API_BASE.replace(/^http/, 'ws')}/chat/stream`,

@@ -7,7 +7,7 @@ import time
 
 from fastapi import APIRouter, Depends, WebSocket
 
-from api.auth import get_tenant_id
+from api.auth import get_current_user
 from api.db import get_conn
 from api.schemas import CitationSource, QueryRequest, QueryResponse
 
@@ -37,8 +37,8 @@ def _get_or_create_session(tenant_id: str, session_id, user_id: str = "demo-user
         with conn, conn.cursor() as cur:
             if session_id:
                 cur.execute(
-                    "SELECT id FROM sessions WHERE id=%s AND tenant_id=%s",
-                    (session_id, tenant_id),
+                    "SELECT id FROM sessions WHERE id=%s AND tenant_id=%s AND user_id=%s",
+                    (session_id, tenant_id, user_id),
                 )
                 row = cur.fetchone()
                 if row:
@@ -117,18 +117,20 @@ def _log_query(tenant_id: str, session_id: str, query: str,
 
 
 @router.post("", response_model=QueryResponse)
-async def chat(body: QueryRequest, tenant_id: str = Depends(get_tenant_id)):
+async def chat(body: QueryRequest, user: dict = Depends(get_current_user)):
     """Synchronous RAG query. Returns full answer with citations."""
-    from guardrails.filters import detect_prompt_injection, filter_pii
     from fastapi import HTTPException
+
+    from guardrails.filters import detect_prompt_injection, filter_pii
 
     if detect_prompt_injection(body.query):
         raise HTTPException(status_code=400, detail="Potansiyel prompt injection tespit edildi.")
 
     t_start = time.monotonic()
 
+    tenant_id = user["tenant_id"]
     tenant_slug = _get_tenant_slug(tenant_id)
-    session_id = _get_or_create_session(tenant_id, body.session_id)
+    session_id = _get_or_create_session(tenant_id, body.session_id, user_id=user["id"])
     history = _load_history(session_id)
 
     # Check semantic cache first
@@ -219,11 +221,13 @@ async def chat_stream(websocket: WebSocket):
         await websocket.close()
         return
 
-    from api.auth import decode_token
+    from api.auth import decode_token, get_current_user
     token = payload_json.get("token", "")
     try:
         claims = decode_token(token)
-        tenant_id = claims["tenant_id"]
+        # Reuse DB-backed validation so inactive users cannot keep streaming.
+        user = await get_current_user(claims)
+        tenant_id = user["tenant_id"]
     except Exception as exc:
         await websocket.send_text(json.dumps({"type": "error", "message": f"Auth failed: {exc}"}))
         await websocket.close()
@@ -245,7 +249,7 @@ async def chat_stream(websocket: WebSocket):
         await websocket.close()
         return
 
-    session_id = _get_or_create_session(tenant_id, client_session_id)
+    session_id = _get_or_create_session(tenant_id, client_session_id, user_id=user["id"])
     history = _load_history(session_id)
 
     from generation.streamer import stream_rag_response

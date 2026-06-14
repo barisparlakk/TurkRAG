@@ -9,7 +9,7 @@ Simplified metrics that don't require an external LLM judge:
 import json
 import logging
 import os
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
@@ -35,8 +35,8 @@ def _ngram_overlap(text_a: str, text_b: str, n: int = 3) -> float:
         return 0.0
     a_lower = text_a.lower()
     b_lower = text_b.lower()
-    ngrams_a = set(a_lower[i:i+n] for i in range(len(a_lower) - n + 1))
-    ngrams_b = set(b_lower[i:i+n] for i in range(len(b_lower) - n + 1))
+    ngrams_a = {a_lower[i:i+n] for i in range(len(a_lower) - n + 1)}
+    ngrams_b = {b_lower[i:i+n] for i in range(len(b_lower) - n + 1)}
     if not ngrams_a:
         return 0.0
     return len(ngrams_a & ngrams_b) / len(ngrams_a)
@@ -153,9 +153,18 @@ def save_eval_result(result: EvalResult) -> str:
                 "context_precision": result.context_precision,
             }
             cur.execute(
-                """INSERT INTO eval_runs (tenant_id, metrics_json, num_queries, avg_score)
-                   VALUES (%s, %s, %s, %s) RETURNING id""",
-                (result.tenant_id, json.dumps(metrics), result.num_queries, result.avg_score),
+                """INSERT INTO eval_runs
+                      (tenant_id, run_label, config_json, metrics_json, per_query_json, num_queries, avg_score)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id""",
+                (
+                    result.tenant_id,
+                    "api-auto-eval",
+                    json.dumps({"mode": "hybrid+rerank", "source": "api"}),
+                    json.dumps(metrics),
+                    json.dumps([]),
+                    result.num_queries,
+                    result.avg_score,
+                ),
             )
             return str(cur.fetchone()[0])
     finally:

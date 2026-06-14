@@ -11,7 +11,6 @@ instead of closing it. All existing callers work with zero changes.
 import logging
 import os
 
-import psycopg2
 from psycopg2.pool import ThreadedConnectionPool
 
 logger = logging.getLogger(__name__)

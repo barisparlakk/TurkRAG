@@ -280,6 +280,190 @@ function DocumentsSection() {
   )
 }
 
+function UserSection() {
+  const [users, setUsers] = useState([])
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [role, setRole] = useState('member')
+  const [loading, setLoading] = useState(true)
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    try {
+      setUsers(await api.listUsers())
+      setError('')
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  const create = async (e) => {
+    e.preventDefault()
+    setMessage(''); setError('')
+    try {
+      await api.createUser(email.trim(), password, role)
+      setEmail(''); setPassword(''); setRole('member')
+      setMessage('Kullanıcı oluşturuldu')
+      await load()
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  const update = async (user, patch) => {
+    setMessage(''); setError('')
+    try {
+      await api.updateUser(user.id, patch)
+      setMessage('Kullanıcı güncellendi')
+      await load()
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  return (
+    <div className="admin-section">
+      <SectionTitle>Kullanıcılar</SectionTitle>
+      <form onSubmit={create} className="admin-inline-form">
+        <input className="input-field" type="email" placeholder="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input className="input-field" type="password" placeholder="ilk şifre" value={password} onChange={(e) => setPassword(e.target.value)} />
+        <select className="input-field" value={role} onChange={(e) => setRole(e.target.value)}>
+          <option value="member">member</option>
+          <option value="admin">admin</option>
+        </select>
+        <button className="btn btn-primary" disabled={!email.trim() || password.length < 8}>Ekle</button>
+      </form>
+      {message && <div className="admin-success">{message}</div>}
+      {error && <div className="admin-error">{error}</div>}
+      <div className="admin-table">
+        <div className="admin-row admin-row-head">
+          <span>Email</span><span>Rol</span><span>Durum</span><span>İşlem</span>
+        </div>
+        {loading ? (
+          <div className="admin-empty">Yükleniyor</div>
+        ) : users.length === 0 ? (
+          <div className="admin-empty">Kullanıcı yok</div>
+        ) : users.map((u) => (
+          <div className="admin-row" key={u.id}>
+            <span>{u.email}</span>
+            <span>{u.role}</span>
+            <span className={u.is_active ? 'admin-status-ok' : 'admin-status-warn'}>{u.is_active ? 'Aktif' : 'Pasif'}</span>
+            <span className="admin-actions">
+              <button className="btn btn-outline" onClick={() => update(u, { role: u.role === 'admin' ? 'member' : 'admin' })}>
+                {u.role === 'admin' ? 'Member yap' : 'Admin yap'}
+              </button>
+              <button className="btn btn-danger" onClick={() => update(u, { is_active: !u.is_active })}>
+                {u.is_active ? 'Pasifleştir' : 'Aktifleştir'}
+              </button>
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function JobsSection() {
+  const [jobs, setJobs] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    try { setJobs(await api.listJobs(20)) } catch { }
+    setLoading(false)
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  return (
+    <div className="admin-section">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <SectionTitle>İşleme İşleri</SectionTitle>
+        <button className="btn btn-outline" onClick={load} disabled={loading}><IconRefresh /> Yenile</button>
+      </div>
+      <div className="admin-table">
+        <div className="admin-row admin-row-head">
+          <span>Dosya</span><span>Durum</span><span>Başlangıç</span><span>Hata</span>
+        </div>
+        {loading ? (
+          <div className="admin-empty">Yükleniyor</div>
+        ) : jobs.length === 0 ? (
+          <div className="admin-empty">İş yok</div>
+        ) : jobs.map((job) => (
+          <div className="admin-row" key={job.id}>
+            <span>{job.filename}</span>
+            <span className={job.status === 'failed' ? 'admin-status-warn' : 'admin-status-ok'}>{job.status}</span>
+            <span>{job.started_at ? new Date(job.started_at).toLocaleString('tr-TR') : '-'}</span>
+            <span title={job.error_message || ''}>{job.error_message || '-'}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function EvaluationSection() {
+  const [runs, setRuns] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    try {
+      setRuns(await api.getEvalHistory())
+      setError('')
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  const runEval = async () => {
+    setLoading(true); setError('')
+    try {
+      await api.runEval()
+      await load()
+    } catch (err) {
+      setError(err.message)
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="admin-section">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <SectionTitle>Değerlendirme</SectionTitle>
+        <button className="btn btn-primary" onClick={runEval} disabled={loading}>{loading ? 'Çalışıyor...' : 'Eval çalıştır'}</button>
+      </div>
+      {error && <div className="admin-error">{error}</div>}
+      <div className="admin-table">
+        <div className="admin-row admin-row-head">
+          <span>Etiket</span><span>Skor</span><span>Soru</span><span>Tarih</span>
+        </div>
+        {runs.length === 0 ? (
+          <div className="admin-empty">Eval geçmişi yok</div>
+        ) : runs.map((run) => (
+          <div className="admin-row" key={run.id}>
+            <span>{run.run_label || run.id.slice(0, 8)}</span>
+            <span>{Number(run.avg_score || 0).toFixed(3)}</span>
+            <span>{run.num_queries}</span>
+            <span>{new Date(run.created_at).toLocaleString('tr-TR')}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 /* ── RAG Config section ─────────────────────────────────────────────────────── */
 function ConfigSection() {
   const configs = [
@@ -351,6 +535,9 @@ export default function AdminPanel() {
 
       <HealthSection health={health} />
       <TenantSection onCreated={() => setRefreshKey((n) => n + 1)} />
+      <UserSection />
+      <JobsSection />
+      <EvaluationSection />
       <DocumentsSection key={refreshKey} />
       <ConfigSection />
     </div>

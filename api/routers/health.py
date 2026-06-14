@@ -40,6 +40,9 @@ async def health_check():
     # Check LLM
     from generation.llm import is_available
     llm_ok = is_available()
+    llm_path = os.getenv("LLM_MODEL_PATH", "models/qwen3-8b-instruct-q4_k_m.gguf")
+    embedder_path = os.getenv("TURKISH_EMBEDDER_PATH", "models/turkish-embedder")
+    embedder_exists = os.path.exists(embedder_path)
 
     overall = "ok" if qdrant_status == "ok" and postgres_status == "ok" else "degraded"
 
@@ -48,4 +51,10 @@ async def health_check():
         qdrant=qdrant_status,
         postgres=postgres_status,
         llm_available=llm_ok,
+        details={
+            "llm_model_path": llm_path,
+            "llm_model_exists": os.path.exists(llm_path),
+            "embedder_path": embedder_path,
+            "embedder_exists": embedder_exists,
+        },
     )

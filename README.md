@@ -76,11 +76,17 @@ open http://localhost:5173
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/auth/token` | Issue a JWT for dev/testing |
+| `POST` | `/auth/login` | Login with tenant slug, email, and password |
+| `POST` | `/auth/token` | Issue a dev JWT when `ENABLE_DEV_AUTH=true` |
+| `GET` | `/users` | List tenant users (admin) |
+| `POST` | `/users` | Create tenant user (admin) |
+| `PATCH` | `/users/{id}` | Update user role/status (admin) |
 | `GET` | `/health` | Health check (Qdrant, Postgres, LLM) |
 | `POST` | `/documents/upload` | Upload PDF/DOCX/TXT/XLSX/CSV |
 | `GET` | `/documents` | List tenant documents |
 | `DELETE` | `/documents/{id}` | Delete document |
+| `GET` | `/documents/jobs` | List ingestion jobs |
+| `GET` | `/documents/jobs/{id}` | Check ingestion job status |
 | `POST` | `/chat` | Synchronous RAG query |
 | `WS` | `/chat/stream` | Streaming WebSocket RAG |
 | `POST` | `/tenants` | Create tenant (admin) |
@@ -96,10 +102,14 @@ Interactive docs at: http://localhost:8000/docs
 ## Provision a New Tenant
 
 ```bash
-python scripts/create_tenant.py --name "Acme Şirketi" --slug "acme"
+python scripts/create_tenant.py \
+  --name "Acme Şirketi" \
+  --slug "acme" \
+  --admin-email "admin@acme.com" \
+  --admin-password "change-me-strongly"
 ```
 
-This creates the PostgreSQL row, provisions a Qdrant collection, and prints an admin JWT.
+This creates the PostgreSQL row, provisions a Qdrant collection, and bootstraps the first admin user.
 
 ---
 
@@ -190,6 +200,8 @@ Run the commands above to refresh those artifacts for the current dataset or ten
 | `QDRANT_URL` | `http://localhost:6333` | Qdrant vector DB URL |
 | `JWT_SECRET` | *(required)* | Secret for signing JWTs |
 | `CORS_ORIGINS` | `*` | Comma-separated allowed origins for the dashboard/API |
+| `APP_ENV` | `development` | Set `production` to reject insecure defaults |
+| `ENABLE_DEV_AUTH` | `true` in dev, `false` in prod | Enable legacy dev token/mock login endpoints |
 | `UPLOAD_DIR` | `/tmp/uploads` | Temporary file upload path |
 | `BM25_INDEX_DIR` | `indexes` | BM25 index persistence directory |
 

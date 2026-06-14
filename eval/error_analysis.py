@@ -150,10 +150,10 @@ def run_error_analysis(
     final_k: int = 5,
     use_llm_judge: bool = False,
 ) -> dict:
-    from retrieval.hybrid import HybridRetriever
+    from generation.citations import strip_think_tags
     from generation.llm import generate, is_available
     from generation.prompt import build_prompt
-    from generation.citations import strip_think_tags
+    from retrieval.hybrid import HybridRetriever
 
     queries_file = Path(queries_path)
     if not queries_file.exists():

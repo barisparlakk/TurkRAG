@@ -32,9 +32,9 @@ def generate_followups(query: str, answer: str, max_tokens: int = 120) -> list[s
 
     try:
         raw = strip_think_tags(generate(prompt, max_tokens=max_tokens)).strip()
-        lines = [l.strip() for l in raw.splitlines() if l.strip()]
+        lines = [line.strip() for line in raw.splitlines() if line.strip()]
         # Filter out lines that look like numbering artifacts
-        questions = [l.lstrip("0123456789.-) ").strip() for l in lines if len(l) > 10][:3]
+        questions = [line.lstrip("0123456789.-) ").strip() for line in lines if len(line) > 10][:3]
         logger.debug("Generated %d follow-up questions", len(questions))
         return questions
     except Exception as exc:

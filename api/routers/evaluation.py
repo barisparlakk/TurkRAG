@@ -31,10 +31,10 @@ async def trigger_eval(background_tasks: BackgroundTasks, tenant_id: str = Depen
             "num_queries": result.num_queries,
         }
     except FileNotFoundError as exc:
-        raise HTTPException(status_code=404, detail=str(exc))
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
     except Exception as exc:
         logger.exception("Evaluation failed: %s", exc)
-        raise HTTPException(status_code=500, detail=f"Evaluation failed: {exc}")
+        raise HTTPException(status_code=500, detail=f"Evaluation failed: {exc}") from exc
 
 
 @router.get("/history")
@@ -44,7 +44,8 @@ async def eval_history(tenant_id: str = Depends(get_tenant_id)):
     try:
         with conn.cursor() as cur:
             cur.execute(
-                """SELECT id, metrics_json, num_queries, avg_score, created_at
+                """SELECT id, run_label, config_json, metrics_json, per_query_json,
+                          num_queries, avg_score, created_at
                    FROM eval_runs WHERE tenant_id=%s
                    ORDER BY created_at DESC LIMIT 50""",
                 (tenant_id,),
@@ -57,10 +58,13 @@ async def eval_history(tenant_id: str = Depends(get_tenant_id)):
     return [
         {
             "id": str(r[0]),
-            "metrics": json.loads(r[1]) if r[1] else {},
-            "num_queries": r[2],
-            "avg_score": float(r[3]) if r[3] else 0.0,
-            "created_at": str(r[4]),
+            "run_label": r[1],
+            "config": json.loads(r[2]) if r[2] else {},
+            "metrics": json.loads(r[3]) if r[3] else {},
+            "per_query": json.loads(r[4]) if r[4] else [],
+            "num_queries": r[5],
+            "avg_score": float(r[6]) if r[6] else 0.0,
+            "created_at": str(r[7]),
         }
         for r in rows
     ]

@@ -34,10 +34,7 @@ IBAN_PATTERN = re.compile(r"\bTR\d{2}\s?\d{4}\s?\d{4}\s?\d{4}\s?\d{4}\s?\d{4}\s?
 
 def detect_prompt_injection(text: str) -> bool:
     """Return True if text contains likely prompt injection attempts."""
-    for pattern in _compiled_patterns:
-        if pattern.search(text):
-            return True
-    return False
+    return any(pattern.search(text) for pattern in _compiled_patterns)
 
 
 def filter_pii(text: str) -> str:
@@ -61,10 +58,10 @@ def check_hallucination_risk(answer: str, context_chunks: list[str]) -> float:
     answer_lower = answer.lower()
 
     n = 4
-    answer_ngrams = set(answer_lower[i:i+n] for i in range(len(answer_lower) - n + 1))
+    answer_ngrams = {answer_lower[i:i+n] for i in range(len(answer_lower) - n + 1)}
     if not answer_ngrams:
         return 0.0
 
-    context_ngrams = set(combined_context[i:i+n] for i in range(len(combined_context) - n + 1))
+    context_ngrams = {combined_context[i:i+n] for i in range(len(combined_context) - n + 1)}
     overlap = len(answer_ngrams & context_ngrams)
     return overlap / len(answer_ngrams)

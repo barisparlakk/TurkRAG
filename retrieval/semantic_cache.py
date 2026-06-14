@@ -6,8 +6,6 @@ import os
 import time
 from dataclasses import dataclass
 
-import numpy as np
-
 logger = logging.getLogger(__name__)
 
 CACHE_COLLECTION = "semantic_cache"
@@ -47,8 +45,9 @@ class SemanticCache:
 
     def get(self, query: str, tenant_id: str, threshold: float = CACHE_THRESHOLD) -> CacheHit | None:
         """Check cache for similar query. Returns CacheHit or None."""
-        from ingestion.embedder import embed
         from qdrant_client.models import FieldCondition, Filter, MatchValue
+
+        from ingestion.embedder import embed
 
         query_vec = embed(query)
         client = self._get_client()
@@ -83,8 +82,9 @@ class SemanticCache:
         """Store query+answer in cache."""
         import uuid
 
-        from ingestion.embedder import embed
         from qdrant_client.models import PointStruct
+
+        from ingestion.embedder import embed
 
         query_vec = embed(query)
         client = self._get_client()

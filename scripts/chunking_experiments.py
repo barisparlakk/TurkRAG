@@ -23,9 +23,7 @@ Pre-requisites:
 import argparse
 import json
 import logging
-import os
 import sys
-import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -56,14 +54,14 @@ def load_raw_texts_from_bm25(tenant_slug: str) -> list[tuple[str, dict]]:
         data = pickle.load(f)
 
     docs: dict[str, dict] = {}
-    for text, payload in zip(data["texts"], data["payloads"]):
+    for text, payload in zip(data["texts"], data["payloads"], strict=False):
         doc_id = payload.get("doc_id", "")
         if doc_id not in docs:
             docs[doc_id] = {"text": "", "payload": payload, "chunks": []}
         docs[doc_id]["chunks"].append((payload.get("chunk_index", 0), text))
 
     result = []
-    for doc_id, doc in docs.items():
+    for _doc_id, doc in docs.items():
         ordered = sorted(doc["chunks"], key=lambda x: x[0])
         full_text = "\n\n".join(t for _, t in ordered)
         result.append((full_text, doc["payload"]))
@@ -78,7 +76,6 @@ def rechunk_and_index(
     temp_tenant: str,
 ) -> None:
     """Chunk documents with the given strategy and build temp BM25 + Qdrant indexes."""
-    import pickle
     from ingestion.chunker import get_chunker
     from ingestion.embedder import embed
     from retrieval.bm25_store import BM25Store
@@ -89,8 +86,6 @@ def rechunk_and_index(
 
     all_texts = []
     all_payloads = []
-    all_vectors = []
-
     for full_text, base_payload in docs:
         chunks = chunker.chunk(full_text)
         for chunk in chunks:
@@ -142,7 +137,6 @@ def evaluate_strategy(
 
 def cleanup_temp_tenant(temp_tenant: str) -> None:
     """Remove temp BM25 pickle and Qdrant collection."""
-    import pickle
     bm25_path = Path("indexes") / f"bm25_{temp_tenant}.pkl"
     if bm25_path.exists():
         bm25_path.unlink()

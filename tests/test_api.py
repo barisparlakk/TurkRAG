@@ -170,6 +170,92 @@ class TestAuthEndpoint:
         assert body["tenant"]["slug"] == "acme-sirket"
         assert "access_token" in body
 
+    def test_login_accepts_active_user_credentials(self, client):
+        from api.auth import hash_password
+
+        class FakeCursor:
+            def execute(self, query, params):
+                self.params = params
+
+            def fetchone(self):
+                return (
+                    "10000000-0000-0000-0000-000000000001",
+                    "00000000-0000-0000-0000-000000000001",
+                    "admin@acme.com",
+                    hash_password("password123"),
+                    "admin",
+                    True,
+                    "Acme Sirket",
+                    "acme-sirket",
+                )
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+        class FakeConn:
+            def cursor(self):
+                return FakeCursor()
+
+            def close(self):
+                return None
+
+        with patch("api.db.get_conn", return_value=FakeConn()):
+            resp = client.post("/auth/login", json={
+                "tenant_slug": "acme-sirket",
+                "email": "admin@acme.com",
+                "password": "password123",
+            })
+
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["tenant"]["slug"] == "acme-sirket"
+        assert body["user"]["role"] == "admin"
+        assert "access_token" in body
+
+    def test_login_rejects_bad_password(self, client):
+        from api.auth import hash_password
+
+        class FakeCursor:
+            def execute(self, query, params):
+                pass
+
+            def fetchone(self):
+                return (
+                    "10000000-0000-0000-0000-000000000001",
+                    "00000000-0000-0000-0000-000000000001",
+                    "admin@acme.com",
+                    hash_password("password123"),
+                    "admin",
+                    True,
+                    "Acme Sirket",
+                    "acme-sirket",
+                )
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+        class FakeConn:
+            def cursor(self):
+                return FakeCursor()
+
+            def close(self):
+                return None
+
+        with patch("api.db.get_conn", return_value=FakeConn()):
+            resp = client.post("/auth/login", json={
+                "tenant_slug": "acme-sirket",
+                "email": "admin@acme.com",
+                "password": "wrong-password",
+            })
+
+        assert resp.status_code == 401
+
 
 class TestTenantEndpointAuth:
     def test_tenants_without_token_returns_401_or_403(self, client):

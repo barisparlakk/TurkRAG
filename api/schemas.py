@@ -29,6 +29,7 @@ class QueryResponse(BaseModel):
 
 class DocumentUploadResponse(BaseModel):
     document_id: str
+    job_id: str | None = None
     filename: str
     status: str
 
@@ -75,9 +76,49 @@ class AdminTenantSwitchRequest(BaseModel):
     tenant_slug: str = Field(..., min_length=1)
 
 
+class LoginRequest(BaseModel):
+    tenant_slug: str = Field(..., min_length=1)
+    email: str = Field(..., min_length=3)
+    password: str = Field(..., min_length=1)
+
+
+class UserCreateRequest(BaseModel):
+    email: str = Field(..., min_length=3)
+    password: str = Field(..., min_length=8)
+    role: str = Field(default="member", pattern="^(admin|member)$")
+
+
+class UserUpdateRequest(BaseModel):
+    role: str | None = Field(default=None, pattern="^(admin|member)$")
+    is_active: bool | None = None
+
+
+class UserResponse(BaseModel):
+    id: str
+    tenant_id: str
+    email: str
+    role: str
+    is_active: bool
+    created_at: str
+
+
+class AuthUser(BaseModel):
+    id: str
+    tenant_id: str
+    email: str
+    role: str
+    is_active: bool
+
+
+class PasswordChangeRequest(BaseModel):
+    current_password: str = Field(..., min_length=1)
+    new_password: str = Field(..., min_length=8)
+
+
 class HealthResponse(BaseModel):
     status: str
     qdrant: str
     postgres: str
     llm_available: bool
+    details: dict = Field(default_factory=dict)
     version: str = "1.0.0"
