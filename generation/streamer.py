@@ -25,6 +25,7 @@ async def stream_rag_response(
     top_k: int = 5,
     history: list[dict] | None = None,
     session_id: str | None = None,
+    accessible_doc_ids: set[str] | None = None,
 ) -> dict[str, Any] | None:
     """Run full RAG pipeline and stream tokens over a WebSocket connection.
 
@@ -50,7 +51,7 @@ async def stream_rag_response(
         # Retrieval
         logger.info("WS RAG: query='%s...' tenant=%s", query[:50], tenant_slug)
         retriever = HybridRetriever()
-        chunks = retriever.retrieve(query, tenant_slug, final_k=top_k)
+        chunks = retriever.retrieve(query, tenant_slug, final_k=top_k, accessible_doc_ids=accessible_doc_ids)
 
         if not chunks:
             await send({"type": "error", "message": "İlgili belge bulunamadı. Lütfen önce belge yükleyin."})

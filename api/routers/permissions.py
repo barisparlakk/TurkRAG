@@ -5,9 +5,14 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
-from api.auth import get_tenant_id
+from api.auth import get_current_user
 from api.db import get_conn
-from api.rbac import grant_access, list_document_permissions, revoke_access
+from api.rbac import (
+    grant_access,
+    list_document_permissions,
+    revoke_access,
+    user_has_document_management_access,
+)
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/documents", tags=["permissions"])
@@ -22,9 +27,10 @@ class GrantPermissionRequest(BaseModel):
 async def grant_document_access(
     doc_id: str,
     body: GrantPermissionRequest,
-    tenant_id: str = Depends(get_tenant_id),
+    user: dict = Depends(get_current_user),
 ):
     """Grant access to a document for a user."""
+    tenant_id = user["tenant_id"]
     conn = get_conn()
     try:
         with conn.cursor() as cur:
@@ -34,7 +40,9 @@ async def grant_document_access(
             )
             if not cur.fetchone():
                 raise HTTPException(status_code=404, detail="Document not found")
-        grant_access(doc_id, body.user_id, body.level, "api", conn)
+        if not user_has_document_management_access(user, doc_id, conn, required_level="owner"):
+            raise HTTPException(status_code=403, detail="Document owner or admin access required")
+        grant_access(doc_id, body.user_id, body.level, user["id"], conn)
     finally:
         conn.close()
     return {"status": "granted", "document_id": doc_id, "user_id": body.user_id, "level": body.level}
@@ -44,9 +52,10 @@ async def grant_document_access(
 async def revoke_document_access(
     doc_id: str,
     user_id: str,
-    tenant_id: str = Depends(get_tenant_id),
+    user: dict = Depends(get_current_user),
 ):
     """Revoke a user's access to a document."""
+    tenant_id = user["tenant_id"]
     conn = get_conn()
     try:
         with conn.cursor() as cur:
@@ -56,6 +65,8 @@ async def revoke_document_access(
             )
             if not cur.fetchone():
                 raise HTTPException(status_code=404, detail="Document not found")
+        if not user_has_document_management_access(user, doc_id, conn, required_level="owner"):
+            raise HTTPException(status_code=403, detail="Document owner or admin access required")
         if not revoke_access(doc_id, user_id, conn):
             raise HTTPException(status_code=404, detail="Permission not found")
     finally:
@@ -65,9 +76,10 @@ async def revoke_document_access(
 @router.get("/{doc_id}/permissions")
 async def get_document_permissions(
     doc_id: str,
-    tenant_id: str = Depends(get_tenant_id),
+    user: dict = Depends(get_current_user),
 ):
     """List all permissions for a document."""
+    tenant_id = user["tenant_id"]
     conn = get_conn()
     try:
         with conn.cursor() as cur:
@@ -77,6 +89,8 @@ async def get_document_permissions(
             )
             if not cur.fetchone():
                 raise HTTPException(status_code=404, detail="Document not found")
+        if not user_has_document_management_access(user, doc_id, conn, required_level="owner"):
+            raise HTTPException(status_code=403, detail="Document owner or admin access required")
         return list_document_permissions(doc_id, conn)
     finally:
         conn.close()

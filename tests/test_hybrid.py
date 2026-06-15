@@ -114,3 +114,29 @@ class TestRerankerFallback:
         results = self._run_retrieve()
         rerank_scores = [r["rerank_score"] for r in results]
         assert rerank_scores == sorted(rerank_scores, reverse=True)
+
+
+class TestAccessFiltering:
+    def test_retrieve_filters_out_inaccessible_documents(self):
+        chunks = [
+            _make_hit("allowed-doc", 0, "allowed passage"),
+            _make_hit("blocked-doc", 1, "blocked passage"),
+        ]
+        fake_vec = np.zeros(768, dtype="float32")
+
+        with (
+            patch("retrieval.hybrid.HYDE_ENABLED", False),
+            patch("ingestion.embedder.embed", return_value=fake_vec.reshape(1, -1)),
+            patch("retrieval.bm25_store.BM25Store.search", return_value=chunks),
+            patch("retrieval.vector_store.VectorStore.search", return_value=chunks),
+            patch("retrieval.reranker.rerank", return_value=[0.9]),
+        ):
+            results = HybridRetriever().retrieve(
+                "sorgu",
+                "tenant-a",
+                final_k=5,
+                accessible_doc_ids={"allowed-doc"},
+            )
+
+        assert len(results) == 1
+        assert results[0]["doc_id"] == "allowed-doc"

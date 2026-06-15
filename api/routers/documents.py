@@ -8,8 +8,13 @@ from pathlib import Path
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, UploadFile, status
 
-from api.auth import get_tenant_id
+from api.auth import get_current_user, get_tenant_id
 from api.db import get_conn
+from api.rbac import (
+    get_accessible_document_ids,
+    grant_access,
+    user_has_document_management_access,
+)
 from api.schemas import DocumentListItem, DocumentUploadResponse
 
 logger = logging.getLogger(__name__)
@@ -23,9 +28,10 @@ ALLOWED_EXTENSIONS = {".pdf", ".docx", ".txt", ".xlsx", ".xls", ".csv"}
 async def upload_document(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
-    tenant_id: str = Depends(get_tenant_id),
+    user: dict = Depends(get_current_user),
 ):
     """Upload a document for ingestion. Returns immediately; processing is async."""
+    tenant_id = user["tenant_id"]
     suffix = Path(file.filename).suffix.lower()
     if suffix not in ALLOWED_EXTENSIONS:
         raise HTTPException(
@@ -52,6 +58,7 @@ async def upload_document(
                 "INSERT INTO documents (id, tenant_id, filename, file_hash, status) VALUES (%s, %s, %s, %s, 'processing')",
                 (document_id, tenant_id, file.filename, file_hash),
             )
+        grant_access(document_id, user["id"], "owner", user["id"], conn)
     finally:
         conn.close()
 
@@ -83,15 +90,31 @@ async def upload_document(
 
 
 @router.get("", response_model=list[DocumentListItem])
-async def list_documents(tenant_id: str = Depends(get_tenant_id)):
+async def list_documents(user: dict = Depends(get_current_user)):
     """List all documents for the current tenant."""
+    tenant_id = user["tenant_id"]
     conn = get_conn()
     try:
         with conn.cursor() as cur:
-            cur.execute(
-                "SELECT id, filename, chunk_count, status, created_at FROM documents WHERE tenant_id=%s ORDER BY created_at DESC",
-                (tenant_id,),
-            )
+            if user.get("role") == "admin":
+                cur.execute(
+                    """SELECT id, filename, chunk_count, status, created_at
+                       FROM documents
+                       WHERE tenant_id=%s
+                       ORDER BY created_at DESC""",
+                    (tenant_id,),
+                )
+            else:
+                accessible_ids = get_accessible_document_ids(user["id"], tenant_id, conn)
+                if not accessible_ids:
+                    return []
+                cur.execute(
+                    """SELECT id, filename, chunk_count, status, created_at
+                       FROM documents
+                       WHERE tenant_id=%s AND id = ANY(%s)
+                       ORDER BY created_at DESC""",
+                    (tenant_id, accessible_ids),
+                )
             rows = cur.fetchall()
     finally:
         conn.close()
@@ -109,8 +132,9 @@ async def list_documents(tenant_id: str = Depends(get_tenant_id)):
 
 
 @router.delete("/{doc_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_document(doc_id: str, tenant_id: str = Depends(get_tenant_id)):
+async def delete_document(doc_id: str, user: dict = Depends(get_current_user)):
     """Remove a document from Qdrant, BM25, and PostgreSQL."""
+    tenant_id = user["tenant_id"]
     tenant_slug = None
     conn = get_conn()
     try:
@@ -126,6 +150,8 @@ async def delete_document(doc_id: str, tenant_id: str = Depends(get_tenant_id)):
                 raise HTTPException(status_code=404, detail="Document not found")
             if str(row[1]) != tenant_id:
                 raise HTTPException(status_code=403, detail="Access denied")
+            if not user_has_document_management_access(user, doc_id, conn, required_level="editor"):
+                raise HTTPException(status_code=403, detail="Document editor or admin access required")
             tenant_slug = row[2]
             cur.execute("DELETE FROM documents WHERE id=%s", (doc_id,))
     finally:

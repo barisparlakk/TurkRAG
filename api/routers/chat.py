@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, WebSocket
 
 from api.auth import get_current_user
 from api.db import get_conn
+from api.rbac import get_accessible_document_ids
 from api.schemas import CitationSource, QueryRequest, QueryResponse
 
 logger = logging.getLogger(__name__)
@@ -132,11 +133,20 @@ async def chat(body: QueryRequest, user: dict = Depends(get_current_user)):
     tenant_slug = _get_tenant_slug(tenant_id)
     session_id = _get_or_create_session(tenant_id, body.session_id, user_id=user["id"])
     history = _load_history(session_id)
+    cache_scope = f"user:{user['id']}"
+
+    accessible_doc_ids: set[str] | None = None
+    if user.get("role") != "admin":
+        conn = get_conn()
+        try:
+            accessible_doc_ids = set(get_accessible_document_ids(user["id"], tenant_id, conn))
+        finally:
+            conn.close()
 
     # Check semantic cache first
     from retrieval.semantic_cache import get_cache
     cache = get_cache()
-    cache_hit = cache.get(body.query, tenant_id)
+    cache_hit = cache.get(body.query, tenant_id, access_scope=cache_scope)
     if cache_hit:
         query_time_ms = int((time.monotonic() - t_start) * 1000)
         citations = [CitationSource(**c) for c in cache_hit.citations]
@@ -157,7 +167,12 @@ async def chat(body: QueryRequest, user: dict = Depends(get_current_user)):
     from generation.prompt import build_prompt
     from retrieval.hybrid import HybridRetriever
 
-    chunks = HybridRetriever().retrieve(body.query, tenant_slug, final_k=body.top_k)
+    chunks = HybridRetriever().retrieve(
+        body.query,
+        tenant_slug,
+        final_k=body.top_k,
+        accessible_doc_ids=accessible_doc_ids,
+    )
 
     if not chunks:
         return QueryResponse(
@@ -185,7 +200,7 @@ async def chat(body: QueryRequest, user: dict = Depends(get_current_user)):
     citations = [CitationSource(**c) for c in raw_citations]
 
     # Cache the result
-    cache.put(body.query, answer, raw_citations, tenant_id)
+    cache.put(body.query, answer, raw_citations, tenant_id, access_scope=cache_scope)
 
     query_time_ms = int((time.monotonic() - t_start) * 1000)
     logger.info("Chat query answered in %d ms for tenant %s", query_time_ms, tenant_id)
@@ -251,11 +266,19 @@ async def chat_stream(websocket: WebSocket):
 
     session_id = _get_or_create_session(tenant_id, client_session_id, user_id=user["id"])
     history = _load_history(session_id)
+    accessible_doc_ids: set[str] | None = None
+    if user.get("role") != "admin":
+        conn = get_conn()
+        try:
+            accessible_doc_ids = set(get_accessible_document_ids(user["id"], tenant_id, conn))
+        finally:
+            conn.close()
 
     from generation.streamer import stream_rag_response
     result = await stream_rag_response(
         websocket, query, tenant_slug, top_k=top_k,
         history=history, session_id=session_id,
+        accessible_doc_ids=accessible_doc_ids,
     )
 
     if result:

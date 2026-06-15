@@ -86,6 +86,7 @@ class HybridRetriever:
         top_k: int = 20,
         final_k: int = 5,
         mode: str = "hybrid+rerank",
+        accessible_doc_ids: set[str] | None = None,
     ) -> list[dict]:
         """Return final_k most relevant chunks for *query* within the tenant's index.
 
@@ -122,7 +123,7 @@ class HybridRetriever:
 
         # ── Step 2: retrieve from the selected source(s) ──────────────────────
         if mode == "sparse":
-            hits = BM25Store(tenant_slug).search(query, top_k)
+            hits = self._filter_accessible(BM25Store(tenant_slug).search(query, top_k), accessible_doc_ids)
             if not hits:
                 logger.warning("BM25 returned no results for tenant '%s'", tenant_slug)
                 return []
@@ -135,7 +136,7 @@ class HybridRetriever:
             return self._tag(candidates[:final_k], mode)
 
         if mode == "dense":
-            hits = VectorStore(tenant_slug).search(query_vec, top_k)
+            hits = self._filter_accessible(VectorStore(tenant_slug).search(query_vec, top_k), accessible_doc_ids)
             if not hits:
                 logger.warning("Dense search returned no results for tenant '%s'", tenant_slug)
                 return []
@@ -151,8 +152,8 @@ class HybridRetriever:
         with ThreadPoolExecutor(max_workers=2) as pool:
             bm25_future = pool.submit(BM25Store(tenant_slug).search, query, top_k)
             dense_future = pool.submit(VectorStore(tenant_slug).search, query_vec, top_k)
-            bm25_hits = bm25_future.result()
-            dense_hits = dense_future.result()
+            bm25_hits = self._filter_accessible(bm25_future.result(), accessible_doc_ids)
+            dense_hits = self._filter_accessible(dense_future.result(), accessible_doc_ids)
 
         if not bm25_hits and not dense_hits:
             logger.warning("No results from either BM25 or dense search for tenant '%s'", tenant_slug)
@@ -204,6 +205,13 @@ class HybridRetriever:
         for r in results:
             r["retrieval_mode"] = mode
         return results
+
+    @staticmethod
+    def _filter_accessible(hits: list[dict], accessible_doc_ids: set[str] | None) -> list[dict]:
+        """Drop hits outside the caller's document scope."""
+        if accessible_doc_ids is None:
+            return hits
+        return [hit for hit in hits if str(hit.get("doc_id", "")) in accessible_doc_ids]
 
     def _rrf_fusion(self, bm25_hits: list[dict], dense_hits: list[dict]) -> list[dict]:
         """Merge two ranked lists via Reciprocal Rank Fusion."""

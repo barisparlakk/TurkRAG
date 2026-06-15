@@ -21,6 +21,33 @@ def check_document_access(user_id: str, document_id: str, required_level: str, c
         return _LEVEL_RANK.get(row[0], -1) >= _LEVEL_RANK.get(required_level, 999)
 
 
+def user_has_document_access(user: dict, document_id: str, conn, required_level: str = "viewer") -> bool:
+    """Check document access with admin bypass and legacy fallback.
+
+    Documents that have no ACL rows yet remain tenant-visible so existing
+    deployments do not lose access immediately. Once a document has at least
+    one ACL row, explicit permissions are enforced for non-admin users.
+    """
+    if user.get("role") == "admin":
+        return True
+
+    with conn.cursor() as cur:
+        cur.execute("SELECT EXISTS(SELECT 1 FROM document_permissions WHERE document_id=%s)", (document_id,))
+        row = cur.fetchone()
+    has_acl = bool(row and row[0])
+    if not has_acl:
+        return True
+
+    return check_document_access(user["id"], document_id, required_level, conn)
+
+
+def user_has_document_management_access(user: dict, document_id: str, conn, required_level: str = "owner") -> bool:
+    """Check write/manage access without the legacy-read fallback."""
+    if user.get("role") == "admin":
+        return True
+    return check_document_access(user["id"], document_id, required_level, conn)
+
+
 def grant_access(document_id: str, user_id: str, level: str, granted_by: str, conn):
     """Grant or update access level for a user on a document."""
     if level not in PERMISSION_LEVELS:
@@ -46,13 +73,31 @@ def revoke_access(document_id: str, user_id: str, conn) -> bool:
 
 
 def get_accessible_document_ids(user_id: str, tenant_id: str, conn) -> list[str]:
-    """Get all document IDs the user can access within a tenant."""
+    """Get all document IDs a non-admin user can access within a tenant.
+
+    Legacy documents with no ACL rows remain visible to all tenant members.
+    """
     with conn.cursor() as cur:
         cur.execute(
-            """SELECT dp.document_id FROM document_permissions dp
-               JOIN documents d ON d.id = dp.document_id
-               WHERE dp.user_id=%s AND d.tenant_id=%s""",
-            (user_id, tenant_id),
+            """
+            SELECT d.id
+            FROM documents d
+            WHERE d.tenant_id=%s
+              AND (
+                NOT EXISTS (
+                    SELECT 1 FROM document_permissions dp_any
+                    WHERE dp_any.document_id = d.id
+                )
+                OR EXISTS (
+                    SELECT 1 FROM document_permissions dp_user
+                    WHERE dp_user.document_id = d.id
+                      AND dp_user.user_id=%s
+                      AND dp_user.permission_level IN ('viewer', 'editor', 'owner')
+                )
+              )
+            ORDER BY d.created_at DESC
+            """,
+            (tenant_id, user_id),
         )
         return [str(row[0]) for row in cur.fetchall()]
 

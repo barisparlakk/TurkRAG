@@ -18,6 +18,7 @@ class CacheHit:
     answer: str
     citations: list
     tenant_id: str
+    access_scope: str
     score: float
 
 
@@ -43,7 +44,13 @@ class SemanticCache:
             )
             logger.info("Created semantic cache collection")
 
-    def get(self, query: str, tenant_id: str, threshold: float = CACHE_THRESHOLD) -> CacheHit | None:
+    def get(
+        self,
+        query: str,
+        tenant_id: str,
+        threshold: float = CACHE_THRESHOLD,
+        access_scope: str = "tenant",
+    ) -> CacheHit | None:
         """Check cache for similar query. Returns CacheHit or None."""
         from qdrant_client.models import FieldCondition, Filter, MatchValue
 
@@ -57,6 +64,7 @@ class SemanticCache:
             query_vector=query_vec,
             query_filter=Filter(must=[
                 FieldCondition(key="tenant_id", match=MatchValue(value=tenant_id)),
+                FieldCondition(key="access_scope", match=MatchValue(value=access_scope)),
             ]),
             limit=1,
             score_threshold=threshold,
@@ -75,10 +83,11 @@ class SemanticCache:
             answer=hit.payload["answer"],
             citations=json.loads(hit.payload.get("citations", "[]")),
             tenant_id=tenant_id,
+            access_scope=hit.payload.get("access_scope", "tenant"),
             score=hit.score,
         )
 
-    def put(self, query: str, answer: str, citations: list, tenant_id: str):
+    def put(self, query: str, answer: str, citations: list, tenant_id: str, access_scope: str = "tenant"):
         """Store query+answer in cache."""
         import uuid
 
@@ -97,6 +106,7 @@ class SemanticCache:
                 "answer": answer,
                 "citations": json.dumps(citations),
                 "tenant_id": tenant_id,
+                "access_scope": access_scope,
                 "timestamp": time.time(),
             },
         )

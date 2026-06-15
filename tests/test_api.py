@@ -301,3 +301,88 @@ class TestDocumentUploadValidation:
         )
         assert resp.status_code == 422
         assert ".exe" in resp.json().get("detail", "").lower() or "unsupported" in resp.json().get("detail", "").lower()
+
+
+class TestDocumentPermissions:
+    def test_member_document_list_only_returns_accessible_rows(self, client):
+        token = client.post("/auth/token", json={
+            "tenant_id": "00000000-0000-0000-0000-000000000001",
+            "user_id": "member-user",
+        }).json()["access_token"]
+
+        class FakeCursor:
+            def execute(self, query, params):
+                self.query = query
+
+            def fetchall(self):
+                if "SELECT d.id" in self.query:
+                    return [("doc-visible",)]
+                if "id = ANY" in self.query:
+                    return [("doc-visible", "Visible.txt", 4, "ready", "2026-06-15T00:00:00Z")]
+                return []
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+        class FakeConn:
+            def cursor(self):
+                return FakeCursor()
+
+            def close(self):
+                return None
+
+        with patch("api.routers.documents.get_conn", return_value=FakeConn()):
+            resp = client.get("/documents", headers={"Authorization": f"Bearer {token}"})
+
+        assert resp.status_code == 200
+        assert resp.json() == [
+            {
+                "id": "doc-visible",
+                "filename": "Visible.txt",
+                "chunk_count": 4,
+                "status": "ready",
+                "created_at": "2026-06-15T00:00:00Z",
+            }
+        ]
+
+    def test_member_cannot_grant_permissions_without_owner_access(self, client):
+        token = client.post("/auth/token", json={
+            "tenant_id": "00000000-0000-0000-0000-000000000001",
+            "user_id": "member-user",
+        }).json()["access_token"]
+
+        class FakeCursor:
+            def execute(self, query, params):
+                self.query = query
+
+            def fetchone(self):
+                if "SELECT id FROM documents" in self.query:
+                    return ("doc-1",)
+                if "SELECT permission_level FROM document_permissions" in self.query:
+                    return None
+                return None
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+        class FakeConn:
+            def cursor(self):
+                return FakeCursor()
+
+            def close(self):
+                return None
+
+        with patch("api.routers.permissions.get_conn", return_value=FakeConn()):
+            resp = client.post(
+                "/documents/doc-1/permissions",
+                json={"user_id": "other-user", "level": "viewer"},
+                headers={"Authorization": f"Bearer {token}"},
+            )
+
+        assert resp.status_code == 403
