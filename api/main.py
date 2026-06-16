@@ -47,7 +47,7 @@ logger = logging.getLogger(__name__)
 POSTGRES_URL = os.getenv("POSTGRES_URL", "postgresql://turkrag:turkrag_secret@localhost/turkrag")
 UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", "/tmp/uploads"))
 BM25_INDEX_DIR = Path(os.getenv("BM25_INDEX_DIR", "indexes"))
-REQUIRED_ALEMBIC_REVISION = "0002_ingestion_job_retries"
+REQUIRED_ALEMBIC_REVISION = "0003_backfill_document_permissions"
 AUTO_INIT_SCHEMA = os.getenv("AUTO_INIT_SCHEMA", "false").lower() == "true"
 REQUIRED_TABLES = {
     "tenants",

@@ -1,6 +1,6 @@
 # TurkRAG TODO
 
-Last reviewed: 2026-06-15
+Last reviewed: 2026-06-16
 
 ## Requirement analysis
 
@@ -19,10 +19,10 @@ Last reviewed: 2026-06-15
 - [x] `eval/ragas_eval.py`, `eval/auto_eval.py`, `api/routers/evaluation.py`, and `scripts/run_experiments.py`: align `eval_runs` persistence and include retrieval-only metrics in experiments.
 - [x] `api/middleware.py`, `api/routers/health.py`, and `README.md`: add production safety checks for JWT/CORS and richer health details.
 - [x] `api/rbac.py`, `api/routers/documents.py`, `api/routers/permissions.py`, `api/routers/chat.py`, `generation/streamer.py`, and `retrieval/semantic_cache.py`: enforce document ACLs for new documents in listing/retrieval/chat, scope cached answers per user, and restrict permission management to owners/admins.
+- [x] `migrations/versions/0003_backfill_document_permissions.py` and `scripts/backfill_document_permissions.py`: backfill ACL rows for legacy documents by granting active tenant admins owner access and active members viewer access.
 
 ## Current gaps
 
-- [ ] Existing documents created before ACL enforcement remain tenant-readable until a one-time `document_permissions` backfill assigns owners/viewers explicitly.
 - [ ] Existing deployments need a one-time admin bootstrap before disabling dev auth in production.
 - [ ] Generated historical eval artifacts may still contain model scratchpad text; newly generated artifacts are cleaned, but old committed artifacts were not rewritten.
 

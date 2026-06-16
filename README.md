@@ -251,6 +251,15 @@ alembic stamp 0001_baseline
 alembic upgrade head
 ```
 
+Migration `0003_backfill_document_permissions` backfills ACL rows for legacy
+documents that existed before document-level permissions. If you bootstrap users
+after that migration has already run, rerun the idempotent backfill manually:
+
+```bash
+python scripts/backfill_document_permissions.py --dry-run
+python scripts/backfill_document_permissions.py
+```
+
 `AUTO_INIT_SCHEMA=true` is available only for local development and is rejected
 when `APP_ENV=production`.
 
