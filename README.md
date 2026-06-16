@@ -256,6 +256,18 @@ when `APP_ENV=production`.
 
 ---
 
+## Production Hardening
+
+The API and dashboard Docker images run as non-root users. Runtime write paths
+used by the API are limited to `/tmp/uploads` and `/app/indexes`; mount writable
+volumes there if overriding Compose defaults.
+
+Python installs use `requirements.txt` with `requirements.lock.txt` constraints
+in CI and Docker builds. Update `requirements.txt` for intended dependency
+changes, then refresh the lock file from a verified environment.
+
+---
+
 ## KVKK Compliance
 
 - All data stays on the customer's server (on-premise Docker)
