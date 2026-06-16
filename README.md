@@ -219,6 +219,9 @@ Run the commands above to refresh those artifacts for the current dataset or ten
 | `MOCK_ADMIN_EMAIL` / `MOCK_ADMIN_PASSWORD` | *(empty)* | Local-only mock admin credentials when dev auth is explicitly enabled |
 | `UPLOAD_DIR` | `/tmp/uploads` | Temporary file upload path |
 | `MAX_UPLOAD_BYTES` | `52428800` | Maximum upload size in bytes (default 50 MB) |
+| `INGESTION_MAX_JOB_ATTEMPTS` | `3` | Maximum attempts before an ingestion job is marked failed |
+| `INGESTION_RETRY_DELAY_SECONDS` | `60` | Delay before retrying a failed ingestion attempt |
+| `INGESTION_STALE_JOB_TIMEOUT_SECONDS` | `900` | Processing heartbeat timeout before a job is recovered |
 | `BM25_INDEX_DIR` | `indexes` | BM25 index persistence directory |
 
 ---
@@ -233,11 +236,19 @@ missing or stale.
 alembic upgrade head
 ```
 
-For an existing database that already exactly matches the baseline schema, stamp
+For an existing database that already exactly matches the current schema, stamp
 it once instead of recreating tables:
 
 ```bash
 alembic stamp head
+```
+
+For a pre-Alembic database that matches only the original baseline tables, stamp
+the baseline first and then apply later migrations:
+
+```bash
+alembic stamp 0001_baseline
+alembic upgrade head
 ```
 
 `AUTO_INIT_SCHEMA=true` is available only for local development and is rejected
