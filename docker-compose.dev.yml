@@ -1,0 +1,12 @@
+services:
+  qdrant:
+    ports: ["6333:6333"]
+
+  postgres:
+    ports: ["5432:5432"]
+
+  api:
+    environment:
+      APP_ENV: development
+      AUTO_INIT_SCHEMA: ${AUTO_INIT_SCHEMA:-true}
+      ENABLE_DEV_AUTH: ${ENABLE_DEV_AUTH:-false}
