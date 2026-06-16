@@ -26,7 +26,12 @@ class SemanticCache:
     """Query cache backed by a dedicated Qdrant collection."""
 
     def __init__(self):
-        self._ensure_collection()
+        self._disabled = False
+        try:
+            self._ensure_collection()
+        except Exception as exc:
+            self._disabled = True
+            logger.warning("Semantic cache disabled: %s", exc)
 
     def _get_client(self):
         from qdrant_client import QdrantClient
@@ -35,14 +40,51 @@ class SemanticCache:
 
     def _ensure_collection(self):
         from qdrant_client.models import Distance, VectorParams
+
+        from ingestion.embedder import embedding_dim
+
         client = self._get_client()
+        desired_size = embedding_dim()
         collections = [c.name for c in client.get_collections().collections]
-        if CACHE_COLLECTION not in collections:
-            client.create_collection(
-                collection_name=CACHE_COLLECTION,
-                vectors_config=VectorParams(size=384, distance=Distance.COSINE),
+        if CACHE_COLLECTION in collections:
+            current_size = self._collection_vector_size(client)
+            if current_size == desired_size:
+                return
+            if current_size is None:
+                logger.warning("Semantic cache collection exists but vector size could not be verified")
+                return
+            logger.warning(
+                "Recreating semantic cache collection: vector size %s != %s",
+                current_size,
+                desired_size,
             )
-            logger.info("Created semantic cache collection")
+            client.delete_collection(CACHE_COLLECTION)
+
+        client.create_collection(
+            collection_name=CACHE_COLLECTION,
+            vectors_config=VectorParams(size=desired_size, distance=Distance.COSINE),
+        )
+        logger.info("Created semantic cache collection (dim=%d)", desired_size)
+
+    def _collection_vector_size(self, client) -> int | None:
+        """Best-effort extraction of the configured Qdrant vector size."""
+        try:
+            info = client.get_collection(CACHE_COLLECTION)
+            vectors = info.config.params.vectors
+            if isinstance(vectors, dict):
+                first = next(iter(vectors.values()), None)
+                return getattr(first, "size", None)
+            return getattr(vectors, "size", None)
+        except Exception as exc:
+            logger.warning("Could not inspect semantic cache collection: %s", exc)
+            return None
+
+    @staticmethod
+    def _embed_query(query: str) -> list[float]:
+        from ingestion.embedder import embed
+
+        vec = embed([query])[0]
+        return vec.tolist() if hasattr(vec, "tolist") else list(vec)
 
     def get(
         self,
@@ -54,38 +96,42 @@ class SemanticCache:
         """Check cache for similar query. Returns CacheHit or None."""
         from qdrant_client.models import FieldCondition, Filter, MatchValue
 
-        from ingestion.embedder import embed
-
-        query_vec = embed(query)
-        client = self._get_client()
-
-        results = client.search(
-            collection_name=CACHE_COLLECTION,
-            query_vector=query_vec,
-            query_filter=Filter(must=[
-                FieldCondition(key="tenant_id", match=MatchValue(value=tenant_id)),
-                FieldCondition(key="access_scope", match=MatchValue(value=access_scope)),
-            ]),
-            limit=1,
-            score_threshold=threshold,
-        )
-
-        if not results:
+        if self._disabled:
             return None
+        try:
+            query_vec = self._embed_query(query)
+            client = self._get_client()
 
-        hit = results[0]
-        timestamp = hit.payload.get("timestamp", 0)
-        if time.time() - timestamp > CACHE_TTL_SECONDS:
+            results = client.search(
+                collection_name=CACHE_COLLECTION,
+                query_vector=query_vec,
+                query_filter=Filter(must=[
+                    FieldCondition(key="tenant_id", match=MatchValue(value=tenant_id)),
+                    FieldCondition(key="access_scope", match=MatchValue(value=access_scope)),
+                ]),
+                limit=1,
+                score_threshold=threshold,
+            )
+
+            if not results:
+                return None
+
+            hit = results[0]
+            timestamp = hit.payload.get("timestamp", 0)
+            if time.time() - timestamp > CACHE_TTL_SECONDS:
+                return None
+
+            logger.info("Cache hit (score=%.3f) for query: %s", hit.score, query[:50])
+            return CacheHit(
+                answer=hit.payload["answer"],
+                citations=json.loads(hit.payload.get("citations", "[]")),
+                tenant_id=tenant_id,
+                access_scope=hit.payload.get("access_scope", "tenant"),
+                score=hit.score,
+            )
+        except Exception as exc:
+            logger.warning("Semantic cache lookup failed: %s", exc)
             return None
-
-        logger.info("Cache hit (score=%.3f) for query: %s", hit.score, query[:50])
-        return CacheHit(
-            answer=hit.payload["answer"],
-            citations=json.loads(hit.payload.get("citations", "[]")),
-            tenant_id=tenant_id,
-            access_scope=hit.payload.get("access_scope", "tenant"),
-            score=hit.score,
-        )
 
     def put(self, query: str, answer: str, citations: list, tenant_id: str, access_scope: str = "tenant"):
         """Store query+answer in cache."""
@@ -93,25 +139,28 @@ class SemanticCache:
 
         from qdrant_client.models import PointStruct
 
-        from ingestion.embedder import embed
+        if self._disabled:
+            return
+        try:
+            query_vec = self._embed_query(query)
+            client = self._get_client()
 
-        query_vec = embed(query)
-        client = self._get_client()
-
-        point = PointStruct(
-            id=str(uuid.uuid4()),
-            vector=query_vec,
-            payload={
-                "query": query,
-                "answer": answer,
-                "citations": json.dumps(citations),
-                "tenant_id": tenant_id,
-                "access_scope": access_scope,
-                "timestamp": time.time(),
-            },
-        )
-        client.upsert(collection_name=CACHE_COLLECTION, points=[point])
-        logger.info("Cached answer for query: %s", query[:50])
+            point = PointStruct(
+                id=str(uuid.uuid4()),
+                vector=query_vec,
+                payload={
+                    "query": query,
+                    "answer": answer,
+                    "citations": json.dumps(citations),
+                    "tenant_id": tenant_id,
+                    "access_scope": access_scope,
+                    "timestamp": time.time(),
+                },
+            )
+            client.upsert(collection_name=CACHE_COLLECTION, points=[point])
+            logger.info("Cached answer for query: %s", query[:50])
+        except Exception as exc:
+            logger.warning("Semantic cache write failed: %s", exc)
 
     def invalidate(self, tenant_id: str):
         """Clear all cache entries for a tenant."""
