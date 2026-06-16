@@ -1,7 +1,4 @@
-"""TurkRAG FastAPI application entrypoint.
-
-On startup: initialise PostgreSQL schema and ensure upload/index directories exist.
-"""
+"""TurkRAG FastAPI application entrypoint."""
 
 import logging
 import os
@@ -50,6 +47,20 @@ logger = logging.getLogger(__name__)
 POSTGRES_URL = os.getenv("POSTGRES_URL", "postgresql://turkrag:turkrag_secret@localhost/turkrag")
 UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", "/tmp/uploads"))
 BM25_INDEX_DIR = Path(os.getenv("BM25_INDEX_DIR", "indexes"))
+REQUIRED_ALEMBIC_REVISION = "0001_baseline"
+AUTO_INIT_SCHEMA = os.getenv("AUTO_INIT_SCHEMA", "false").lower() == "true"
+REQUIRED_TABLES = {
+    "tenants",
+    "documents",
+    "users",
+    "sessions",
+    "messages",
+    "query_logs",
+    "document_permissions",
+    "eval_runs",
+    "ingestion_jobs",
+    "document_versions",
+}
 
 
 @asynccontextmanager
@@ -61,6 +72,8 @@ async def lifespan(app: FastAPI):
         raise RuntimeError("JWT_SECRET must be set before running in production")
     if APP_ENV == "production" and ENABLE_DEV_AUTH:
         raise RuntimeError("ENABLE_DEV_AUTH must be false before running in production")
+    if APP_ENV == "production" and AUTO_INIT_SCHEMA:
+        raise RuntimeError("AUTO_INIT_SCHEMA must be false before running in production")
     if jwt_secret == "change_this_in_production":
         logger.warning(
             "JWT_SECRET is the default insecure value. "
@@ -68,7 +81,7 @@ async def lifespan(app: FastAPI):
         )
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     BM25_INDEX_DIR.mkdir(parents=True, exist_ok=True)
-    _init_postgres()
+    _ensure_schema_ready()
     # Warm up connection pool
     from api.db import _get_pool
     _get_pool()
@@ -95,8 +108,64 @@ async def lifespan(app: FastAPI):
         logger.info("DB connection pool closed.")
 
 
+def _run_alembic_upgrade():
+    """Run Alembic upgrade for explicit local development bootstrap."""
+    from alembic import command
+    from alembic.config import Config
+
+    logger.info("AUTO_INIT_SCHEMA enabled — running Alembic upgrade head.")
+    cfg = Config("alembic.ini")
+    command.upgrade(cfg, "head")
+
+
+def _ensure_schema_ready():
+    """Fail startup unless the database is at the required Alembic baseline."""
+    import psycopg2
+
+    if AUTO_INIT_SCHEMA:
+        if APP_ENV == "production":
+            raise RuntimeError("AUTO_INIT_SCHEMA must be false before running in production")
+        _run_alembic_upgrade()
+
+    try:
+        conn = psycopg2.connect(POSTGRES_URL)
+    except Exception as exc:
+        raise RuntimeError("Failed to connect to PostgreSQL. Check POSTGRES_URL.") from exc
+
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT to_regclass('public.alembic_version')")
+            version_table = cur.fetchone()
+            if not version_table or version_table[0] is None:
+                raise RuntimeError("Database schema is not migrated. Run: alembic upgrade head")
+
+            cur.execute("SELECT version_num FROM alembic_version")
+            row = cur.fetchone()
+            current_revision = row[0] if row else None
+            if current_revision != REQUIRED_ALEMBIC_REVISION:
+                raise RuntimeError(
+                    f"Database migration revision mismatch: expected "
+                    f"{REQUIRED_ALEMBIC_REVISION}, got {current_revision or 'none'}"
+                )
+
+            cur.execute(
+                """SELECT table_name
+                   FROM information_schema.tables
+                   WHERE table_schema='public' AND table_name = ANY(%s)""",
+                (list(REQUIRED_TABLES),),
+            )
+            existing_tables = {row[0] for row in cur.fetchall()}
+            missing = sorted(REQUIRED_TABLES - existing_tables)
+            if missing:
+                raise RuntimeError(f"Database schema is incomplete. Missing tables: {', '.join(missing)}")
+
+        logger.info("Database schema verified at revision %s.", REQUIRED_ALEMBIC_REVISION)
+    finally:
+        conn.close()
+
+
 def _init_postgres():
-    """Create database schema if tables do not exist."""
+    """Legacy local schema initializer. Use Alembic migrations instead."""
     import psycopg2
 
     logger.info("Initialising PostgreSQL schema…")

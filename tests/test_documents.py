@@ -19,13 +19,13 @@ def client():
     import api.main as main_module
     import ingestion.worker as worker_module
 
-    original = main_module._init_postgres
+    original = main_module._ensure_schema_ready
     original_get_pool = db_module._get_pool
     original_pool = db_module._pool
     original_start_worker = worker_module.start_worker
     original_stop_worker = worker_module.stop_worker
 
-    main_module._init_postgres = lambda: None
+    main_module._ensure_schema_ready = lambda: None
     db_module._get_pool = lambda: None
     db_module._pool = None
     worker_module.start_worker = lambda: None
@@ -33,7 +33,7 @@ def client():
     from api.main import app
     with TestClient(app, raise_server_exceptions=True) as c:
         yield c
-    main_module._init_postgres = original
+    main_module._ensure_schema_ready = original
     db_module._get_pool = original_get_pool
     db_module._pool = original_pool
     worker_module.start_worker = original_start_worker
