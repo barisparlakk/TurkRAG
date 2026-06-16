@@ -59,6 +59,8 @@ async def lifespan(app: FastAPI):
     jwt_secret = os.getenv("JWT_SECRET", "change_this_in_production")
     if APP_ENV == "production" and jwt_secret == "change_this_in_production":
         raise RuntimeError("JWT_SECRET must be set before running in production")
+    if APP_ENV == "production" and ENABLE_DEV_AUTH:
+        raise RuntimeError("ENABLE_DEV_AUTH must be false before running in production")
     if jwt_secret == "change_this_in_production":
         logger.warning(
             "JWT_SECRET is the default insecure value. "

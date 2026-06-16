@@ -15,8 +15,8 @@ JWT_ALGORITHM = "HS256"
 JWT_EXPIRY_HOURS = 24
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token", auto_error=True)
-MOCK_ADMIN_EMAIL = os.getenv("MOCK_ADMIN_EMAIL", "baris@dev.com")
-MOCK_ADMIN_PASSWORD = os.getenv("MOCK_ADMIN_PASSWORD", "1234")
+MOCK_ADMIN_EMAIL = os.getenv("MOCK_ADMIN_EMAIL", "")
+MOCK_ADMIN_PASSWORD = os.getenv("MOCK_ADMIN_PASSWORD", "")
 APP_ENV = os.getenv("APP_ENV", "development").lower()
 ENABLE_DEV_AUTH = os.getenv("ENABLE_DEV_AUTH", "true" if APP_ENV != "production" else "false").lower() == "true"
 
@@ -135,4 +135,6 @@ async def require_admin(user: dict = Depends(get_current_user)) -> dict:
 
 def validate_mock_admin(email: str, password: str) -> bool:
     """Validate the built-in mock admin credentials used by the dashboard."""
+    if not MOCK_ADMIN_EMAIL or not MOCK_ADMIN_PASSWORD:
+        return False
     return email.strip().lower() == MOCK_ADMIN_EMAIL.lower() and password == MOCK_ADMIN_PASSWORD

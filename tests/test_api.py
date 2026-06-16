@@ -1,5 +1,6 @@
 """API integration tests using FastAPI TestClient — no live DB or LLM required."""
 
+import asyncio
 import os
 from unittest.mock import patch
 
@@ -94,7 +95,11 @@ class TestAuthEndpoint:
             def close(self):
                 return None
 
-        with patch("api.db.get_conn", return_value=FakeConn()):
+        with (
+            patch("api.auth.MOCK_ADMIN_EMAIL", "baris@dev.com"),
+            patch("api.auth.MOCK_ADMIN_PASSWORD", "1234"),
+            patch("api.db.get_conn", return_value=FakeConn()),
+        ):
             resp = client.post("/auth/mock-login", json={
                 "tenant_slug": "acme-sirket",
                 "email": "baris@dev.com",
@@ -109,11 +114,15 @@ class TestAuthEndpoint:
         assert "access_token" in body
 
     def test_mock_admin_login_rejects_wrong_password(self, client):
-        resp = client.post("/auth/mock-login", json={
-            "tenant_slug": "acme-sirket",
-            "email": "baris@dev.com",
-            "password": "wrong",
-        })
+        with (
+            patch("api.auth.MOCK_ADMIN_EMAIL", "baris@dev.com"),
+            patch("api.auth.MOCK_ADMIN_PASSWORD", "1234"),
+        ):
+            resp = client.post("/auth/mock-login", json={
+                "tenant_slug": "acme-sirket",
+                "email": "baris@dev.com",
+                "password": "wrong",
+            })
         assert resp.status_code == 401
 
     def test_admin_switch_tenant_requires_admin_token(self, client):
@@ -152,7 +161,11 @@ class TestAuthEndpoint:
             def close(self):
                 return None
 
-        with patch("api.db.get_conn", return_value=FakeConn()):
+        with (
+            patch("api.auth.MOCK_ADMIN_EMAIL", "baris@dev.com"),
+            patch("api.auth.MOCK_ADMIN_PASSWORD", "1234"),
+            patch("api.db.get_conn", return_value=FakeConn()),
+        ):
             admin_token = client.post("/auth/mock-login", json={
                 "tenant_slug": "acme-sirket",
                 "email": "baris@dev.com",
@@ -255,6 +268,49 @@ class TestAuthEndpoint:
             })
 
         assert resp.status_code == 401
+
+    def test_dev_token_endpoint_returns_403_when_dev_auth_disabled(self, client):
+        with patch("api.main.ENABLE_DEV_AUTH", False):
+            resp = client.post("/auth/token", json={
+                "tenant_id": "00000000-0000-0000-0000-000000000001",
+                "user_id": "test",
+            })
+
+        assert resp.status_code == 403
+
+    def test_mock_admin_login_returns_403_when_dev_auth_disabled(self, client):
+        with patch("api.main.ENABLE_DEV_AUTH", False):
+            resp = client.post("/auth/mock-login", json={
+                "tenant_slug": "acme-sirket",
+                "email": "baris@dev.com",
+                "password": "1234",
+            })
+
+        assert resp.status_code == 403
+
+    def test_validate_mock_admin_returns_false_without_configured_credentials(self):
+        from api.auth import validate_mock_admin
+
+        with (
+            patch("api.auth.MOCK_ADMIN_EMAIL", ""),
+            patch("api.auth.MOCK_ADMIN_PASSWORD", ""),
+        ):
+            assert validate_mock_admin("baris@dev.com", "1234") is False
+
+    def test_production_startup_rejects_dev_auth(self):
+        import api.main as main_module
+
+        async def _start():
+            async with main_module.lifespan(main_module.app):
+                pass
+
+        with (
+            patch("api.main.APP_ENV", "production"),
+            patch("api.main.ENABLE_DEV_AUTH", True),
+            patch.dict(os.environ, {"JWT_SECRET": "test-secret"}, clear=False),
+            pytest.raises(RuntimeError, match="ENABLE_DEV_AUTH"),
+        ):
+            asyncio.run(_start())
 
 
 class TestTenantEndpointAuth:

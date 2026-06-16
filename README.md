@@ -63,7 +63,9 @@ pip install huggingface-hub
 huggingface-cli download Qwen/Qwen3-8B-Instruct-GGUF \
   qwen3-8b-instruct-q4_k_m.gguf --local-dir ./models
 
-# 2. Start all services
+# 2. Configure required secrets, then start all services
+cp .env.example .env
+# Edit JWT_SECRET and POSTGRES_PASSWORD in .env before production use.
 docker compose up
 
 # 3. Open the dashboard
@@ -199,10 +201,12 @@ Run the commands above to refresh those artifacts for the current dataset or ten
 | `TURKISH_EMBEDDER_PATH` | `models/turkish-embedder` | Local SentenceTransformer directory |
 | `QDRANT_URL` | `http://localhost:6333` | Qdrant vector DB URL |
 | `JWT_SECRET` | *(required)* | Secret for signing JWTs |
-| `CORS_ORIGINS` | `*` | Comma-separated allowed origins for the dashboard/API |
-| `APP_ENV` | `development` | Set `production` to reject insecure defaults |
-| `ENABLE_DEV_AUTH` | `true` in dev, `false` in prod | Enable legacy dev token/mock login endpoints |
+| `CORS_ORIGINS` | `http://localhost:5173` | Comma-separated allowed origins for the dashboard/API. `*` is rejected in production |
+| `APP_ENV` | `production` in Docker, `development` locally | Production rejects insecure defaults |
+| `ENABLE_DEV_AUTH` | `false` | Enable legacy dev token/mock login endpoints only for explicit local development |
+| `MOCK_ADMIN_EMAIL` / `MOCK_ADMIN_PASSWORD` | *(empty)* | Local-only mock admin credentials when dev auth is explicitly enabled |
 | `UPLOAD_DIR` | `/tmp/uploads` | Temporary file upload path |
+| `MAX_UPLOAD_BYTES` | `52428800` | Maximum upload size in bytes (default 50 MB) |
 | `BM25_INDEX_DIR` | `indexes` | BM25 index persistence directory |
 
 ---
