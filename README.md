@@ -63,13 +63,24 @@ pip install huggingface-hub
 huggingface-cli download Qwen/Qwen3-8B-Instruct-GGUF \
   qwen3-8b-instruct-q4_k_m.gguf --local-dir ./models
 
-# 2. Configure required secrets, then start all services
+# 2. Configure required secrets
 cp .env.example .env
 # Edit JWT_SECRET and POSTGRES_PASSWORD in .env before production use.
+
+# 3. Start Postgres/Qdrant, run migrations, then start all services
+docker compose up -d postgres qdrant
+docker compose run --rm api alembic upgrade head
 docker compose up
 
-# 3. Open the dashboard
+# 4. Open the dashboard
 open http://localhost:5173
+```
+
+For local development with Postgres and Qdrant exposed on host ports and automatic
+schema initialization:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 ```
 
 ---
@@ -204,10 +215,33 @@ Run the commands above to refresh those artifacts for the current dataset or ten
 | `CORS_ORIGINS` | `http://localhost:5173` | Comma-separated allowed origins for the dashboard/API. `*` is rejected in production |
 | `APP_ENV` | `production` in Docker, `development` locally | Production rejects insecure defaults |
 | `ENABLE_DEV_AUTH` | `false` | Enable legacy dev token/mock login endpoints only for explicit local development |
+| `AUTO_INIT_SCHEMA` | `false` | Local-only option to run `alembic upgrade head` during API startup. Rejected in production |
 | `MOCK_ADMIN_EMAIL` / `MOCK_ADMIN_PASSWORD` | *(empty)* | Local-only mock admin credentials when dev auth is explicitly enabled |
 | `UPLOAD_DIR` | `/tmp/uploads` | Temporary file upload path |
 | `MAX_UPLOAD_BYTES` | `52428800` | Maximum upload size in bytes (default 50 MB) |
 | `BM25_INDEX_DIR` | `indexes` | BM25 index persistence directory |
+
+---
+
+## Database Migrations
+
+TurkRAG uses Alembic for PostgreSQL schema management. API startup verifies that
+the database is migrated to the required revision and fails fast if the schema is
+missing or stale.
+
+```bash
+alembic upgrade head
+```
+
+For an existing database that already exactly matches the baseline schema, stamp
+it once instead of recreating tables:
+
+```bash
+alembic stamp head
+```
+
+`AUTO_INIT_SCHEMA=true` is available only for local development and is rejected
+when `APP_ENV=production`.
 
 ---
 
