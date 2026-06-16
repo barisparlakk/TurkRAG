@@ -47,16 +47,27 @@ def _token(client):
     }).json()["access_token"]
 
 
-class _Cursor:
-    def __init__(self, duplicate=False):
+class _DbState:
+    def __init__(self, duplicate=False, raise_on_insert=False, raise_on_delete=False):
         self.duplicate = duplicate
+        self.raise_on_insert = raise_on_insert
+        self.raise_on_delete = raise_on_delete
         self.queries = []
 
+
+class _Cursor:
+    def __init__(self, state):
+        self.state = state
+
     def execute(self, query, params=None):
-        self.queries.append((query, params))
+        self.state.queries.append((query, params))
+        if "INSERT INTO documents" in query and self.state.raise_on_insert:
+            raise RuntimeError("insert failed")
+        if "DELETE FROM documents" in query and self.state.raise_on_delete:
+            raise RuntimeError("delete failed")
 
     def fetchone(self):
-        if self.queries and "SELECT id FROM documents" in self.queries[-1][0] and self.duplicate:
+        if self.state.queries and "SELECT id FROM documents" in self.state.queries[-1][0] and self.state.duplicate:
             return ("existing-doc",)
         return None
 
@@ -68,8 +79,13 @@ class _Cursor:
 
 
 class _Conn:
-    def __init__(self, duplicate=False):
-        self.cursor_obj = _Cursor(duplicate=duplicate)
+    def __init__(self, state=None, duplicate=False, raise_on_insert=False, raise_on_delete=False):
+        self.state = state or _DbState(
+            duplicate=duplicate,
+            raise_on_insert=raise_on_insert,
+            raise_on_delete=raise_on_delete,
+        )
+        self.cursor_obj = _Cursor(self.state)
 
     def cursor(self):
         return self.cursor_obj
@@ -82,6 +98,10 @@ class _Conn:
 
     def __exit__(self, exc_type, exc, tb):
         return False
+
+
+def _delete_queries(state):
+    return [query for query, _ in state.queries if "DELETE FROM documents" in query]
 
 
 def test_upload_enqueues_once_and_does_not_run_inline_ingestion(client, tmp_path):
@@ -171,6 +191,69 @@ def test_duplicate_upload_returns_409_and_does_not_enqueue(client, tmp_path):
     assert resp.status_code == 409
     enqueue_job.assert_not_called()
     assert list(tmp_path.iterdir()) == []
+
+
+def test_db_insert_failure_cleans_temp_file(client, tmp_path):
+    token = _token(client)
+    state = _DbState(raise_on_insert=True)
+
+    with (
+        patch("api.routers.documents.UPLOAD_DIR", tmp_path),
+        patch("api.routers.documents.get_conn", return_value=_Conn(state=state)),
+    ):
+        resp = client.post(
+            "/documents/upload",
+            files={"file": ("insert-fails.txt", BytesIO(b"content"), "text/plain")},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+    assert resp.status_code == 500
+    assert list(tmp_path.iterdir()) == []
+    assert _delete_queries(state) == []
+
+
+def test_grant_access_failure_cleans_files_and_deletes_document_row(client, tmp_path):
+    token = _token(client)
+    state = _DbState()
+
+    with (
+        patch("api.routers.documents.UPLOAD_DIR", tmp_path),
+        patch("api.routers.documents.get_conn", return_value=_Conn(state=state)),
+        patch("api.routers.documents.grant_access", side_effect=RuntimeError("acl failed")),
+        patch("ingestion.queue.enqueue_job") as enqueue_job,
+    ):
+        resp = client.post(
+            "/documents/upload",
+            files={"file": ("acl-fails.txt", BytesIO(b"content"), "text/plain")},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+    assert resp.status_code == 500
+    enqueue_job.assert_not_called()
+    assert list(tmp_path.iterdir()) == []
+    assert len(_delete_queries(state)) == 1
+
+
+def test_enqueue_failure_removes_final_file_and_deletes_document_row(client, tmp_path):
+    token = _token(client)
+    state = _DbState()
+
+    with (
+        patch("api.routers.documents.UPLOAD_DIR", tmp_path),
+        patch("api.routers.documents.get_conn", return_value=_Conn(state=state)),
+        patch("api.routers.documents.grant_access"),
+        patch("retrieval.semantic_cache.get_cache", return_value=MagicMock()),
+        patch("ingestion.queue.enqueue_job", side_effect=RuntimeError("queue down")),
+    ):
+        resp = client.post(
+            "/documents/upload",
+            files={"file": ("queue-fails.txt", BytesIO(b"content"), "text/plain")},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+    assert resp.status_code == 500
+    assert list(tmp_path.iterdir()) == []
+    assert len(_delete_queries(state)) == 1
 
 
 def test_unsupported_extension_rejected_before_file_write(client, tmp_path):

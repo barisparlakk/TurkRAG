@@ -66,48 +66,78 @@ async def upload_document(
         raise
 
     file_hash = hasher.hexdigest()
+    document_id = None
+    document_inserted = False
+    save_path = None
 
-    # Reject duplicate uploads for this tenant; insert processing row atomically
-    conn = get_conn()
     try:
-        with conn, conn.cursor() as cur:
-            cur.execute(
-                "SELECT id FROM documents WHERE tenant_id=%s AND file_hash=%s AND status='ready'",
-                (tenant_id, file_hash),
-            )
-            if cur.fetchone():
-                temp_path.unlink(missing_ok=True)
-                raise HTTPException(status_code=409, detail="This document has already been uploaded for this tenant")
+        # Reject duplicate uploads for this tenant; insert processing row atomically
+        conn = get_conn()
+        try:
+            with conn, conn.cursor() as cur:
+                cur.execute(
+                    "SELECT id FROM documents WHERE tenant_id=%s AND file_hash=%s AND status='ready'",
+                    (tenant_id, file_hash),
+                )
+                if cur.fetchone():
+                    raise HTTPException(
+                        status_code=409,
+                        detail="This document has already been uploaded for this tenant",
+                    )
 
-            document_id = str(uuid.uuid4())
-            cur.execute(
-                "INSERT INTO documents (id, tenant_id, filename, file_hash, status) VALUES (%s, %s, %s, %s, 'processing')",
-                (document_id, tenant_id, safe_filename, file_hash),
-            )
-        grant_access(document_id, user["id"], "owner", user["id"], conn)
-    finally:
-        conn.close()
+                document_id = str(uuid.uuid4())
+                cur.execute(
+                    "INSERT INTO documents (id, tenant_id, filename, file_hash, status) VALUES (%s, %s, %s, %s, 'processing')",
+                    (document_id, tenant_id, safe_filename, file_hash),
+                )
+                document_inserted = True
+            grant_access(document_id, user["id"], "owner", user["id"], conn)
+        finally:
+            conn.close()
 
-    save_path = UPLOAD_DIR / f"{document_id}{suffix}"
-    temp_path.replace(save_path)
-    logger.info("Saved upload: %s → %s (%d bytes)", safe_filename, save_path, total_bytes)
+        save_path = UPLOAD_DIR / f"{document_id}{suffix}"
+        temp_path.replace(save_path)
+        logger.info("Saved upload: %s → %s (%d bytes)", safe_filename, save_path, total_bytes)
 
-    # Invalidate semantic cache for this tenant
-    try:
-        from retrieval.semantic_cache import get_cache
-        get_cache().invalidate(tenant_id)
+        # Invalidate semantic cache for this tenant
+        try:
+            from retrieval.semantic_cache import get_cache
+            get_cache().invalidate(tenant_id)
+        except Exception as exc:
+            logger.warning("Cache invalidation failed: %s", exc)
+
+        from ingestion.queue import enqueue_job
+
+        conn = get_conn()
+        try:
+            job_id = enqueue_job(tenant_id, document_id, safe_filename, str(save_path), conn)
+        finally:
+            conn.close()
     except Exception as exc:
-        logger.warning("Cache invalidation failed: %s", exc)
-
-    from ingestion.queue import enqueue_job
-
-    conn = get_conn()
-    try:
-        job_id = enqueue_job(tenant_id, document_id, safe_filename, str(save_path), conn)
-    finally:
-        conn.close()
+        temp_path.unlink(missing_ok=True)
+        if save_path is not None:
+            save_path.unlink(missing_ok=True)
+        if document_inserted and document_id is not None:
+            _delete_document_row(document_id)
+        if isinstance(exc, HTTPException):
+            raise
+        raise HTTPException(status_code=500, detail="Document upload failed") from exc
 
     return DocumentUploadResponse(document_id=document_id, job_id=job_id, filename=safe_filename, status="processing")
+
+
+def _delete_document_row(document_id: str) -> None:
+    """Best-effort cleanup for uploads that fail before returning success."""
+    conn = None
+    try:
+        conn = get_conn()
+        with conn, conn.cursor() as cur:
+            cur.execute("DELETE FROM documents WHERE id=%s", (document_id,))
+    except Exception as exc:
+        logger.warning("Upload rollback could not delete document row %s: %s", document_id, exc)
+    finally:
+        if conn is not None:
+            conn.close()
 
 
 @router.get("", response_model=list[DocumentListItem])
