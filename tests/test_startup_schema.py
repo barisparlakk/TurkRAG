@@ -6,7 +6,7 @@ import pytest
 
 
 class _Cursor:
-    def __init__(self, version_table=True, revision="0001_baseline", tables=None):
+    def __init__(self, version_table=True, revision="0002_ingestion_job_retries", tables=None):
         self.version_table = version_table
         self.revision = revision
         self.tables = tables or {

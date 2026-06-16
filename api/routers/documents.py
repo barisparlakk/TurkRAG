@@ -243,7 +243,8 @@ async def list_jobs(limit: int = 30, tenant_id: str = Depends(get_tenant_id)):
         with conn.cursor() as cur:
             cur.execute(
                 """SELECT id, tenant_id, document_id, filename, status, error_message,
-                          created_at, started_at, completed_at
+                          created_at, started_at, completed_at, attempts, max_attempts,
+                          last_heartbeat_at, retry_after
                    FROM ingestion_jobs
                    WHERE tenant_id=%s
                    ORDER BY created_at DESC LIMIT %s""",
@@ -263,6 +264,10 @@ async def list_jobs(limit: int = 30, tenant_id: str = Depends(get_tenant_id)):
             "created_at": str(r[6]) if r[6] else None,
             "started_at": str(r[7]) if r[7] else None,
             "completed_at": str(r[8]) if r[8] else None,
+            "attempts": int(r[9]),
+            "max_attempts": int(r[10]),
+            "last_heartbeat_at": str(r[11]) if r[11] else None,
+            "retry_after": str(r[12]) if r[12] else None,
         }
         for r in rows
     ]
