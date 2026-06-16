@@ -156,17 +156,16 @@ export function SourcesPanel({ citations, attribution }) {
       <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
         <AttributionSection sentences={attribution} />
         {!citations?.length ? (
-          <div style={{
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center',
-            height: '100%', gap: '10px', padding: '32px 16px',
-            textAlign: 'center',
-          }}>
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-            </svg>
-            <span style={{ fontSize: '13px', color: 'var(--text-3)' }}>Kaynak yok</span>
+          <div className="sources-empty">
+            <div className="sources-empty-icon">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <path d="M8 13h8M8 17h5"/>
+              </svg>
+            </div>
+            <strong>Kaynak bekleniyor</strong>
+            <span>Yanıt geldikten sonra kullanılan belge parçaları burada görünür.</span>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

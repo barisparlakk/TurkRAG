@@ -285,7 +285,27 @@ export default function App() {
           onThemeToggle={() => setTheme((t) => t === 'dark' ? 'light' : 'dark')}
         />
 
-        <div className="dashboard-body">
+        <div
+          className="dashboard-body"
+          data-view={tab}
+          onPointerMove={(event) => {
+            const rect = event.currentTarget.getBoundingClientRect()
+            const x = ((event.clientX - rect.left) / rect.width) * 100
+            const y = ((event.clientY - rect.top) / rect.height) * 100
+            event.currentTarget.style.setProperty('--pointer-x', `${x.toFixed(2)}%`)
+            event.currentTarget.style.setProperty('--pointer-y', `${y.toFixed(2)}%`)
+          }}
+          onPointerLeave={(event) => {
+            event.currentTarget.style.setProperty('--pointer-x', '50%')
+            event.currentTarget.style.setProperty('--pointer-y', '45%')
+          }}
+        >
+          <div className="ambient-scene" aria-hidden="true">
+            <span className="ambient-field ambient-field-a" />
+            <span className="ambient-field ambient-field-b" />
+            <span className="ambient-field ambient-field-c" />
+          </div>
+
           <Sidebar
             tab={tab}
             onTabChange={(t) => { setTab(t); if (t !== 'chat') setCitations([]) }}

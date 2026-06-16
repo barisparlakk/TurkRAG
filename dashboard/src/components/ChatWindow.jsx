@@ -53,29 +53,69 @@ function stripThink(text) {
 
 /* ── Example questions chips ────────────────────────────── */
 const EXAMPLE_QUESTIONS = [
-  'İzin prosedürü nasıl işler?',
-  'Satın alma süreci nedir?',
-  'KVKK kapsamında verilerimi nasıl koruyabilirim?',
+  {
+    label: 'İzin prosedürü nasıl işler?',
+    meta: 'İK politikası',
+  },
+  {
+    label: 'Satın alma süreci nedir?',
+    meta: 'Operasyon',
+  },
+  {
+    label: 'KVKK kapsamında verilerimi nasıl koruyabilirim?',
+    meta: 'Uyum',
+  },
 ]
 
 function EmptyState({ onSend }) {
   return (
     <div className="chat-empty">
-      <div className="chat-empty-logo">
-        <img src="/logo-light.png" className="logo-light" alt="" />
-        <img src="/logo-dark.png" className="logo-dark" alt="" />
-      </div>
+      <div className="chat-empty-card">
+        <div className="chat-empty-orbit" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
 
-      <h2>Belgeye sor</h2>
+        <div className="chat-empty-logo">
+          <img src="/logo-light.png" className="logo-light" alt="" />
+          <img src="/logo-dark.png" className="logo-dark" alt="" />
+        </div>
+
+        <div className="chat-empty-copy">
+          <span className="chat-eyebrow">Belge zekası hazır</span>
+          <h2>Soruyu yaz, kaynaklı yanıtı al.</h2>
+          <p>
+            TurkRAG şirket belgelerini tenant sınırları içinde arar, yanıtı üretir
+            ve dayandığı parçaları sağ panelde gösterir.
+          </p>
+        </div>
+
+        <div className="chat-empty-metrics">
+          <div>
+            <strong>ACL</strong>
+            <span>Belge yetkisi</span>
+          </div>
+          <div>
+            <strong>RAG</strong>
+            <span>Kaynaklı cevap</span>
+          </div>
+          <div>
+            <strong>TR</strong>
+            <span>Türkçe arama</span>
+          </div>
+        </div>
+      </div>
 
       <div className="prompt-chips">
         {EXAMPLE_QUESTIONS.map((q, i) => (
           <button
             key={i}
-            onClick={() => onSend(q)}
+            onClick={() => onSend(q.label)}
             className="prompt-chip"
           >
-            {q}
+            <span>{q.meta}</span>
+            <strong>{q.label}</strong>
           </button>
         ))}
       </div>

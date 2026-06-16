@@ -58,8 +58,8 @@ function NavItem({ item, active, collapsed, onClick }) {
       title={collapsed ? item.label : undefined}
       className={`sidebar-nav-item ${active ? 'active' : ''} ${collapsed ? 'collapsed' : ''}`}
     >
-      <span style={{ flexShrink: 0 }}>{item.icon}</span>
-      {!collapsed && <span>{item.label}</span>}
+      <span className="sidebar-nav-icon">{item.icon}</span>
+      {!collapsed && <span className="sidebar-nav-label">{item.label}</span>}
     </button>
   )
 }
@@ -94,7 +94,7 @@ export function Sidebar({
           <>
             <div className="divider" style={{ margin: '8px 4px' }} />
             <div className="sidebar-section-label">Geçmiş</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+            <div className="session-list">
               {sessions.map((s) => (
                 <button
                   key={s.id}
