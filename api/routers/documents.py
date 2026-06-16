@@ -6,7 +6,7 @@ import os
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 
 from api.auth import get_current_user, get_tenant_id
 from api.db import get_conn
@@ -22,25 +22,50 @@ router = APIRouter(prefix="/documents", tags=["documents"])
 
 UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", "/tmp/uploads"))
 ALLOWED_EXTENSIONS = {".pdf", ".docx", ".txt", ".xlsx", ".xls", ".csv"}
+UPLOAD_CHUNK_BYTES = 1024 * 1024
+MAX_UPLOAD_BYTES = int(os.getenv("MAX_UPLOAD_BYTES", str(50 * 1024 * 1024)))
 
 
 @router.post("/upload", response_model=DocumentUploadResponse, status_code=status.HTTP_202_ACCEPTED)
 async def upload_document(
-    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     user: dict = Depends(get_current_user),
 ):
     """Upload a document for ingestion. Returns immediately; processing is async."""
     tenant_id = user["tenant_id"]
-    suffix = Path(file.filename).suffix.lower()
+    safe_filename = Path(file.filename or "upload").name
+    suffix = Path(safe_filename).suffix.lower()
     if suffix not in ALLOWED_EXTENSIONS:
         raise HTTPException(
             status_code=422,
             detail=f"Unsupported file type '{suffix}'. Allowed: {', '.join(ALLOWED_EXTENSIONS)}",
         )
 
-    content = await file.read()
-    file_hash = hashlib.sha256(content).hexdigest()
+    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    temp_path = UPLOAD_DIR / f"upload_{uuid.uuid4().hex}{suffix}.tmp"
+    total_bytes = 0
+    hasher = hashlib.sha256()
+
+    try:
+        with temp_path.open("wb") as out:
+            while chunk := await file.read(UPLOAD_CHUNK_BYTES):
+                total_bytes += len(chunk)
+                if total_bytes > MAX_UPLOAD_BYTES:
+                    raise HTTPException(
+                        status_code=status.HTTP_413_CONTENT_TOO_LARGE,
+                        detail=f"File too large. Maximum allowed size is {MAX_UPLOAD_BYTES} bytes.",
+                    )
+                hasher.update(chunk)
+                out.write(chunk)
+    except HTTPException:
+        temp_path.unlink(missing_ok=True)
+        raise
+    except Exception:
+        temp_path.unlink(missing_ok=True)
+        logger.exception("Failed to stream upload: %s", safe_filename)
+        raise
+
+    file_hash = hasher.hexdigest()
 
     # Reject duplicate uploads for this tenant; insert processing row atomically
     conn = get_conn()
@@ -51,22 +76,21 @@ async def upload_document(
                 (tenant_id, file_hash),
             )
             if cur.fetchone():
+                temp_path.unlink(missing_ok=True)
                 raise HTTPException(status_code=409, detail="This document has already been uploaded for this tenant")
 
             document_id = str(uuid.uuid4())
             cur.execute(
                 "INSERT INTO documents (id, tenant_id, filename, file_hash, status) VALUES (%s, %s, %s, %s, 'processing')",
-                (document_id, tenant_id, file.filename, file_hash),
+                (document_id, tenant_id, safe_filename, file_hash),
             )
         grant_access(document_id, user["id"], "owner", user["id"], conn)
     finally:
         conn.close()
 
-    # Save file to disk
-    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     save_path = UPLOAD_DIR / f"{document_id}{suffix}"
-    save_path.write_bytes(content)
-    logger.info("Saved upload: %s → %s (%d bytes)", file.filename, save_path, len(content))
+    temp_path.replace(save_path)
+    logger.info("Saved upload: %s → %s (%d bytes)", safe_filename, save_path, total_bytes)
 
     # Invalidate semantic cache for this tenant
     try:
@@ -79,14 +103,11 @@ async def upload_document(
 
     conn = get_conn()
     try:
-        job_id = enqueue_job(tenant_id, document_id, file.filename, str(save_path), conn)
+        job_id = enqueue_job(tenant_id, document_id, safe_filename, str(save_path), conn)
     finally:
         conn.close()
 
-    # Trigger background ingestion
-    background_tasks.add_task(_ingest_document, document_id, str(save_path), file.filename, tenant_id, job_id)
-
-    return DocumentUploadResponse(document_id=document_id, job_id=job_id, filename=file.filename, status="processing")
+    return DocumentUploadResponse(document_id=document_id, job_id=job_id, filename=safe_filename, status="processing")
 
 
 @router.get("", response_model=list[DocumentListItem])
