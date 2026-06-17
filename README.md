@@ -124,6 +124,19 @@ python scripts/create_tenant.py \
 
 This creates the PostgreSQL row, provisions a Qdrant collection, and bootstraps the first admin user.
 
+For existing deployments that already have tenants but still need their first
+local admin before turning off dev auth:
+
+```bash
+python scripts/bootstrap_admin.py \
+  --tenant-slug "acme" \
+  --email "admin@acme.com" \
+  --password "change-me-strongly"
+```
+
+The command is idempotent: it creates the tenant admin if missing, or
+promotes/reactivates the existing tenant user and rotates its password hash.
+
 ---
 
 ## Ingest Sample Documents
