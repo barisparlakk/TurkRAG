@@ -14,7 +14,7 @@
   "per_query": [
     {
       "question": "Şirketin iade politikası nedir?",
-      "answer": "<think>\n\n</think>\n\nŞirketin iade politikasına göre, satın aldığınız ürünleri teslim tarihinden itibaren 30 gün içinde iade edebilirsiniz. İade işlemi için ürünün orijinal ambalajında, kullanılmamış ve fatura ile birlikte iade edilmesi gerekmektedir. İade talebinizi müşteri hizmetleri e-posta adresine (iade@techvizyon.com.tr) bildirmeniz yeterlidir; size 1 iş günü içinde dönüş yapılır. [Kaynak 5]",
+      "answer": "Şirketin iade politikasına göre, satın aldığınız ürünleri teslim tarihinden itibaren 30 gün içinde iade edebilirsiniz. İade işlemi için ürünün orijinal ambalajında, kullanılmamış ve fatura ile birlikte iade edilmesi gerekmektedir. İade talebinizi müşteri hizmetleri e-posta adresine (iade@techvizyon.com.tr) bildirmeniz yeterlidir; size 1 iş günü içinde dönüş yapılır. [Kaynak 5]",
       "ground_truth": "Ürünler 30 gün içinde iade edilebilir.",
       "relevant_doc": "musteri_hizmetleri.txt",
       "retrieved_docs": [
@@ -31,7 +31,7 @@
     },
     {
       "question": "Uzaktan çalışma kuralları nelerdir?",
-      "answer": "<think>\n\n</think>\n\nUzaktan çalışma kuralları şu şekildedir:\n\n- Çalışanlar haftada en fazla üç (3) gün evden çalışabilir.  \n- Bu haktan yararlanmak için ilgili birim yöneticisinden yazılı onay alınması zorunludur.  \n- Uzaktan çalışma günlerinde çalışanların şirket VPN'ine bağlı olması ve anlık mesajlaşma sistemleri üzerinden erişilebilir durumda bulunması gerekmektedir.  \n- Çalışanların uzaktan çalışma sırasında iş güvenliği protokollerine uyması zorunludur; gizli belgeler kişisel cihazlarda depolanamaz.  \n- Uzaktan çalışma hakkını kötüye kullanan veya verimliliği düşen çalışanların uzaktan çalışma izni, yönetim tarafından askıya alınabilir.  \n\n[Kaynak 1, Kaynak 2]",
+      "answer": "Uzaktan çalışma kuralları şu şekildedir:\n\n- Çalışanlar haftada en fazla üç (3) gün evden çalışabilir.  \n- Bu haktan yararlanmak için ilgili birim yöneticisinden yazılı onay alınması zorunludur.  \n- Uzaktan çalışma günlerinde çalışanların şirket VPN'ine bağlı olması ve anlık mesajlaşma sistemleri üzerinden erişilebilir durumda bulunması gerekmektedir.  \n- Çalışanların uzaktan çalışma sırasında iş güvenliği protokollerine uyması zorunludur; gizli belgeler kişisel cihazlarda depolanamaz.  \n- Uzaktan çalışma hakkını kötüye kullanan veya verimliliği düşen çalışanların uzaktan çalışma izni, yönetim tarafından askıya alınabilir.  \n\n[Kaynak 1, Kaynak 2]",
       "ground_truth": "Çalışanlar haftada en fazla üç gün evden çalışabilir ve yönetici onayı gereklidir.",
       "relevant_doc": "sirket_politikasi.txt",
       "retrieved_docs": [
@@ -48,7 +48,7 @@
     },
     {
       "question": "Yıllık izin süresi kaç gündür?",
-      "answer": "<think>\n\n</think>\n\nYıllık izin süresi, çalışanın kıdemine göre değişmektedir. 2 yıl kıdeme sahip çalışanlar için 14 iş gün, 5 yıl kıdeme sahip çalışanlar için 20 iş gün, 10 yıl kıdeme sahip çalışanlar için 24 iş gün ve 10 yıl ve üzeri kıdem için 30 iş gün izin hakkı tanınmaktadır. [Kaynak 3]",
+      "answer": "Yıllık izin süresi, çalışanın kıdemine göre değişmektedir. 2 yıl kıdeme sahip çalışanlar için 14 iş gün, 5 yıl kıdeme sahip çalışanlar için 20 iş gün, 10 yıl kıdeme sahip çalışanlar için 24 iş gün ve 10 yıl ve üzeri kıdem için 30 iş gün izin hakkı tanınmaktadır. [Kaynak 3]",
       "ground_truth": "İlk iki yılda 14 iş günü, sonrasında 20 iş günü yıllık izin hakkı doğmaktadır.",
       "relevant_doc": "sirket_politikasi.txt",
       "retrieved_docs": [
@@ -65,7 +65,7 @@
     },
     {
       "question": "Ürün kataloğunda hangi ürünler yer almaktadır?",
-      "answer": "<think>\n\n</think>\n\nÜrün kataloğunda yer alan ürünler şunlardır: TechVizyon ERP Pro, TechVizyon CRM Suite, TechVizyon Analitik Dashboard, Veri Analitiği Bootcamp ve destek ve bakım sözleşmeleri. [Kaynak 1], [Kaynak 4]",
+      "answer": "Ürün kataloğunda yer alan ürünler şunlardır: TechVizyon ERP Pro, TechVizyon CRM Suite, TechVizyon Analitik Dashboard, Veri Analitiği Bootcamp ve destek ve bakım sözleşmeleri. [Kaynak 1], [Kaynak 4]",
       "ground_truth": "Katalogda yazılım çözümleri, danışmanlık hizmetleri ve eğitim paketleri yer almaktadır.",
       "relevant_doc": "urun_katalogu.txt",
       "retrieved_docs": [
@@ -82,7 +82,7 @@
     },
     {
       "question": "Müşteri hizmetlerine nasıl ulaşabilirim?",
-      "answer": "<think>\n\n</think>\n\nMüşteri hizmetlerine aşağıdaki kanallar aracılığıyla ulaşabilirsiniz:  \n- Telefon: 0850 123 45 67 (Hafta içi 09:00-18:00)  \n- E-posta: destek@techvizyon.com.tr (24 saat içinde yanıt)  \n- Canlı destek: Web sitemizin sağ alt köşesindeki sohbet balonu (Hafta içi 09:00-20:00)  \n- Destek portalı: destek.techvizyon.com.tr (7/24 bilet sistemi)  \n\n[Kaynak 1]",
+      "answer": "Müşteri hizmetlerine aşağıdaki kanallar aracılığıyla ulaşabilirsiniz:  \n- Telefon: 0850 123 45 67 (Hafta içi 09:00-18:00)  \n- E-posta: destek@techvizyon.com.tr (24 saat içinde yanıt)  \n- Canlı destek: Web sitemizin sağ alt köşesindeki sohbet balonu (Hafta içi 09:00-20:00)  \n- Destek portalı: destek.techvizyon.com.tr (7/24 bilet sistemi)  \n\n[Kaynak 1]",
       "ground_truth": "Müşteri hizmetleri telefon, e-posta ve canlı destek kanalları üzerinden ulaşılabilir.",
       "relevant_doc": "musteri_hizmetleri.txt",
       "retrieved_docs": [

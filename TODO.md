@@ -1,6 +1,6 @@
 # TurkRAG TODO
 
-Last reviewed: 2026-06-17
+Last reviewed: 2026-06-20
 
 ## Requirement analysis
 
@@ -24,7 +24,7 @@ Last reviewed: 2026-06-17
 
 ## Current gaps
 
-- [ ] Generated historical eval artifacts may still contain model scratchpad text; newly generated artifacts are cleaned, but old committed artifacts were not rewritten.
+- [x] Generated historical eval artifacts no longer contain model scratchpad text; shared sanitization now covers new eval outputs and the committed artifacts were rewritten.
 
 ## Deferred work
 

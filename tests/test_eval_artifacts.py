@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 from unittest.mock import patch
 
 from eval.ragas_eval import run_eval
@@ -65,3 +66,21 @@ def test_plot_results_loads_matching_mode_json_for_latency(tmp_path):
 
     assert {entry["retrieval_mode"] for entry in loaded} == {"hybrid", "dense"}
     assert latency_series == {"dense": [9.0], "hybrid": [12.5, 18.0]}
+
+
+def test_committed_eval_artifacts_do_not_contain_scratchpad_text():
+    root = Path(__file__).resolve().parent.parent
+    artifact_paths = [
+        root / "eval" / "eval_set_generated.csv",
+        root / "results" / "retrieval_metrics_47q.json",
+        root / "results" / "20260522_132834_sparse.json",
+        root / "results" / "20260522_132834_dense.json",
+        root / "results" / "20260522_132834_hybrid.json",
+        root / "results" / "20260522_132834_hybrid_rerank.json",
+    ]
+
+    for path in artifact_paths:
+        contents = path.read_text(encoding="utf-8")
+        lowered = contents.lower()
+        assert "<think>" not in contents, f"scratchpad tag found in {path.name}"
+        assert "okay, let's see." not in lowered, f"reasoning preamble found in {path.name}"

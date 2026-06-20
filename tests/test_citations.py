@@ -1,6 +1,6 @@
-"""Tests for citation extraction and think-tag stripping."""
+"""Tests for citation extraction and model-output sanitizing."""
 
-from generation.citations import extract_citations, strip_think_tags
+from generation.citations import clean_model_artifact_text, extract_citations, strip_think_tags
 
 
 def _chunk(i, filename="doc.pdf", text="chunk text"):
@@ -29,6 +29,19 @@ class TestStripThinkTags:
     def test_strips_leading_whitespace_after_removal(self):
         result = strip_think_tags("<think>x</think>   answer")
         assert result == "answer"
+
+
+class TestCleanModelArtifactText:
+    def test_removes_residual_reasoning_lines(self):
+        raw = (
+            "<think>internal</think>\n"
+            "Okay, let's see. The user wants two questions.\n"
+            "Asıl içerik burada.\n"
+        )
+        assert clean_model_artifact_text(raw) == "Asıl içerik burada."
+
+    def test_preserves_normal_text(self):
+        assert clean_model_artifact_text("Normal yanıt.") == "Normal yanıt."
 
 
 class TestExtractCitations:

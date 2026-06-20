@@ -25,14 +25,9 @@ logger = logging.getLogger(__name__)
 
 def _clean_generated_text(text: str) -> str:
     """Remove model scratchpad/reasoning residue from generated eval artifacts."""
-    import re
+    from generation.citations import clean_model_artifact_text
 
-    from generation.citations import strip_think_tags
-
-    cleaned = strip_think_tags(text)
-    cleaned = re.sub(r"(?is)<think>.*?(</think>|$)", "", cleaned)
-    cleaned = re.sub(r"(?im)^(okay|let me|first,|the text|so,).*$", "", cleaned)
-    return cleaned.strip()
+    return clean_model_artifact_text(text)
 
 
 def load_chunks_from_bm25(tenant_slug: str) -> list[dict]:

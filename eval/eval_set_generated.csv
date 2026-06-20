@@ -1,230 +1,92 @@
 question,ground_truth,relevant_doc,doc_id,chunk_index,source_text,verified
-<think>,"<think>
-Okay, let's see. The user provided a text in Turkish about customer service FAQs and a question. The task is to answer the question based solely on the information in the text. The user hasn't specified the question yet, but looking at the example, maybe the question is about returning products.
-
-Wait, the text mentions that returns are possible within 30 days from the delivery date, the product must be in original packaging, unused, and with the invoice. Also, they need to inform customer service via email at iade@techvizyon.com.tr, and they'll respond within 1 business day. 
-
-So if the question is ""How can I return a product?"" the answer should include the 30-day period",musteri_hizmetleri.txt,8d599f56-b636-480b-ba4b-3ae787806e53,0,"MÜŞTERİ HİZMETLERİ SIKÇA SORULAN SORULAR (SSS)
+,,musteri_hizmetleri.txt,8d599f56-b636-480b-ba4b-3ae787806e53,0,"MÜŞTERİ HİZMETLERİ SIKÇA SORULAN SORULAR (SSS)
 Son güncelleme: Mart 2024 S: Ürünleri nasıl iade edebilirim C: Satın aldığınız ürünleri, teslim tarihinden itibaren 30 gün içinde iade edebilirsiniz İade",False
-"Okay, let's see. The user provided a text about customer service FAQs, specifically about returning products. They want two questions generated from this text. The questions need to be in Turkish and directly answerable from the text.","<think>
-Okay, let's see. The user provided a text about customer service FAQs, specifically about returning products. They want two questions generated from this text. The questions need to be in Turkish and directly answerable from the text.
-
-First, I need to understand the content of the text. The text is in Turkish and talks about the return policy. The key points are: products can be returned within 30 days from the delivery date, they must be in original packaging, unused, and with the invoice. The customer needs to inform the customer service via email (iade@techvizyon.com.tr), and they'll respond within 1 business day.
-
-So, possible questions could be about the return period, the required conditions for return",musteri_hizmetleri.txt,8d599f56-b636-480b-ba4b-3ae787806e53,0,"MÜŞTERİ HİZMETLERİ SIKÇA SORULAN SORULAR (SSS)
+,,musteri_hizmetleri.txt,8d599f56-b636-480b-ba4b-3ae787806e53,0,"MÜŞTERİ HİZMETLERİ SIKÇA SORULAN SORULAR (SSS)
 Son güncelleme: Mart 2024 S: Ürünleri nasıl iade edebilirim C: Satın aldığınız ürünleri, teslim tarihinden itibaren 30 gün içinde iade edebilirsiniz İade",False
-Müşteri hizmetlerine hangi kanallar aracılığıyla ulaşıl,"<think>
-Okay, let's see. The user provided a text in Turkish and a question. The task is to answer the question based solely on the information in the text. The question is asking about the channels through which customer service can be reached.
-
-First, I need to read the text carefully. The text starts with a customer asking how to reach customer service, and the answer lists several channels. Let me break down the answer part.
-
-The answer mentions four channels: 
-1. Telefon: 0850 123 45 67, available weekdays from 09:00-18:00.
-2. E-posta: destek@techvizyon.com.tr, with a 2",musteri_hizmetleri.txt,8d599f56-b636-480b-ba4b-3ae787806e53,1,"S: Müşteri hizmetlerine nasıl ulaşabilirim C: Müşteri hizmetlerimize aşağıdaki kanallar aracılığıyla ulaşabilirsiniz:
+Müşteri hizmetlerine hangi kanallar aracılığıyla ulaşıl,,musteri_hizmetleri.txt,8d599f56-b636-480b-ba4b-3ae787806e53,1,"S: Müşteri hizmetlerine nasıl ulaşabilirim C: Müşteri hizmetlerimize aşağıdaki kanallar aracılığıyla ulaşabilirsiniz:
 - Telefon: 0850 123 45 67 (Hafta içi 09:00-18:00)
 - E-posta: destek@techvizyon.com",False
-<think>,"<think>
-Okay, the user provided a text in Turkish and a question. The task is to answer the question based solely on the information in the text. Let me first understand the text.
-
-The text is a customer support response. The first part talks about license renewal dates. It mentions that customers can check their renewal date through their customer panel or annual reminder emails. There's an automatic reminder 30 days before the license expires, and expired licenses are put on hold after 15 days of use.
-
-Then, the question is about what information is needed for technical support. The answer lists four items: customer number (found on the invoice or customer panel), product name and version, when the issue started, and a screenshot of the error message",musteri_hizmetleri.txt,8d599f56-b636-480b-ba4b-3ae787806e53,2,C: Lisans yenileme tarihinizi müşteri panelinizden veya size gönderilen yıllık hatırlatma e-postasından takip edebilirsiniz Lisans süresi dolmadan 30 gün önce otomatik hatırlatma gönderilir Süresi dol,False
-"Okay, let's see. The user provided a text in Turkish and wants two questions generated from it. The questions should be in Turkish, directly answerable from the text, and without any numbers or explanations.","<think>
-Okay, the user wants me to generate two questions based on the given Turkish text. Let me first understand the text.
-
-The text is a customer support response. It has two parts: one about license renewal and another about technical support requirements. 
-
-First part: License renewal details. It mentions that users can check their renewal date via the customer panel or annual reminder email. A reminder is sent 30 days before expiration, and licenses are suspended 15 days after expiration.
-
-Second part: Technical support needs. They need to prepare customer number (from invoice or panel), product name and version, when the issue started, and a screenshot of the error message.
-
-Now, the user wants two questions in Turkish, each answerable directly from",musteri_hizmetleri.txt,8d599f56-b636-480b-ba4b-3ae787806e53,2,C: Lisans yenileme tarihinizi müşteri panelinizden veya size gönderilen yıllık hatırlatma e-postasından takip edebilirsiniz Lisans süresi dolmadan 30 gün önce otomatik hatırlatma gönderilir Süresi dol,False
-<think>,"<think>
-Okay, let's see. The user provided a text and a question. The task is to answer the question based solely on the information in the text. The text is in Turkish, so I need to make sure I understand it correctly.
-
-First, the text mentions that to get a quote, you can email sales@techvizyon.com.tr or call the sales team at 0850 123 45 67, extension 2. Then there's a question and answer section. The question is about data privacy, and the answer states that all personal data processed in their system is protected under the KVKK (which is Turkey's Personal Data Protection Law, numbered 6698). It also",musteri_hizmetleri.txt,8d599f56-b636-480b-ba4b-3ae787806e53,3,Teklif almak için satis@techvizyon.com.tr adresine e-posta gönderebilir ya da satış ekibimizi (0850 123 45 67 dahili 2) arayabilirsiniz. S: Veri gizliliğim nasıl korunuyor C: Sistemimizde işlenen tüm ,False
-"Okay, let's see. The user provided a text in Turkish and wants two direct questions based on it. The text is about contacting for a quote, data privacy, and a free trial.","<think>
-Okay, let's see. The user provided a text in Turkish and wants two direct questions based on it. The text is about contacting for a quote, data privacy, and a free trial. 
-
-First, I need to understand the content of the text. The text mentions that you can contact via email or call the sales team. Then there's a question and answer about data privacy, stating that personal data is protected under KVKK, stored in domestic servers, not shared without consent, and how to request deletion or transfer. Then another Q&A about a free trial, offering 14 days free.
-
-So, the user wants two direct questions. The first one should be about how data privacy is ensured. The second could be about",musteri_hizmetleri.txt,8d599f56-b636-480b-ba4b-3ae787806e53,3,Teklif almak için satis@techvizyon.com.tr adresine e-posta gönderebilir ya da satış ekibimizi (0850 123 45 67 dahili 2) arayabilirsiniz. S: Veri gizliliğim nasıl korunuyor C: Sistemimizde işlenen tüm ,False
-<think>,"SORU: Hafta içi standart çalışma saatleri ne zaman?  
+,,musteri_hizmetleri.txt,8d599f56-b636-480b-ba4b-3ae787806e53,2,C: Lisans yenileme tarihinizi müşteri panelinizden veya size gönderilen yıllık hatırlatma e-postasından takip edebilirsiniz Lisans süresi dolmadan 30 gün önce otomatik hatırlatma gönderilir Süresi dol,False
+,,musteri_hizmetleri.txt,8d599f56-b636-480b-ba4b-3ae787806e53,2,C: Lisans yenileme tarihinizi müşteri panelinizden veya size gönderilen yıllık hatırlatma e-postasından takip edebilirsiniz Lisans süresi dolmadan 30 gün önce otomatik hatırlatma gönderilir Süresi dol,False
+,,musteri_hizmetleri.txt,8d599f56-b636-480b-ba4b-3ae787806e53,3,Teklif almak için satis@techvizyon.com.tr adresine e-posta gönderebilir ya da satış ekibimizi (0850 123 45 67 dahili 2) arayabilirsiniz. S: Veri gizliliğim nasıl korunuyor C: Sistemimizde işlenen tüm,False
+,,musteri_hizmetleri.txt,8d599f56-b636-480b-ba4b-3ae787806e53,3,Teklif almak için satis@techvizyon.com.tr adresine e-posta gönderebilir ya da satış ekibimizi (0850 123 45 67 dahili 2) arayabilirsiniz. S: Veri gizliliğim nasıl korunuyor C: Sistemimizde işlenen tüm,False
+,"SORU: Hafta içi standart çalışma saatleri ne zaman?  
 CEVAP: Hafta içi standart çalışma saatleri 09:00-18:00 arasındadır.",sirket_politikasi.txt,054df054-08c3-4ded-9d10-841db81e2a39,0,"ŞIRKET ÇALIŞMA POLİTİKASI
 Versiyon 2.1 — Ocak 2024 1. ÇALIŞMA SAATLERİ Şirketimizde standart çalışma saatleri hafta içi 09:00-18:00 arasındadır Öğle arası 12:00-13:00 saatleri arasında kullanılmaktadı",False
-"Okay, the user provided a text about a company's work policy and wants two direct questions based on it. Let me read through the text carefully.","<think>
-Okay, the user provided a text about a company's work policy and wants two direct questions based on it. Let me read through the text carefully. The text is in Turkish, so I need to make sure I understand the key points. 
-
-First, the text mentions standard working hours from 09:00 to 18:00 on weekdays, with a lunch break from 12:00 to 13:00. There's also a flexible start time from 08:00 to 10:00 with manager approval. Overtime is limited to 20 hours monthly and requires prior approval, with a 50% premium. Then, remote work allows up to",sirket_politikasi.txt,054df054-08c3-4ded-9d10-841db81e2a39,0,"ŞIRKET ÇALIŞMA POLİTİKASI
+,,sirket_politikasi.txt,054df054-08c3-4ded-9d10-841db81e2a39,0,"ŞIRKET ÇALIŞMA POLİTİKASI
 Versiyon 2.1 — Ocak 2024 1. ÇALIŞMA SAATLERİ Şirketimizde standart çalışma saatleri hafta içi 09:00-18:00 arasındadır Öğle arası 12:00-13:00 saatleri arasında kullanılmaktadı",False
-<think>,"SORU: Uzaktan çalışma izni ne durumlarda askıya alınabilir?  
+,"SORU: Uzaktan çalışma izni ne durumlarda askıya alınabilir?  
 CEVAP: Uzaktan çalışma hakkını kötüye kullanan veya verimliliği düşen çalışanların uzaktan çalışma izni, yönetim tarafından askıya alınabilir.",sirket_politikasi.txt,054df054-08c3-4ded-9d10-841db81e2a39,1,Bu haktan yararlanmak için ilgili birim yöneticisinden yazılı onay alınması zorunludur Uzaktan çalışma günlerinde çalışanların şirket VPN'ine bağlı olması ve anlık mesajlaşma sistemleri üzerinden eriş,False
-"Okay, let's see. The user provided a text in Turkish about remote work policies and annual leave. They want two direct questions based on the text. First, I need to understand the main points of the text.","<think>
-Okay, let's see. The user provided a text in Turkish about remote work policies and annual leave. They want two direct questions based on the text. First, I need to understand the main points of the text.
-
-The text mentions that to benefit from remote work, written approval from the relevant department manager is required. Employees must be connected to the company's VPN and available via instant messaging during remote work days. They must follow work safety protocols, and sensitive documents can't be stored on personal devices. If someone misuses the remote work privilege or their productivity drops, the management can suspend their remote work permit. Then there's a section about annual leave rights, stating that the annual paid leave is determined based on tenure, and for those",sirket_politikasi.txt,054df054-08c3-4ded-9d10-841db81e2a39,1,Bu haktan yararlanmak için ilgili birim yöneticisinden yazılı onay alınması zorunludur Uzaktan çalışma günlerinde çalışanların şirket VPN'ine bağlı olması ve anlık mesajlaşma sistemleri üzerinden eriş,False
-<think>,"SORU: İzin talepleri ne kadar önceden iletilmelidir?  
-CEVAP: İzin talepleri en az iki (2) hafta öncesinde yöneticiye iletilmelidir.",sirket_politikasi.txt,054df054-08c3-4ded-9d10-841db81e2a39,2,İzin taleplerinin en az iki (2) hafta öncesinde yöneticiye iletilmesi gerekmektedir İzin günleri yıl sonuna taşınamaz; yılsonuna kadar kullanılmayan izinler yasal mevzuat kapsamında ücretlendirilerek ,False
-"Okay, let's see. The user provided a text about leave requests and dress code rules. They want two questions in Turkish that can be directly answered from the text.","<think>
-Okay, the user wants two questions in Turkish that can be answered based on the given text. Let me first understand the text thoroughly.
-
-The text mentions that leave requests must be submitted at least two weeks in advance. Leave days cannot be carried over to the next year; unused leaves are removed according to legal regulations. For sick leave, a doctor's report must be submitted to HR from the first day. Up to 5 days of sick leave can be used without a doctor's note. Then there's the dress code: Monday-Thursday require formal attire, Friday is smart casual. On days with customer visits, formal attire is required regardless of the day.
-
-So, possible questions could be about the leave request deadline, the consequences of unused",sirket_politikasi.txt,054df054-08c3-4ded-9d10-841db81e2a39,2,İzin taleplerinin en az iki (2) hafta öncesinde yöneticiye iletilmesi gerekmektedir İzin günleri yıl sonuna taşınamaz; yılsonuna kadar kullanılmayan izinler yasal mevzuat kapsamında ücretlendirilerek ,False
-<think>,"SORU: Şirket bilgisayarları hangi amaçlar için kullanılmalıdır?  
+,,sirket_politikasi.txt,054df054-08c3-4ded-9d10-841db81e2a39,1,Bu haktan yararlanmak için ilgili birim yöneticisinden yazılı onay alınması zorunludur Uzaktan çalışma günlerinde çalışanların şirket VPN'ine bağlı olması ve anlık mesajlaşma sistemleri üzerinden eriş,False
+,"SORU: İzin talepleri ne kadar önceden iletilmelidir?  
+CEVAP: İzin talepleri en az iki (2) hafta öncesinde yöneticiye iletilmelidir.",sirket_politikasi.txt,054df054-08c3-4ded-9d10-841db81e2a39,2,İzin taleplerinin en az iki (2) hafta öncesinde yöneticiye iletilmesi gerekmektedir İzin günleri yıl sonuna taşınamaz; yılsonuna kadar kullanılmayan izinler yasal mevzuat kapsamında ücretlendirilerek,False
+,,sirket_politikasi.txt,054df054-08c3-4ded-9d10-841db81e2a39,2,İzin taleplerinin en az iki (2) hafta öncesinde yöneticiye iletilmesi gerekmektedir İzin günleri yıl sonuna taşınamaz; yılsonuna kadar kullanılmayan izinler yasal mevzuat kapsamında ücretlendirilerek,False
+,"SORU: Şirket bilgisayarları hangi amaçlar için kullanılmalıdır?  
 CEVAP: Şirket bilgisayarları yalnızca iş amaçlı kullanılmalıdır.",sirket_politikasi.txt,054df054-08c3-4ded-9d10-841db81e2a39,3,Şirket bilgisayarları yalnızca iş amaçlı kullanılmalıdır Kişisel verilerin işlenmesinde KVKK (Kişisel Verilerin Korunması Kanunu) hükümlerine uyulması zorunludur İhlaller disiplin sürecine tabidir.,False
-"Okay, the user provided a text in Turkish and wants two questions generated from it. Let me read the text carefully.","<think>
-Okay, the user provided a text in Turkish and wants two questions generated from it. Let me read the text carefully. The text mentions that company computers should only be used for business purposes, that personal data processing must comply with the KVKK (Personal Data Protection Law), and that violations are subject to disciplinary procedures. 
-
-First, I need to create two questions based on this information. The first question could be about the main rule regarding computer usage. The second might focus on the consequences of violating the data protection law. I should make sure the questions are clear and directly related to the text. Also, the answers should be concise and only use information from the text. Let me check if I missed any key points. The text emphasizes business",sirket_politikasi.txt,054df054-08c3-4ded-9d10-841db81e2a39,3,Şirket bilgisayarları yalnızca iş amaçlı kullanılmalıdır Kişisel verilerin işlenmesinde KVKK (Kişisel Verilerin Korunması Kanunu) hükümlerine uyulması zorunludur İhlaller disiplin sürecine tabidir.,False
-<think>,"<think>
-Okay, let's see. The user provided a text about a product catalog from TechVizyon Yazılım Çözümleri A.Ş. for 2024. The text lists three software packages: ERP Pro, CRM Suite, and Analitik Dashboard. Each has details like target audience, features, and pricing.
-
-The user's question is in Turkish, but it's cut off. The original instruction says to answer based on the text, using only the information given. Since the question isn't fully visible, maybe it's about the pricing or features. Let me check the text again.
-
-The ERP Pro starts at 2,500 TL/month + VAT. CRM Suite starts at 1,",urun_katalogu.txt,27ec4f6f-f43a-4219-ab19-178e09b2d18f,0,"ÜRÜN KATALOĞU 2024
+,,sirket_politikasi.txt,054df054-08c3-4ded-9d10-841db81e2a39,3,Şirket bilgisayarları yalnızca iş amaçlı kullanılmalıdır Kişisel verilerin işlenmesinde KVKK (Kişisel Verilerin Korunması Kanunu) hükümlerine uyulması zorunludur İhlaller disiplin sürecine tabidir.,False
+,,urun_katalogu.txt,27ec4f6f-f43a-4219-ab19-178e09b2d18f,0,"ÜRÜN KATALOĞU 2024
 TechVizyon Yazılım Çözümleri A.Ş. 1. KURUMSAL YAZILIM PAKETLERI TechVizyon ERP Pro
 Küçük ve orta ölçekli işletmeler için tasarlanmış entegre iş yönetim sistemi Finans, stok, satış v",False
-"Okay, let's see. The user provided a text about a product catalog from TechVizyon Yazılım Çözümleri A.Ş. They want two questions that can be directly answered from the text. The questions need to be in Turkish, and I should just list them without any numbers or explanations.","<think>
-Okay, let's see. The user wants two questions based on the given text. The text is about a product catalog from TechVizyon Yazılım Çözümleri A.Ş. The first question should be about the price of the TechVizyon ERP Pro. The text mentions that the monthly license fee starts at 2,500 TL plus VAT. So the first question could be asking for the starting price of the ERP Pro.
-
-The second question needs to be about the features of the TechVizyon CRM Suite. The text lists features like sales funnel management, customer segmentation, email marketing integration, and real-time reporting. So the second question could ask which features are included in the CRM Suite.",urun_katalogu.txt,27ec4f6f-f43a-4219-ab19-178e09b2d18f,0,"ÜRÜN KATALOĞU 2024
+,,urun_katalogu.txt,27ec4f6f-f43a-4219-ab19-178e09b2d18f,0,"ÜRÜN KATALOĞU 2024
 TechVizyon Yazılım Çözümleri A.Ş. 1. KURUMSAL YAZILIM PAKETLERI TechVizyon ERP Pro
 Küçük ve orta ölçekli işletmeler için tasarlanmış entegre iş yönetim sistemi Finans, stok, satış v",False
-<think>,"Metinde yer alan bilgilere göre, ""Özelleştirilebilir panolar ve otomatik rapor üretimi"" hizmeti kullanıcı başına aylık 400 TL + KDV fiyatlandırılmaktadır.",urun_katalogu.txt,27ec4f6f-f43a-4219-ab19-178e09b2d18f,1,"Özelleştirilebilir panolar ve otomatik rapor üretimi sunar Fiyat: kullanıcı başına 400 TL/ay + KDV. 2. DANIŞMANLIK HİZMETLERİ Dijital Dönüşüm Danışmanlığı
+,"Metinde yer alan bilgilere göre, ""Özelleştirilebilir panolar ve otomatik rapor üretimi"" hizmeti kullanıcı başına aylık 400 TL + KDV fiyatlandırılmaktadır.",urun_katalogu.txt,27ec4f6f-f43a-4219-ab19-178e09b2d18f,1,"Özelleştirilebilir panolar ve otomatik rapor üretimi sunar Fiyat: kullanıcı başına 400 TL/ay + KDV. 2. DANIŞMANLIK HİZMETLERİ Dijital Dönüşüm Danışmanlığı
 Şirketinizin dijital olgunluk seviyesini anal",False
-"Okay, let's see. The user provided a text in Turkish about various services, and they want two questions that can be directly answered from the text. The questions need to be in Turkish, just the questions, no numbers or explanations.","<think>
-Okay, let's see. The user provided a text in Turkish about various services, and they want two questions that can be directly answered from the text. The questions need to be in Turkish, just the questions, no numbers or explanations.
-
-First, I need to understand the text. The text lists different services with their details. Let me break it down:
-
-1. Özelleştirilebilir panolar ve otomatik rapor üretimi: Fiyat 400 TL/ay + KDV per user.
-2. 2. DANIŞMANLIK HİZMETLERİ: Dijital Dönüşüm Danışmanlığı. Analyzes digital maturity, determines priority areas. Project duration 4-12",urun_katalogu.txt,27ec4f6f-f43a-4219-ab19-178e09b2d18f,1,"Özelleştirilebilir panolar ve otomatik rapor üretimi sunar Fiyat: kullanıcı başına 400 TL/ay + KDV. 2. DANIŞMANLIK HİZMETLERİ Dijital Dönüşüm Danışmanlığı
+,,urun_katalogu.txt,27ec4f6f-f43a-4219-ab19-178e09b2d18f,1,"Özelleştirilebilir panolar ve otomatik rapor üretimi sunar Fiyat: kullanıcı başına 400 TL/ay + KDV. 2. DANIŞMANLIK HİZMETLERİ Dijital Dönüşüm Danışmanlığı
 Şirketinizin dijital olgunluk seviyesini anal",False
-<think>,"SORU: Veri Analitiği Bootcamp programının katılımcı başına ücreti nedir?  
+,"SORU: Veri Analitiği Bootcamp programının katılımcı başına ücreti nedir?  
 CEVAP: Katılımcı başına 2.000 TL + KDV.",urun_katalogu.txt,27ec4f6f-f43a-4219-ab19-178e09b2d18f,2,"Eğitimler online veya yerinde gerçekleştirilebilir Grup eğitimi (maks. 10 kişi): 5.000 TL + KDV / tam gün. Veri Analitiği Bootcamp
 3 günlük yoğun eğitim programı Python, SQL ve Power BI araçlarıyla iş",False
-"Okay, let's see. The user provided a text in Turkish and wants two questions generated directly from it. The questions need to be in Turkish, just the questions without any numbers or explanations.","<think>
-Okay, let's see. The user provided a text in Turkish and wants two questions generated directly from it. The questions need to be in Turkish, just the questions without any numbers or explanations.
-
-First, I need to understand the text. The text is about training programs and support contracts. Let me break it down.
-
-The first part talks about training options: online or in-person. Group training (max 10 people) is 5000 TL + VAT for full-day. Then there's a Data Analytics Bootcamp, a 3-day intensive program teaching Python, SQL, and Power BI for 2000 TL per participant + VAT.
-
-Then there's a section about support and maintenance contracts. Annual maintenance contracts",urun_katalogu.txt,27ec4f6f-f43a-4219-ab19-178e09b2d18f,2,"Eğitimler online veya yerinde gerçekleştirilebilir Grup eğitimi (maks. 10 kişi): 5.000 TL + KDV / tam gün. Veri Analitiği Bootcamp
+,,urun_katalogu.txt,27ec4f6f-f43a-4219-ab19-178e09b2d18f,2,"Eğitimler online veya yerinde gerçekleştirilebilir Grup eğitimi (maks. 10 kişi): 5.000 TL + KDV / tam gün. Veri Analitiği Bootcamp
 3 günlük yoğun eğitim programı Python, SQL ve Power BI araçlarıyla iş",False
-<think>,"SORU: Bu rehberin hangi birimleri kapsadığını belirtin.  
+,"SORU: Bu rehberin hangi birimleri kapsadığını belirtin.  
 CEVAP: Rehber, yazılım geliştirme, müşteri destek, satış, insan kaynakları, pazarlama, finans ve yönetim birimlerini kapsar.",bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,0,"BİLGİ GÜVENLİĞİ VE YAPAY ZEKÂ KULLANIM REHBERİ
 TechVizyon Yazılım Çözümleri A.Ş Versiyon 1.0 — Mayıs 2026 1. AMAÇ VE KAPSAM Bu rehber, şirket çalışanlarının bilgi güvenliği kurallarına uygun hareket e",False
-"Okay, let's see. The user provided a text in Turkish about a guide on information security and AI usage. They want two direct questions based on the text. First, I need to understand the content of the text. The text is the introduction of a guide by TechVizyon Yazılım Çözümleri A.Ş, version 1.0 from May 2026. The purpose is to ensure employees follow information security rules and use AI tools safely and responsibly. It covers all departments like software development, customer support, sales, HR, marketing, finance, and management. The rules include company data, customer info, source codes, trade secrets, financial documents, contracts, and technical documents.","<think>
-Okay, let's see. The user provided a text in Turkish about a guide on information security and AI usage. They want two direct questions based on the text. First, I need to understand the content of the text. The text is the introduction of a guide by TechVizyon Yazılım Çözümleri A.Ş, version 1.0 from May 2026. The purpose is to ensure employees follow information security rules and use AI tools safely and responsibly. It covers all departments like software development, customer support, sales, HR, marketing, finance, and management. The rules include company data, customer info, source codes, trade secrets, financial documents, contracts, and technical documents.
-
-Now",bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,0,"BİLGİ GÜVENLİĞİ VE YAPAY ZEKÂ KULLANIM REHBERİ
+,,bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,0,"BİLGİ GÜVENLİĞİ VE YAPAY ZEKÂ KULLANIM REHBERİ
 TechVizyon Yazılım Çözümleri A.Ş Versiyon 1.0 — Mayıs 2026 1. AMAÇ VE KAPSAM Bu rehber, şirket çalışanlarının bilgi güvenliği kurallarına uygun hareket e",False
-<think>,"<think>
-Okay, let's see. The user provided a text about information security principles and a question. The task is to answer the question based solely on the information given in the text. The user hasn't actually asked a question yet; the last line is just ""SORU: "" which means ""Question: "" in Turkish. Maybe there was a mistake in the input, and the question didn't get pasted properly.
-
-Wait, looking back, the user's message starts with ""METİN:"" followed by the text, then ""SORU: "" but no actual question. So perhaps the user intended to include a question but forgot. In that case, I should point out that there's no question provided. However, maybe the user is",bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,1,"2. BİLGİ GÜVENLİĞİ TEMEL İLKELERİ Şirket içerisinde üretilen, saklanan veya işlenen tüm bilgiler kurumsal varlık olarak kabul edilir Çalışanlar bu bilgileri yalnızca görev tanımları kapsamında ve yetk",False
-"Okay, let's tackle this. The user provided a text about information security principles and wants two questions based on it. First, I need to understand the main points of the text. The text mentions that all information within the company is considered corporate assets. Employees can only use this information within their job roles and with their permissions. The key principles are confidentiality, integrity, availability, and accountability.","<think>
-Okay, let's see. The user wants me to generate two questions based on the provided text about information security principles. First, I need to make sure I understand the text thoroughly. The text outlines four main principles: confidentiality, integrity, availability, and accountability. It also mentions that all information within the company is considered corporate assets, and employees can only use them within their job roles and with their permissions.
-
-So, the first question could be about the main principles mentioned. The second question might focus on the restrictions on employee access. Let me check if there are other key points. The text also talks about ensuring access to systems for business processes and recording operations in critical systems. Maybe another question could be about the requirement for secure access.",bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,1,"2. BİLGİ GÜVENLİĞİ TEMEL İLKELERİ Şirket içerisinde üretilen, saklanan veya işlenen tüm bilgiler kurumsal varlık olarak kabul edilir Çalışanlar bu bilgileri yalnızca görev tanımları kapsamında ve yetk",False
-<think>,"SORU: Parolaların hangi karakterler içermesi gerekiyor?  
+,,bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,1,"2. BİLGİ GÜVENLİĞİ TEMEL İLKELERİ Şirket içerisinde üretilen, saklanan veya işlenen tüm bilgiler kurumsal varlık olarak kabul edilir Çalışanlar bu bilgileri yalnızca görev tanımları kapsamında ve yetk",False
+,,bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,1,"2. BİLGİ GÜVENLİĞİ TEMEL İLKELERİ Şirket içerisinde üretilen, saklanan veya işlenen tüm bilgiler kurumsal varlık olarak kabul edilir Çalışanlar bu bilgileri yalnızca görev tanımları kapsamında ve yetk",False
+,"SORU: Parolaların hangi karakterler içermesi gerekiyor?  
 CEVAP: Parolalar en az 12 karakterden oluşmalı; büyük harf, küçük harf, rakam ve özel karakter içermelidir.",bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,2,"Parolalar en az 12 karakterden oluşmalı; büyük harf, küçük harf, rakam ve özel karakter içermelidir. Aşağıdaki kurallara uyulması zorunludur:
 - Parolalar e-posta, mesajlaşma uygulaması veya not defter",False
-"Okay, let's see. The user provided a text about password policies and some rules. They want two questions that can be directly answered from the text. The questions need to be in Turkish, no numbers or explanations, just the questions on separate lines.","<think>
-Okay, the user wants two questions based on the given text. Let me read through the text again to make sure I understand all the points.
-
-The text starts with password requirements: at least 12 characters, including uppercase, lowercase, numbers, and special characters. Then there are several rules. The first rule is not sharing passwords via email, messaging apps, or note apps. The second is not reusing the same password across multiple systems. Third, critical systems must have multi-factor authentication. Fourth, if there's a suspicious login attempt, report to IT within an hour. Lastly, when employees leave, their system access is closed the same day.
-
-So, possible questions could be about the password requirements, the rules for sharing passwords",bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,2,"Parolalar en az 12 karakterden oluşmalı; büyük harf, küçük harf, rakam ve özel karakter içermelidir. Aşağıdaki kurallara uyulması zorunludur:
+,,bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,2,"Parolalar en az 12 karakterden oluşmalı; büyük harf, küçük harf, rakam ve özel karakter içermelidir. Aşağıdaki kurallara uyulması zorunludur:
 - Parolalar e-posta, mesajlaşma uygulaması veya not defter",False
-<think>,"SORU: Yapay zekâ araçlarına girilmemesi gereken bilgiler nelerdir?  
+,"SORU: Yapay zekâ araçlarına girilmemesi gereken bilgiler nelerdir?  
 CEVAP: Yapay zekâ araçlarına girilmemesi gereken bilgiler şunlardır: müşteri kişisel verileri, kimlik",bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,3,"Ancak bu araçlara girilen verilerin niteliği dikkatle değerlendirilmelidir. Yapay zekâ araçlarına kesinlikle girilmemesi gereken bilgiler şunlardır:
 - Müşterilere ait kişisel veriler
-- Kimlik, adres, ",False
-"Okay, let's see. The user provided a text about what information should not be input into AI systems. They want two questions in Turkish that can be directly answered from the text.","<think>
-Okay, the user wants two questions in Turkish that can be directly answered from the given text. Let me read the text again to make sure I understand it correctly.
-
-The text lists several types of information that should not be input into AI systems. These include personal customer data, identity details, addresses, phone numbers, email, payment info, company source codes, unpublished product plans, financial statements, contracts, price offers, access keys, API keys, tokens, and passwords. It also mentions that outputs from AI should be checked by the relevant staff before use, especially for technical, legal, financial, or customer-related purposes.
-
-So, the first question could be about which information should not be input into AI systems. The answer would be the",bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,3,"Ancak bu araçlara girilen verilerin niteliği dikkatle değerlendirilmelidir. Yapay zekâ araçlarına kesinlikle girilmemesi gereken bilgiler şunlardır:
+- Kimlik, adres,",False
+,,bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,3,"Ancak bu araçlara girilen verilerin niteliği dikkatle değerlendirilmelidir. Yapay zekâ araçlarına kesinlikle girilmemesi gereken bilgiler şunlardır:
 - Müşterilere ait kişisel veriler
-- Kimlik, adres, ",False
-<think>,"Metinde yer alan bilgilere göre, kişisel veriler KVKK hükümlerine uygun şekilde korunmalı ve yetkisiz üçüncü taraflarla paylaşılmamalıdır. Müşteri destek süreçlerinde ekran görüntüsü, log kaydı veya hata rap",bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,5,"Kişisel veriler, KVKK hükümlerine uygun şekilde korunmalı ve yetkisiz üçüncü taraflarla paylaşılmamalıdır. Müşteri destek süreçlerinde ekran görüntüsü, log kaydı veya hata raporu paylaşılması gerekiyo",False
-"Okay, the user provided a text in Turkish about data protection under the KVKK (General Data Protection Regulation). They want two direct questions based on the text. Let me read through the text again to make sure I understand the key points.","<think>
-Okay, the user provided a text in Turkish about data protection under the KVKK (General Data Protection Regulation). They want two direct questions based on the text. Let me read through the text again to make sure I understand the key points.
-
-First, the text mentions that personal data must be protected according to KVKK rules and not shared with unauthorized third parties. It also states that when sharing screenshots, logs, or error reports in customer support, personal data should be masked. Examples given include names, emails, phone numbers, IP addresses, and payment details. It also talks about data deletion, correction, or transfer requests being recorded and reported to the KVKK responsible person. Then there's a section about corporate email accounts being used only for",bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,5,"Kişisel veriler, KVKK hükümlerine uygun şekilde korunmalı ve yetkisiz üçüncü taraflarla paylaşılmamalıdır. Müşteri destek süreçlerinde ekran görüntüsü, log kaydı veya hata raporu paylaşılması gerekiyo",False
-<think>,"<think>
-Okay, let's tackle this. The user provided a text in Turkish about data security policies and a question that's cut off. The task is to answer the question based solely on the given text. First, I need to understand the text.
-
-The text mentions that sharing company data via personal cloud accounts, USB drives, or unauthorized file transfer services is prohibited. When sharing with external parties, certain controls must be in place: verifying the recipient's address, checking file sharing permissions, applying password protection if needed, and preferring time-limited access links. Then there's a section about device and remote access security, stating that company computers must have up-to-date antivirus, firewall, and OS patches. Employees can't lend company devices to third parties",bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,6,"Kişisel bulut hesapları, USB bellekler veya yetkisiz dosya aktarım servisleri üzerinden şirket verisi paylaşılması yasaktır. Dış paydaşlarla dosya paylaşılırken aşağıdaki kontroller yapılmalıdır:
+- Kimlik, adres,",False
+,"Metinde yer alan bilgilere göre, kişisel veriler KVKK hükümlerine uygun şekilde korunmalı ve yetkisiz üçüncü taraflarla paylaşılmamalıdır. Müşteri destek süreçlerinde ekran görüntüsü, log kaydı veya hata rap",bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,5,"Kişisel veriler, KVKK hükümlerine uygun şekilde korunmalı ve yetkisiz üçüncü taraflarla paylaşılmamalıdır. Müşteri destek süreçlerinde ekran görüntüsü, log kaydı veya hata raporu paylaşılması gerekiyo",False
+,,bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,5,"Kişisel veriler, KVKK hükümlerine uygun şekilde korunmalı ve yetkisiz üçüncü taraflarla paylaşılmamalıdır. Müşteri destek süreçlerinde ekran görüntüsü, log kaydı veya hata raporu paylaşılması gerekiyo",False
+,,bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,6,"Kişisel bulut hesapları, USB bellekler veya yetkisiz dosya aktarım servisleri üzerinden şirket verisi paylaşılması yasaktır. Dış paydaşlarla dosya paylaşılırken aşağıdaki kontroller yapılmalıdır:
 - Al",False
-"Okay, let's see. The user provided a text about data security policies, specifically regarding sharing company data. They want two questions based on this text. The questions need to be in Turkish and directly answerable from the text.","<think>
-Okay, let's see. The user provided a text about data security policies, specifically regarding sharing company data. They want two questions based on this text. The questions need to be in Turkish and directly answerable from the text.
-
-First, I need to understand the main points of the text. The text mentions that personal cloud accounts, USB drives, or unauthorized file transfer services are prohibited for sharing company data. It also lists controls to be done when sharing files with external parties: verifying the recipient's address, checking the file's sharing permissions, applying password protection if needed, and preferring time-limited access links. Then it talks about device and remote access security, requiring up-to-date antivirus, firewall, and OS patches on company computers.",bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,6,"Kişisel bulut hesapları, USB bellekler veya yetkisiz dosya aktarım servisleri üzerinden şirket verisi paylaşılması yasaktır. Dış paydaşlarla dosya paylaşılırken aşağıdaki kontroller yapılmalıdır:
+,,bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,6,"Kişisel bulut hesapları, USB bellekler veya yetkisiz dosya aktarım servisleri üzerinden şirket verisi paylaşılması yasaktır. Dış paydaşlarla dosya paylaşılırken aşağıdaki kontroller yapılmalıdır:
 - Al",False
-<think>,"<think>
-Okay, let's see. The user provided a text in Turkish about reporting incidents related to information security. The question is in Turkish as well, but it's just ""SORU:"" which means ""Question:"" so maybe the user intended to ask something else but forgot. Wait, looking back, the user's instruction says that after the text, a question will be given, and the assistant should answer based on the text. But in this case, the user hasn't provided the actual question yet. The text is about the incident reporting process, including contact channels and the obligation to report.
-
-Wait, maybe the user made a mistake and didn't include the question. But according to the initial instruction, the user will provide a text and a",bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,7,"Kayıp veya çalıntı cihaz durumunda çalışan, en geç 30 dakika içinde Bilgi Teknolojileri birimine ve yöneticisine haber vermelidir. 9. OLAY BİLDİRİM SÜRECİ Bilgi güvenliği ihlali, şüpheli e-posta, yetk",False
-"Okay, I need to generate two questions based on the given text. Let me read through the text again to understand the key points.","<think>
-Okay, the user wants me to generate two questions based on the provided text. Let me first understand the text thoroughly. The main points are about reporting lost or stolen devices, the 30-minute deadline for informing the IT department and manager, the obligation to report security incidents like phishing emails, unauthorized access, data leaks, or incorrect file sharing immediately. The reporting channels are listed: email, internal phone, emergency line, and support portal. Also, employees are protected from consequences if they report in good faith.
-
-Now, I need to create two questions that can be answered using the text. The first question could be about the deadline for reporting lost or stolen devices. The second might focus on the channels available for reporting security incidents. Let",bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,7,"Kayıp veya çalıntı cihaz durumunda çalışan, en geç 30 dakika içinde Bilgi Teknolojileri birimine ve yöneticisine haber vermelidir. 9. OLAY BİLDİRİM SÜRECİ Bilgi güvenliği ihlali, şüpheli e-posta, yetk",False
-<think>,"<think>
-Okay, let's tackle this. The user provided a text in Turkish and a question, but the question is just ""SORU: 10. EĞİTİM VE FARKINDALIK..."" which seems like it's cut off. Wait, maybe there's a typo or formatting issue. Let me check again.
-
-Looking at the METİN section, it's about education and awareness, mentioning that all employees must attend at least one training per year on information security and AI usage. New employees get orientation with basic security training. High-risk departments like software development, customer support, finance, and HR are included. Then there's section 11 about misuse and discipline, stating that violations can lead to warnings, access restrictions",bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,8,10. EĞİTİM VE FARKINDALIK Tüm çalışanlar yılda en az bir kez bilgi güvenliği ve yapay zekâ kullanımı farkındalık eğitimine katılmakla yükümlüdür Yeni başlayan çalışanlara oryantasyon sürecinde temel g,False
-"Okay, let's tackle this. The user provided a text in Turkish about education and awareness, and they want two questions based on it. First, I need to understand the text thoroughly.","<think>
-Okay, let's see. The user provided a text in Turkish about education and awareness, and they want two questions based on it. First, I need to understand the text thoroughly. The text is about employees being required to attend at least one information security and AI usage awareness training per year. New employees get orientation with basic security training. High-risk departments like software development, customer support, finance, and HR have additional training. Then there's a section about misuse and discipline, where violations can lead to warnings, access restrictions, disciplinary actions, or termination.
-
-So, the user wants two questions based on this text. The first question should be about the mandatory training for employees. The second could be about the consequences of violating the rules.",bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,8,10. EĞİTİM VE FARKINDALIK Tüm çalışanlar yılda en az bir kez bilgi güvenliği ve yapay zekâ kullanımı farkındalık eğitimine katılmakla yükümlüdür Yeni başlayan çalışanlara oryantasyon sürecinde temel g,False
-<think>,"<think>
-Okay, let's see. The user provided a text in Turkish about the validity of a guide. The text says that the guide comes into effect from the date of publication, is reviewed at least once a year by the Information Technology, Human Resources, and Legal units, and is updated when necessary, informing the employees.
-
-The question is in Turkish, but it's just ""SORU:"" which means ""Question:"" So the user probably intended to ask a question related to the text. However, the actual question isn't provided. Maybe there was a mistake in the input. But since the user mentioned that the answer should be based solely on the text and the question is missing, I need to check if there's any hidden question or if",bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,9,"12. YÜRÜRLÜK Bu rehber, yayımlandığı tarih itibarıyla yürürlüğe girer Bilgi Teknolojileri, İnsan Kaynakları ve Hukuk birimleri tarafından yılda en az bir kez gözden geçirilir Gerekli görülen durumlard",False
-"Okay, the user provided a text in Turkish about the validity of a guide. They want two questions generated directly from the text. Let me read the text again carefully.","<think>
-Okay, the user provided a text in Turkish about the validity of a guide. They want two questions generated directly from the text. Let me read the text again carefully.
-
-The text says: ""12. YÜRÜRLÜK Bu rehber, yayımlandığı tarih itibarıyla yürürlüğe girer Bilgi Teknolojileri, İnsan Kaynakları ve Hukuk birimleri tarafından yılda en az bir kez gözden geçirilir Gerekli görülen durumlarda rehber güncellenir ve çalışanlara duyurulur.""
-
-So, the key points here are:
-- The guide becomes effective from the date of publication.
-- It is reviewed",bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,9,"12. YÜRÜRLÜK Bu rehber, yayımlandığı tarih itibarıyla yürürlüğe girer Bilgi Teknolojileri, İnsan Kaynakları ve Hukuk birimleri tarafından yılda en az bir kez gözden geçirilir Gerekli görülen durumlard",False
-<think>,"SORU: Oryantasyon süreci sadece ilk gün bilgilendirmesiyle sınırlı mı?  
+,,bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,7,"Kayıp veya çalıntı cihaz durumunda çalışan, en geç 30 dakika içinde Bilgi Teknolojileri birimine ve yöneticisine haber vermelidir. 9. OLAY BİLDİRİM SÜRECİ Bilgi güvenliği ihlali, şüpheli e-posta, yetk",False
+,,bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,7,"Kayıp veya çalıntı cihaz durumunda çalışan, en geç 30 dakika içinde Bilgi Teknolojileri birimine ve yöneticisine haber vermelidir. 9. OLAY BİLDİRİM SÜRECİ Bilgi güvenliği ihlali, şüpheli e-posta, yetk",False
+,,bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,8,10. EĞİTİM VE FARKINDALIK Tüm çalışanlar yılda en az bir kez bilgi güvenliği ve yapay zekâ kullanımı farkındalık eğitimine katılmakla yükümlüdür Yeni başlayan çalışanlara oryantasyon sürecinde temel g,False
+,,bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,8,10. EĞİTİM VE FARKINDALIK Tüm çalışanlar yılda en az bir kez bilgi güvenliği ve yapay zekâ kullanımı farkındalık eğitimine katılmakla yükümlüdür Yeni başlayan çalışanlara oryantasyon sürecinde temel g,False
+,,bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,9,"12. YÜRÜRLÜK Bu rehber, yayımlandığı tarih itibarıyla yürürlüğe girer Bilgi Teknolojileri, İnsan Kaynakları ve Hukuk birimleri tarafından yılda en az bir kez gözden geçirilir Gerekli görülen durumlard",False
+,,bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt,c709f9a1-ed6f-44ad-bff9-8fb8123d70fc,9,"12. YÜRÜRLÜK Bu rehber, yayımlandığı tarih itibarıyla yürürlüğe girer Bilgi Teknolojileri, İnsan Kaynakları ve Hukuk birimleri tarafından yılda en az bir kez gözden geçirilir Gerekli görülen durumlard",False
+,"SORU: Oryantasyon süreci sadece ilk gün bilgilendirmesiyle sınırlı mı?  
 CEVAP: Hayır, oryantasyon süreci yalnızca ilk gün bilgilendirmesiyle",sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt,a9ac89a4-5bae-490d-9bcd-2d7d01de0aa9,0,"ŞİRKET İÇİ ORYANTASYON VE EĞİTİM SÜRECİ REHBERİ
 TechVizyon Yazılım Çözümleri A.Ş Versiyon 1.0 — Mayıs 2026 1. AMAÇ VE KAPSAM Bu rehber, TechVizyon Yazılım Çözümleri A.Ş. bünyesinde işe yeni başlayan ç",False
-"Okay, the user provided a text in Turkish about a company onboarding and training guide. They want two direct questions based on the text. Let me read through the text again to understand the key points.","<think>
-Okay, the user provided a text in Turkish about a company onboarding and training guide. They want two direct questions based on the text. Let me read through the text again to understand the key points.
-
-The text is titled ""ŞİRKET İÇİ ORYANTASYON VE EĞİTİM SÜRECİ REHBERİ"" which translates to ""Company Internal Orientation and Training Process Guide"" by TechVizyon Yazılım Çözümleri A.Ş, Version 1.0 — May 2026. The first section is ""AMAÇ VE KAPSAM"" (Purpose and Scope), stating that the guide is prepared to help new employees adapt quickly to the company,",sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt,a9ac89a4-5bae-490d-9bcd-2d7d01de0aa9,0,"ŞİRKET İÇİ ORYANTASYON VE EĞİTİM SÜRECİ REHBERİ
+,,sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt,a9ac89a4-5bae-490d-9bcd-2d7d01de0aa9,0,"ŞİRKET İÇİ ORYANTASYON VE EĞİTİM SÜRECİ REHBERİ
 TechVizyon Yazılım Çözümleri A.Ş Versiyon 1.0 — Mayıs 2026 1. AMAÇ VE KAPSAM Bu rehber, TechVizyon Yazılım Çözümleri A.Ş. bünyesinde işe yeni başlayan ç",False
-<think>,"SORU: Oryantasyon sürecinin dört temel aşaması nelerdir?  
+,"SORU: Oryantasyon sürecinin dört temel aşaması nelerdir?  
 CEVAP: Oryantasyon sürecinin dört temel aşaması şunlardır: 1. Ön hazırlık süreci, 2. İlk gün karşılama ve temel bilgilendirme,",sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt,a9ac89a4-5bae-490d-9bcd-2d7d01de0aa9,1,"2. ORYANTASYON SÜRECİNİN AŞAMALARI Oryantasyon süreci dört temel aşamadan oluşur: - Ön hazırlık süreci
 - İlk gün karşılama ve temel bilgilendirme
 - İlk hafta görev ve araç tanıtımı
 - İlk 30 gün gelişi",False
-"Okay, the user provided a text about the stages of the orientation process and wants two questions based on it. Let me read through the text again to make sure I understand the key points.","<think>
-Okay, the user provided a text about the stages of the orientation process and wants two questions based on it. Let me read through the text again to make sure I understand the key points.
-
-The text is in Turkish, so I need to parse that. The first part talks about the four stages of the orientation process: pre-orientation, first day welcome and basic information, first week job and tool introduction, and the first 30 days development and evaluation. It mentions that responsibilities are shared among HR, department manager, and mentor. Then the second part is about the pre-orientation process, listing tasks like setting up a corporate email, defining access to internal communication tools, and necessary software licenses and user rights.
-
-So, the user",sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt,a9ac89a4-5bae-490d-9bcd-2d7d01de0aa9,1,"2. ORYANTASYON SÜRECİNİN AŞAMALARI Oryantasyon süreci dört temel aşamadan oluşur: - Ön hazırlık süreci
+,,sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt,a9ac89a4-5bae-490d-9bcd-2d7d01de0aa9,1,"2. ORYANTASYON SÜRECİNİN AŞAMALARI Oryantasyon süreci dört temel aşamadan oluşur: - Ön hazırlık süreci
 - İlk gün karşılama ve temel bilgilendirme
 - İlk hafta görev ve araç tanıtımı
 - İlk 30 gün gelişi",False
-<think>,"SORU: İlk gün programında hangi saatlerde hangi etkinlikler yer alır?  
+,"SORU: İlk gün programında hangi saatlerde hangi etkinlikler yer alır?  
 CEVAP: İlk gün programında 09:00-10:00 İnsan kaynakları karşılama görüşmesi, 10:00-11:00 Şirket tanıtımı ve organizasyon yapısı, 11:00-12:00 Çalışma politikaları ve temel kurallar, 13",sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt,a9ac89a4-5bae-490d-9bcd-2d7d01de0aa9,2,"Erişim yetkileri, yalnızca çalışanın görev tanımı için gerekli sistemlerle sınırlı tutulmalıdır Fazladan yetki verilmesi bilgi güvenliği riski oluşturabileceğinden, tüm erişimler birim yöneticisi onay",False
-"Okay, let's see. The user provided a text in Turkish about access rights and the first day program for employees. They want two questions that can be directly answered from the text. The questions need to be in Turkish, no numbers or explanations, just the questions on separate lines.","<think>
-Okay, let's tackle this. The user wants two questions based on the given Turkish text. First, I need to understand the text thoroughly. The text talks about access rights being limited to what's necessary for the employee's job role, and that extra permissions can create security risks. It also mentions that all access should be opened with the unit manager's approval. Then there's the first day program schedule with specific times and activities like HR meeting, company introduction, work policies, etc.
-
-So, the first question could be about the requirement for access rights. The text says that access should be limited to what's necessary for the job and requires unit manager approval. So a question like ""Erişim yetkileri hangi dur",sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt,a9ac89a4-5bae-490d-9bcd-2d7d01de0aa9,2,"Erişim yetkileri, yalnızca çalışanın görev tanımı için gerekli sistemlerle sınırlı tutulmalıdır Fazladan yetki verilmesi bilgi güvenliği riski oluşturabileceğinden, tüm erişimler birim yöneticisi onay",False
-<think>,"SORU: Mentorun sorumluluklarından biri nedir?  
-CEVAP: Mentorun sorumluluklarından biri, çalışanın temel sorularına destek olmaktır.",sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt,a9ac89a4-5bae-490d-9bcd-2d7d01de0aa9,3,"İlk gün sonunda çalışanın e-posta, proje yönetim sistemi, dokümantasyon alanı ve iletişim kanallarına erişimi test edilmelidir. 5. MENTORLUK SÜRECİ Her yeni çalışana, aynı veya yakın departmandan bir ",False
-"Okay, let's see. The user provided a text in Turkish about onboarding processes, specifically the first day and mentorship. They want two direct questions based on the text. First, I need to understand the main points.","<think>
-Okay, let's see. The user provided a text in Turkish about onboarding processes, specifically the first day and mentorship. They want two direct questions based on the text. First, I need to understand the main points. The text mentions that on the first day, the employee's access to email, project management system, documentation area, and communication channels should be tested. Then there's the mentorship process where a mentor is assigned to a new employee from the same or nearby department. The mentor's responsibilities include supporting the employee's basic questions, introducing tools and project folders, explaining team meetings, showing coding, documentation, and task delivery standards, and being available when needed.
-
-So, the first question could be about what is tested",sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt,a9ac89a4-5bae-490d-9bcd-2d7d01de0aa9,3,"İlk gün sonunda çalışanın e-posta, proje yönetim sistemi, dokümantasyon alanı ve iletişim kanallarına erişimi test edilmelidir. 5. MENTORLUK SÜRECİ Her yeni çalışana, aynı veya yakın departmandan bir ",False
+,,sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt,a9ac89a4-5bae-490d-9bcd-2d7d01de0aa9,2,"Erişim yetkileri, yalnızca çalışanın görev tanımı için gerekli sistemlerle sınırlı tutulmalıdır Fazladan yetki verilmesi bilgi güvenliği riski oluşturabileceğinden, tüm erişimler birim yöneticisi onay",False
+,"SORU: Mentorun sorumluluklarından biri nedir?  
+CEVAP: Mentorun sorumluluklarından biri, çalışanın temel sorularına destek olmaktır.",sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt,a9ac89a4-5bae-490d-9bcd-2d7d01de0aa9,3,"İlk gün sonunda çalışanın e-posta, proje yönetim sistemi, dokümantasyon alanı ve iletişim kanallarına erişimi test edilmelidir. 5. MENTORLUK SÜRECİ Her yeni çalışana, aynı veya yakın departmandan bir",False
+,,sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt,a9ac89a4-5bae-490d-9bcd-2d7d01de0aa9,3,"İlk gün sonunda çalışanın e-posta, proje yönetim sistemi, dokümantasyon alanı ve iletişim kanallarına erişimi test edilmelidir. 5. MENTORLUK SÜRECİ Her yeni çalışana, aynı veya yakın departmandan bir",False

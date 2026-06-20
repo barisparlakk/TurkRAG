@@ -92,6 +92,7 @@ def run_eval(
     run_label: str = "",
 ) -> dict:
     """Run evaluation and return a results dict."""
+    from generation.citations import clean_model_artifact_text
     from generation.llm import generate, is_available
     from generation.prompt import build_prompt
     from retrieval.hybrid import HybridRetriever
@@ -123,7 +124,7 @@ def run_eval(
         if is_available() and chunks:
             prompt = build_prompt(question, chunks)
             generation_started_at = time.perf_counter()
-            answer = generate(prompt)
+            answer = clean_model_artifact_text(generate(prompt))
             generation_latency_ms = (time.perf_counter() - generation_started_at) * 1000
             logger.info("  Answer: %s…", answer[:80])
         elif not chunks:

@@ -33,7 +33,7 @@
     },
     "per_query": [
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -78,7 +78,7 @@
         "ndcg@20": 0.9905705161053366
       },
       {
-        "question": "Okay, let's see. The user provided a text about customer service FAQs, specifically about returning products. They want two questions generated from this text. The questions need to be in Turkish and directly answerable from the text.",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -168,7 +168,7 @@
         "ndcg@20": 2.1309297535714578
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -213,7 +213,7 @@
         "ndcg@20": 0.9905705161053366
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish and wants two questions generated from it. The questions should be in Turkish, directly answerable from the text, and without any numbers or explanations.",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -258,7 +258,7 @@
         "ndcg@20": 0.9905705161053366
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -303,7 +303,7 @@
         "ndcg@20": 0.9905705161053366
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish and wants two direct questions based on it. The text is about contacting for a quote, data privacy, and a free trial.",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -348,7 +348,7 @@
         "ndcg@20": 0.9905705161053366
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -393,7 +393,7 @@
         "ndcg@20": 0.8868528072345416
       },
       {
-        "question": "Okay, the user provided a text about a company's work policy and wants two direct questions based on it. Let me read through the text carefully.",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -438,7 +438,7 @@
         "ndcg@20": 0.8868528072345416
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -483,7 +483,7 @@
         "ndcg@20": 0.8868528072345416
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish about remote work policies and annual leave. They want two direct questions based on the text. First, I need to understand the main points of the text.",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -528,7 +528,7 @@
         "ndcg@20": 0.8868528072345416
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -573,7 +573,7 @@
         "ndcg@20": 0.8868528072345416
       },
       {
-        "question": "Okay, let's see. The user provided a text about leave requests and dress code rules. They want two questions in Turkish that can be directly answered from the text.",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -618,7 +618,7 @@
         "ndcg@20": 0.43067655807339306
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -663,7 +663,7 @@
         "ndcg@20": 0.8868528072345416
       },
       {
-        "question": "Okay, the user provided a text in Turkish and wants two questions generated from it. Let me read the text carefully.",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -708,7 +708,7 @@
         "ndcg@20": 0.8868528072345416
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -753,7 +753,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text about a product catalog from TechVizyon Yazılım Çözümleri A.Ş. They want two questions that can be directly answered from the text. The questions need to be in Turkish, and I should just list them without any numbers or explanations.",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -798,7 +798,7 @@
         "ndcg@20": 0.5654648767857288
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -843,7 +843,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish about various services, and they want two questions that can be directly answered from the text. The questions need to be in Turkish, just the questions, no numbers or explanations.",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -888,7 +888,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -933,7 +933,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish and wants two questions generated directly from it. The questions need to be in Turkish, just the questions without any numbers or explanations.",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -978,7 +978,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1023,7 +1023,7 @@
         "ndcg@20": 2.776063352167891
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish about a guide on information security and AI usage. They want two direct questions based on the text. First, I need to understand the content of the text. The text is the introduction of a guide by TechVizyon Yazılım Çözümleri A.Ş, version 1.0 from May 2026. The purpose is to ensure employees follow information security rules and use AI tools safely and responsibly. It covers all departments like software development, customer support, sales, HR, marketing, finance, and management. The rules include company data, customer info, source codes, trade secrets, financial documents, contracts, and technical documents.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1068,7 +1068,7 @@
         "ndcg@20": 0.9319597492354388
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1113,7 +1113,7 @@
         "ndcg@20": 2.776063352167891
       },
       {
-        "question": "Okay, let's tackle this. The user provided a text about information security principles and wants two questions based on it. First, I need to understand the main points of the text. The text mentions that all information within the company is considered corporate assets. Employees can only use this information within their job roles and with their permissions. The key principles are confidentiality, integrity, availability, and accountability.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1158,7 +1158,7 @@
         "ndcg@20": 3.7995533737003
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1203,7 +1203,7 @@
         "ndcg@20": 2.776063352167891
       },
       {
-        "question": "Okay, let's see. The user provided a text about password policies and some rules. They want two questions that can be directly answered from the text. The questions need to be in Turkish, no numbers or explanations, just the questions on separate lines.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1248,7 +1248,7 @@
         "ndcg@20": 2.776063352167891
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1293,7 +1293,7 @@
         "ndcg@20": 2.776063352167891
       },
       {
-        "question": "Okay, let's see. The user provided a text about what information should not be input into AI systems. They want two questions in Turkish that can be directly answered from the text.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1338,7 +1338,7 @@
         "ndcg@20": 3.345386794094498
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1383,7 +1383,7 @@
         "ndcg@20": 2.776063352167891
       },
       {
-        "question": "Okay, the user provided a text in Turkish about data protection under the KVKK (General Data Protection Regulation). They want two direct questions based on the text. Let me read through the text again to make sure I understand the key points.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1428,7 +1428,7 @@
         "ndcg@20": 3.0699568120784115
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1473,7 +1473,7 @@
         "ndcg@20": 2.776063352167891
       },
       {
-        "question": "Okay, let's see. The user provided a text about data security policies, specifically regarding sharing company data. They want two questions based on this text. The questions need to be in Turkish and directly answerable from the text.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1518,7 +1518,7 @@
         "ndcg@20": 3.4475665657799723
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1563,7 +1563,7 @@
         "ndcg@20": 2.776063352167891
       },
       {
-        "question": "Okay, I need to generate two questions based on the given text. Let me read through the text again to understand the key points.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1608,7 +1608,7 @@
         "ndcg@20": 3.497120406516761
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1653,7 +1653,7 @@
         "ndcg@20": 2.776063352167891
       },
       {
-        "question": "Okay, let's tackle this. The user provided a text in Turkish about education and awareness, and they want two questions based on it. First, I need to understand the text thoroughly.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1698,7 +1698,7 @@
         "ndcg@20": 2.776063352167891
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1743,7 +1743,7 @@
         "ndcg@20": 2.776063352167891
       },
       {
-        "question": "Okay, the user provided a text in Turkish about the validity of a guide. They want two questions generated directly from the text. Let me read the text again carefully.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1788,7 +1788,7 @@
         "ndcg@20": 2.776063352167891
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -1833,7 +1833,7 @@
         "ndcg@20": 1.3867817064157428
       },
       {
-        "question": "Okay, the user provided a text in Turkish about a company onboarding and training guide. They want two direct questions based on the text. Let me read through the text again to understand the key points.",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -1878,7 +1878,7 @@
         "ndcg@20": 1.3867817064157428
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -1923,7 +1923,7 @@
         "ndcg@20": 1.3867817064157428
       },
       {
-        "question": "Okay, the user provided a text about the stages of the orientation process and wants two questions based on it. Let me read through the text again to make sure I understand the key points.",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -1968,7 +1968,7 @@
         "ndcg@20": 1.3867817064157428
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -2013,7 +2013,7 @@
         "ndcg@20": 1.3867817064157428
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish about access rights and the first day program for employees. They want two questions that can be directly answered from the text. The questions need to be in Turkish, no numbers or explanations, just the questions on separate lines.",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -2058,7 +2058,7 @@
         "ndcg@20": 1.7558519528442853
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -2103,7 +2103,7 @@
         "ndcg@20": 1.3867817064157428
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish about onboarding processes, specifically the first day and mentorship. They want two direct questions based on the text. First, I need to understand the main points.",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -2183,7 +2183,7 @@
     },
     "per_query": [
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -2228,7 +2228,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text about customer service FAQs, specifically about returning products. They want two questions generated from this text. The questions need to be in Turkish and directly answerable from the text.",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -2318,7 +2318,7 @@
         "ndcg@20": 1.8783561844610368
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -2363,7 +2363,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish and wants two questions generated from it. The questions should be in Turkish, directly answerable from the text, and without any numbers or explanations.",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -2408,7 +2408,7 @@
         "ndcg@20": 0.5838774358049752
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -2453,7 +2453,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish and wants two direct questions based on it. The text is about contacting for a quote, data privacy, and a free trial.",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -2498,7 +2498,7 @@
         "ndcg@20": 1.2559580248098154
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -2543,7 +2543,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, the user provided a text about a company's work policy and wants two direct questions based on it. Let me read through the text carefully.",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -2588,7 +2588,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -2633,7 +2633,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish about remote work policies and annual leave. They want two direct questions based on the text. First, I need to understand the main points of the text.",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -2678,7 +2678,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -2723,7 +2723,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text about leave requests and dress code rules. They want two questions in Turkish that can be directly answered from the text.",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -2768,7 +2768,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -2813,7 +2813,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, the user provided a text in Turkish and wants two questions generated from it. Let me read the text carefully.",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -2858,7 +2858,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -2903,7 +2903,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text about a product catalog from TechVizyon Yazılım Çözümleri A.Ş. They want two questions that can be directly answered from the text. The questions need to be in Turkish, and I should just list them without any numbers or explanations.",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -2948,7 +2948,7 @@
         "ndcg@20": 0.8911081575689676
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -2993,7 +2993,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish about various services, and they want two questions that can be directly answered from the text. The questions need to be in Turkish, just the questions, no numbers or explanations.",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -3038,7 +3038,7 @@
         "ndcg@20": 0.43067655807339306
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -3083,7 +3083,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish and wants two questions generated directly from it. The questions need to be in Turkish, just the questions without any numbers or explanations.",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -3128,7 +3128,7 @@
         "ndcg@20": 0.5
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3173,7 +3173,7 @@
         "ndcg@20": 0.7114376686446234
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish about a guide on information security and AI usage. They want two direct questions based on the text. First, I need to understand the content of the text. The text is the introduction of a guide by TechVizyon Yazılım Çözümleri A.Ş, version 1.0 from May 2026. The purpose is to ensure employees follow information security rules and use AI tools safely and responsibly. It covers all departments like software development, customer support, sales, HR, marketing, finance, and management. The rules include company data, customer info, source codes, trade secrets, financial documents, contracts, and technical documents.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3218,7 +3218,7 @@
         "ndcg@20": 0.7605579381614663
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3263,7 +3263,7 @@
         "ndcg@20": 0.7114376686446234
       },
       {
-        "question": "Okay, let's tackle this. The user provided a text about information security principles and wants two questions based on it. First, I need to understand the main points of the text. The text mentions that all information within the company is considered corporate assets. Employees can only use this information within their job roles and with their permissions. The key principles are confidentiality, integrity, availability, and accountability.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3308,7 +3308,7 @@
         "ndcg@20": 0.7028916286317227
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3353,7 +3353,7 @@
         "ndcg@20": 0.7114376686446234
       },
       {
-        "question": "Okay, let's see. The user provided a text about password policies and some rules. They want two questions that can be directly answered from the text. The questions need to be in Turkish, no numbers or explanations, just the questions on separate lines.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3398,7 +3398,7 @@
         "ndcg@20": 1.8827182562245373
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3443,7 +3443,7 @@
         "ndcg@20": 0.7114376686446234
       },
       {
-        "question": "Okay, let's see. The user provided a text about what information should not be input into AI systems. They want two questions in Turkish that can be directly answered from the text.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3488,7 +3488,7 @@
         "ndcg@20": 0.7211906797278906
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3533,7 +3533,7 @@
         "ndcg@20": 0.7114376686446234
       },
       {
-        "question": "Okay, the user provided a text in Turkish about data protection under the KVKK (General Data Protection Regulation). They want two direct questions based on the text. Let me read through the text again to make sure I understand the key points.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3578,7 +3578,7 @@
         "ndcg@20": 1.964836682686101
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3623,7 +3623,7 @@
         "ndcg@20": 0.7114376686446234
       },
       {
-        "question": "Okay, let's see. The user provided a text about data security policies, specifically regarding sharing company data. They want two questions based on this text. The questions need to be in Turkish and directly answerable from the text.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3668,7 +3668,7 @@
         "ndcg@20": 1.1182659915410322
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3713,7 +3713,7 @@
         "ndcg@20": 0.7114376686446234
       },
       {
-        "question": "Okay, I need to generate two questions based on the given text. Let me read through the text again to understand the key points.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3758,7 +3758,7 @@
         "ndcg@20": 0.6933260931105867
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3803,7 +3803,7 @@
         "ndcg@20": 0.7114376686446234
       },
       {
-        "question": "Okay, let's tackle this. The user provided a text in Turkish about education and awareness, and they want two questions based on it. First, I need to understand the text thoroughly.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3848,7 +3848,7 @@
         "ndcg@20": 0.25
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3893,7 +3893,7 @@
         "ndcg@20": 0.7114376686446234
       },
       {
-        "question": "Okay, the user provided a text in Turkish about the validity of a guide. They want two questions generated directly from the text. Let me read the text again carefully.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3938,7 +3938,7 @@
         "ndcg@20": 0.520443039477647
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -3983,7 +3983,7 @@
         "ndcg@20": 0.4898124665681315
       },
       {
-        "question": "Okay, the user provided a text in Turkish about a company onboarding and training guide. They want two direct questions based on the text. Let me read through the text again to understand the key points.",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -4028,7 +4028,7 @@
         "ndcg@20": 1.84570246067608
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -4073,7 +4073,7 @@
         "ndcg@20": 0.4898124665681315
       },
       {
-        "question": "Okay, the user provided a text about the stages of the orientation process and wants two questions based on it. Let me read through the text again to make sure I understand the key points.",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -4118,7 +4118,7 @@
         "ndcg@20": 2.8500185031920067
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -4163,7 +4163,7 @@
         "ndcg@20": 0.4898124665681315
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish about access rights and the first day program for employees. They want two questions that can be directly answered from the text. The questions need to be in Turkish, no numbers or explanations, just the questions on separate lines.",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -4208,7 +4208,7 @@
         "ndcg@20": 2.389642407588478
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -4253,7 +4253,7 @@
         "ndcg@20": 0.4898124665681315
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish about onboarding processes, specifically the first day and mentorship. They want two direct questions based on the text. First, I need to understand the main points.",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -4333,7 +4333,7 @@
     },
     "per_query": [
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -4368,7 +4368,7 @@
         "ndcg@20": 1.6309297535714575
       },
       {
-        "question": "Okay, let's see. The user provided a text about customer service FAQs, specifically about returning products. They want two questions generated from this text. The questions need to be in Turkish and directly answerable from the text.",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -4438,7 +4438,7 @@
         "ndcg@20": 1.9642630869047908
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -4473,7 +4473,7 @@
         "ndcg@20": 1.6309297535714575
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish and wants two questions generated from it. The questions should be in Turkish, directly answerable from the text, and without any numbers or explanations.",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -4508,7 +4508,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -4543,7 +4543,7 @@
         "ndcg@20": 1.6309297535714575
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish and wants two direct questions based on it. The text is about contacting for a quote, data privacy, and a free trial.",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -4578,7 +4578,7 @@
         "ndcg@20": 1.6309297535714575
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -4613,7 +4613,7 @@
         "ndcg@20": 0.3010299956639812
       },
       {
-        "question": "Okay, the user provided a text about a company's work policy and wants two direct questions based on it. Let me read through the text carefully.",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -4648,7 +4648,7 @@
         "ndcg@20": 0.8010299956639813
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -4683,7 +4683,7 @@
         "ndcg@20": 0.31546487678572877
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish about remote work policies and annual leave. They want two direct questions based on the text. First, I need to understand the main points of the text.",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -4718,7 +4718,7 @@
         "ndcg@20": 0.6045297031036166
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -4753,7 +4753,7 @@
         "ndcg@20": 0.3010299956639812
       },
       {
-        "question": "Okay, let's see. The user provided a text about leave requests and dress code rules. They want two questions in Turkish that can be directly answered from the text.",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -4788,7 +4788,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -4823,7 +4823,7 @@
         "ndcg@20": 0.31546487678572877
       },
       {
-        "question": "Okay, the user provided a text in Turkish and wants two questions generated from it. Let me read the text carefully.",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -4858,7 +4858,7 @@
         "ndcg@20": 0.6164948724497099
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -4893,7 +4893,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text about a product catalog from TechVizyon Yazılım Çözümleri A.Ş. They want two questions that can be directly answered from the text. The questions need to be in Turkish, and I should just list them without any numbers or explanations.",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -4928,7 +4928,7 @@
         "ndcg@20": 0.6309297535714575
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -4963,7 +4963,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish about various services, and they want two questions that can be directly answered from the text. The questions need to be in Turkish, just the questions, no numbers or explanations.",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -4998,7 +4998,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -5033,7 +5033,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish and wants two questions generated directly from it. The questions need to be in Turkish, just the questions without any numbers or explanations.",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -5068,7 +5068,7 @@
         "ndcg@20": 0.3010299956639812
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5103,7 +5103,7 @@
         "ndcg@20": 1.1065941916258226
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish about a guide on information security and AI usage. They want two direct questions based on the text. First, I need to understand the content of the text. The text is the introduction of a guide by TechVizyon Yazılım Çözümleri A.Ş, version 1.0 from May 2026. The purpose is to ensure employees follow information security rules and use AI tools safely and responsibly. It covers all departments like software development, customer support, sales, HR, marketing, finance, and management. The rules include company data, customer info, source codes, trade secrets, financial documents, contracts, and technical documents.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5138,7 +5138,7 @@
         "ndcg@20": 1.0033476796842515
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5173,7 +5173,7 @@
         "ndcg@20": 0.7890648263178879
       },
       {
-        "question": "Okay, let's tackle this. The user provided a text about information security principles and wants two questions based on it. First, I need to understand the main points of the text. The text mentions that all information within the company is considered corporate assets. Employees can only use this information within their job roles and with their permissions. The key principles are confidentiality, integrity, availability, and accountability.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5208,7 +5208,7 @@
         "ndcg@20": 2.14527201342591
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5243,7 +5243,7 @@
         "ndcg@20": 1.1065941916258226
       },
       {
-        "question": "Okay, let's see. The user provided a text about password policies and some rules. They want two questions that can be directly answered from the text. The questions need to be in Turkish, no numbers or explanations, just the questions on separate lines.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5278,7 +5278,7 @@
         "ndcg@20": 2.43786303643695
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5313,7 +5313,7 @@
         "ndcg@20": 0.719741384391281
       },
       {
-        "question": "Okay, let's see. The user provided a text about what information should not be input into AI systems. They want two questions in Turkish that can be directly answered from the text.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5348,7 +5348,7 @@
         "ndcg@20": 3.2247467816183653
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5383,7 +5383,7 @@
         "ndcg@20": 0.719741384391281
       },
       {
-        "question": "Okay, the user provided a text in Turkish about data protection under the KVKK (General Data Protection Regulation). They want two direct questions based on the text. Let me read through the text again to make sure I understand the key points.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5418,7 +5418,7 @@
         "ndcg@20": 2.2796353424232247
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5453,7 +5453,7 @@
         "ndcg@20": 1.1065941916258226
       },
       {
-        "question": "Okay, let's see. The user provided a text about data security policies, specifically regarding sharing company data. They want two questions based on this text. The questions need to be in Turkish and directly answerable from the text.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5488,7 +5488,7 @@
         "ndcg@20": 2.939029634984729
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5523,7 +5523,7 @@
         "ndcg@20": 0.7890648263178879
       },
       {
-        "question": "Okay, I need to generate two questions based on the given text. Let me read through the text again to understand the key points.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5558,7 +5558,7 @@
         "ndcg@20": 1.3562071871080221
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5593,7 +5593,7 @@
         "ndcg@20": 0.719741384391281
       },
       {
-        "question": "Okay, let's tackle this. The user provided a text in Turkish about education and awareness, and they want two questions based on it. First, I need to understand the text thoroughly.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5628,7 +5628,7 @@
         "ndcg@20": 0.7023176840202704
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5663,7 +5663,7 @@
         "ndcg@20": 0.719741384391281
       },
       {
-        "question": "Okay, the user provided a text in Turkish about the validity of a guide. They want two questions generated directly from the text. Let me read the text again carefully.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5698,7 +5698,7 @@
         "ndcg@20": 0.6309297535714575
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -5733,7 +5733,7 @@
         "ndcg@20": 0.8868528072345416
       },
       {
-        "question": "Okay, the user provided a text in Turkish about a company onboarding and training guide. They want two direct questions based on the text. Let me read through the text again to understand the key points.",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -5768,7 +5768,7 @@
         "ndcg@20": 2.9412107161212013
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -5803,7 +5803,7 @@
         "ndcg@20": 0.8868528072345416
       },
       {
-        "question": "Okay, the user provided a text about the stages of the orientation process and wants two questions based on it. Let me read through the text again to make sure I understand the key points.",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -5838,7 +5838,7 @@
         "ndcg@20": 2.446394630357186
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -5873,7 +5873,7 @@
         "ndcg@20": 0.8868528072345416
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish about access rights and the first day program for employees. They want two questions that can be directly answered from the text. The questions need to be in Turkish, no numbers or explanations, just the questions on separate lines.",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -5908,7 +5908,7 @@
         "ndcg@20": 2.8739897479140213
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -5943,7 +5943,7 @@
         "ndcg@20": 0.7640098914067264
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish about onboarding processes, specifically the first day and mentorship. They want two direct questions based on the text. First, I need to understand the main points.",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -6013,7 +6013,7 @@
     },
     "per_query": [
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -6037,7 +6037,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text about customer service FAQs, specifically about returning products. They want two questions generated from this text. The questions need to be in Turkish and directly answerable from the text.",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -6096,7 +6096,7 @@
         "ndcg@20": 2.1309297535714578
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -6120,7 +6120,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish and wants two questions generated from it. The questions should be in Turkish, directly answerable from the text, and without any numbers or explanations.",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -6144,7 +6144,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -6168,7 +6168,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish and wants two direct questions based on it. The text is about contacting for a quote, data privacy, and a free trial.",
+        "question": "",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -6192,7 +6192,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -6216,7 +6216,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, the user provided a text about a company's work policy and wants two direct questions based on it. Let me read through the text carefully.",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -6240,7 +6240,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -6264,7 +6264,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish about remote work policies and annual leave. They want two direct questions based on the text. First, I need to understand the main points of the text.",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -6288,7 +6288,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -6312,7 +6312,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text about leave requests and dress code rules. They want two questions in Turkish that can be directly answered from the text.",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -6336,7 +6336,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -6360,7 +6360,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, the user provided a text in Turkish and wants two questions generated from it. Let me read the text carefully.",
+        "question": "",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -6384,7 +6384,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -6408,7 +6408,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text about a product catalog from TechVizyon Yazılım Çözümleri A.Ş. They want two questions that can be directly answered from the text. The questions need to be in Turkish, and I should just list them without any numbers or explanations.",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -6443,7 +6443,7 @@
         "ndcg@20": 1.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -6467,7 +6467,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish about various services, and they want two questions that can be directly answered from the text. The questions need to be in Turkish, just the questions, no numbers or explanations.",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -6491,7 +6491,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -6515,7 +6515,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish and wants two questions generated directly from it. The questions need to be in Turkish, just the questions without any numbers or explanations.",
+        "question": "",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -6539,7 +6539,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6563,7 +6563,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish about a guide on information security and AI usage. They want two direct questions based on the text. First, I need to understand the content of the text. The text is the introduction of a guide by TechVizyon Yazılım Çözümleri A.Ş, version 1.0 from May 2026. The purpose is to ensure employees follow information security rules and use AI tools safely and responsibly. It covers all departments like software development, customer support, sales, HR, marketing, finance, and management. The rules include company data, customer info, source codes, trade secrets, financial documents, contracts, and technical documents.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6587,7 +6587,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6611,7 +6611,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's tackle this. The user provided a text about information security principles and wants two questions based on it. First, I need to understand the main points of the text. The text mentions that all information within the company is considered corporate assets. Employees can only use this information within their job roles and with their permissions. The key principles are confidentiality, integrity, availability, and accountability.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6635,7 +6635,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6659,7 +6659,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text about password policies and some rules. They want two questions that can be directly answered from the text. The questions need to be in Turkish, no numbers or explanations, just the questions on separate lines.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6683,7 +6683,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6707,7 +6707,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text about what information should not be input into AI systems. They want two questions in Turkish that can be directly answered from the text.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6731,7 +6731,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6755,7 +6755,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, the user provided a text in Turkish about data protection under the KVKK (General Data Protection Regulation). They want two direct questions based on the text. Let me read through the text again to make sure I understand the key points.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6779,7 +6779,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6803,7 +6803,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text about data security policies, specifically regarding sharing company data. They want two questions based on this text. The questions need to be in Turkish and directly answerable from the text.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6827,7 +6827,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6851,7 +6851,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, I need to generate two questions based on the given text. Let me read through the text again to understand the key points.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6875,7 +6875,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6899,7 +6899,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's tackle this. The user provided a text in Turkish about education and awareness, and they want two questions based on it. First, I need to understand the text thoroughly.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6923,7 +6923,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6947,7 +6947,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, the user provided a text in Turkish about the validity of a guide. They want two questions generated directly from the text. Let me read the text again carefully.",
+        "question": "",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6971,7 +6971,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -6995,7 +6995,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, the user provided a text in Turkish about a company onboarding and training guide. They want two direct questions based on the text. Let me read through the text again to understand the key points.",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -7019,7 +7019,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -7043,7 +7043,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, the user provided a text about the stages of the orientation process and wants two questions based on it. Let me read through the text again to make sure I understand the key points.",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -7067,7 +7067,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -7091,7 +7091,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish about access rights and the first day program for employees. They want two questions that can be directly answered from the text. The questions need to be in Turkish, no numbers or explanations, just the questions on separate lines.",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -7115,7 +7115,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "<think>",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -7139,7 +7139,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "Okay, let's see. The user provided a text in Turkish about onboarding processes, specifically the first day and mentorship. They want two direct questions based on the text. First, I need to understand the main points.",
+        "question": "",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],

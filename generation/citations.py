@@ -8,6 +8,19 @@ def strip_think_tags(text: str) -> str:
     return re.sub(r"<think>.*?</think>\s*", "", text, flags=re.DOTALL).strip()
 
 
+def clean_model_artifact_text(text: str) -> str:
+    """Remove scratchpad residue that should never be persisted as artifacts."""
+    cleaned = strip_think_tags(text or "")
+    cleaned = re.sub(r"(?is)<think>.*?(</think>|$)", "", cleaned)
+    cleaned = re.sub(
+        r"(?im)^(okay\b.*|let me\b.*|first,?\b.*|the text\b.*|so,?\b.*)$",
+        "",
+        cleaned,
+    )
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
+    return cleaned.strip()
+
+
 def extract_citations(response: str, context_chunks: list[dict]) -> list[dict]:
     """Find which context chunks are referenced in the response.
 
