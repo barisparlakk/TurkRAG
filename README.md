@@ -192,6 +192,9 @@ python -m eval.retrieval_metrics --tenant demo
 python -m eval.error_analysis --tenant demo
 python scripts/plot_results.py
 python scripts/generate_eval_set.py --tenant demo --max-chunks 20
+python scripts/chunking_experiments.py --tenant demo
+python scripts/embedder_experiments.py --tenant demo
+python scripts/hyperparameter_sweep.py --tenant demo
 ```
 
 ### Evaluation Results
@@ -203,6 +206,9 @@ Recent generated artifacts in [`/Users/barisparlak/Desktop/TurkRAG/results`](/Us
 | `results/experiment_*.csv` | Multi-mode experiment summary from `scripts/run_experiments.py` |
 | `results/*_hybrid*.json`, `results/*_dense.json`, `results/*_sparse.json` | Per-mode RAGAS run outputs |
 | `results/retrieval_metrics*.json` | Retrieval-only metrics such as Recall@K, MRR, and nDCG |
+| `results/chunking_experiments.json` | Chunker ablation summary across temporary tenant indexes |
+| `results/embedder_experiments.json` | Dense-retrieval embedder comparison across local model directories |
+| `results/hyperparameter_sweep.json` | Hyperparameter sweep results plus the top-scoring configurations |
 | `figures/metrics_comparison.png` | RAGAS comparison chart across retrieval modes |
 | `figures/recall_at_k.png` | Retrieval recall visualization |
 | `figures/metrics_radar.png` | Radar overview of the main RAGAS metrics |
@@ -223,6 +229,7 @@ Run the commands above to refresh those artifacts for the current dataset or ten
 | `LLM_TEMPERATURE` | `0.1` | Sampling temperature |
 | `LLM_MAX_TOKENS` | `512` | Max generated tokens per response |
 | `TURKISH_EMBEDDER_PATH` | `models/turkish-embedder` | Local SentenceTransformer directory |
+| `EMBEDDING_MODEL` | *(empty)* | Optional experiment-time local model path/name used by ablation scripts; falls back to `TURKISH_EMBEDDER_PATH` |
 | `QDRANT_URL` | `http://localhost:6333` | Qdrant vector DB URL |
 | `JWT_SECRET` | *(required)* | Secret for signing JWTs |
 | `CORS_ORIGINS` | `http://localhost:5173` | Comma-separated allowed origins for the dashboard/API. `*` is rejected in production |
@@ -264,7 +271,7 @@ alembic stamp 0001_baseline
 alembic upgrade head
 ```
 
-Migration `0003_backfill_document_permissions` backfills ACL rows for legacy
+Migration `0003_acl_backfill` backfills ACL rows for legacy
 documents that existed before document-level permissions. If you bootstrap users
 after that migration has already run, rerun the idempotent backfill manually:
 

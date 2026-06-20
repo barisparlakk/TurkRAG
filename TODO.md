@@ -4,6 +4,8 @@ Last reviewed: 2026-06-20
 
 ## Requirement analysis
 
+- [x] `TECHNICAL_ROADMAP.md`: reconcile the experiment phases with the current codebase; chunking/embedder/sweep scripts already exist and the documented outputs must match their real JSON artifacts.
+- [x] `README.md`: document the `EMBEDDING_MODEL` experiment override alongside `TURKISH_EMBEDDER_PATH` so ablation scripts match the embedder contract.
 - [x] `api/middleware.py`: support production-safe CORS configuration via `CORS_ORIGINS`.
 - [x] `README.md`: align docs with the actual database driver (`psycopg2`, not `asyncpg`).
 - [x] `README.md`: refresh the evaluation/results sections so they reflect the current implemented experiment scripts and outputs.
@@ -28,6 +30,7 @@ Last reviewed: 2026-06-20
 
 ## Deferred work
 
+- [ ] Add lightweight tests for the experiment CLI scripts (`chunking_experiments`, `embedder_experiments`, `hyperparameter_sweep`) so roadmap/documentation drift is caught automatically.
 - [ ] Tighten CORS defaults for non-local deployments once the canonical dashboard origin(s) are fixed per environment.
 - [ ] Add an integration-level CORS header test against a minimal FastAPI app if API surface changes around middleware wiring.
 - [ ] Fold retrieval-only metrics into `scripts/run_experiments.py` / `eval.ragas_eval.py` too if the report still needs a single end-to-end experiment artifact.

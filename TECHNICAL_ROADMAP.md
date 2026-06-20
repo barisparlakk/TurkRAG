@@ -144,12 +144,12 @@ Mevcut `TurkishChunker`'a ek olarak:
 | `ParagraphChunker` | `\n\n` bazlı bölme |
 | `TurkishChunker` | mevcut (sentence-based, 800 char) |
 
-### 4.2 `scripts/chunking_experiments.py` — Oluşturulacak
+### 4.2 `scripts/chunking_experiments.py` — Mevcut
 
 ```
-4 chunker × eval set → Recall@5, context_precision
-Kazanan: en yüksek metrik kombinasyonu
-Çıktı: figures/chunking_comparison.png
+4 chunker × eval set → Recall@K, MRR, nDCG
+Geçici tenant indeksleri ile kıyaslama yapar
+Çıktı: results/chunking_experiments.json
 ```
 
 ### 4.3 `ingestion/embedder.py` — Plug-and-Play
@@ -162,14 +162,14 @@ Kazanan: en yüksek metrik kombinasyonu
 | `intfloat/multilingual-e5-base` | 768 |
 | `dbmdz/bert-base-turkish-uncased` | 768 |
 
-### 4.4 `scripts/embedder_experiments.py` — Oluşturulacak
+### 4.4 `scripts/embedder_experiments.py` — Mevcut
 
 ```
 Her embedder için:
-  1. Tenant index'i yeniden kur
-  2. Eval set üzerinde çalıştır
-  3. Recall@5 + context_precision + index_build_time + query_latency kaydet
-Çıktı: figures/embedder_comparison.png
+  1. Geçici Qdrant koleksiyonu kur
+  2. Dense retrieval eval set üzerinde çalıştır
+  3. Recall@K + MRR + nDCG kaydet
+Çıktı: results/embedder_experiments.json
 ```
 
 ---
@@ -178,7 +178,7 @@ Her embedder için:
 
 **Hedef:** Sistem parametrelerini sistematik olarak optimize etmek.
 
-### 5.1 `scripts/hyperparameter_sweep.py` — Oluşturulacak
+### 5.1 `scripts/hyperparameter_sweep.py` — Mevcut
 
 Taranacak aralıklar:
 
@@ -191,7 +191,7 @@ Taranacak aralıklar:
 | RRF `k` sabiti | {30, 60, 90} |
 | `rerank_threshold` | {-3.0, -2.0, -1.0} |
 
-Çıktı: `results/hparam_sweep.csv` + en iyi konfigürasyon özeti
+Çıktı: `results/hyperparameter_sweep.json` + en iyi konfigürasyon özeti
 
 ---
 
