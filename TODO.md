@@ -23,6 +23,7 @@ Last reviewed: 2026-06-20
 - [x] `api/rbac.py`, `api/routers/documents.py`, `api/routers/permissions.py`, `api/routers/chat.py`, `generation/streamer.py`, and `retrieval/semantic_cache.py`: enforce document ACLs for new documents in listing/retrieval/chat, scope cached answers per user, and restrict permission management to owners/admins.
 - [x] `migrations/versions/0003_backfill_document_permissions.py` and `scripts/backfill_document_permissions.py`: backfill ACL rows for legacy documents by granting active tenant admins owner access and active members viewer access.
 - [x] `scripts/bootstrap_admin.py`, `tests/test_bootstrap_admin.py`, and `README.md`: add an idempotent first-admin bootstrap path for existing tenants before disabling dev auth in production.
+- [x] `tests/test_experiment_scripts.py`: add lightweight CLI coverage for `chunking_experiments`, `embedder_experiments`, and `hyperparameter_sweep` so roadmap/script drift is caught automatically.
 
 ## Current gaps
 
@@ -30,7 +31,6 @@ Last reviewed: 2026-06-20
 
 ## Deferred work
 
-- [ ] Add lightweight tests for the experiment CLI scripts (`chunking_experiments`, `embedder_experiments`, `hyperparameter_sweep`) so roadmap/documentation drift is caught automatically.
 - [ ] Tighten CORS defaults for non-local deployments once the canonical dashboard origin(s) are fixed per environment.
 - [ ] Add an integration-level CORS header test against a minimal FastAPI app if API surface changes around middleware wiring.
 - [ ] Fold retrieval-only metrics into `scripts/run_experiments.py` / `eval.ragas_eval.py` too if the report still needs a single end-to-end experiment artifact.
