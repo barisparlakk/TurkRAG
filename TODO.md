@@ -1,6 +1,6 @@
 # TurkRAG TODO
 
-Last reviewed: 2026-06-20
+Last reviewed: 2026-06-21
 
 ## Requirement analysis
 
@@ -28,9 +28,9 @@ Last reviewed: 2026-06-20
 ## Current gaps
 
 - [x] Generated historical eval artifacts no longer contain model scratchpad text; shared sanitization now covers new eval outputs and the committed artifacts were rewritten.
+- [x] `tests/test_middleware.py`: cover production CORS validation and a header-level middleware integration path so env drift is caught before deploys.
 
 ## Deferred work
 
 - [ ] Tighten CORS defaults for non-local deployments once the canonical dashboard origin(s) are fixed per environment.
-- [ ] Add an integration-level CORS header test against a minimal FastAPI app if API surface changes around middleware wiring.
 - [ ] Fold retrieval-only metrics into `scripts/run_experiments.py` / `eval.ragas_eval.py` too if the report still needs a single end-to-end experiment artifact.
