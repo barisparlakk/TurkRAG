@@ -39,6 +39,12 @@ class _PooledConnection:
 
     def close(self):
         conn = object.__getattribute__(self, "_conn")
+        if conn is None:
+            return
+
+        # Clear the handle first so repeated close calls cannot enqueue the
+        # same physical connection more than once.
+        object.__setattr__(self, "_conn", None)
         try:
             _get_pool().putconn(conn)
         except Exception as exc:
