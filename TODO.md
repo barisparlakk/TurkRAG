@@ -30,6 +30,7 @@ Last reviewed: 2026-06-21
 - [x] Generated historical eval artifacts no longer contain model scratchpad text; shared sanitization now covers new eval outputs and the committed artifacts were rewritten.
 - [x] `tests/test_middleware.py`: cover production CORS validation and a header-level middleware integration path so env drift is caught before deploys.
 - [x] `api/db.py` and `tests/test_db.py`: make pooled connection release idempotent so duplicate cleanup cannot return one physical connection to the pool twice.
+- [x] `api/routers/health.py` and `tests/test_health.py`: run dependency probes concurrently outside the event loop, close probe clients, and cover healthy/degraded responses without live services.
 
 ## Deferred work
 

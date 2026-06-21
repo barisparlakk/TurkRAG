@@ -17,17 +17,22 @@ def client():
 
     import api.db as db_module
     import api.main as main_module
+    import api.routers.health as health_module
     import ingestion.worker as worker_module
 
     original = main_module._ensure_schema_ready
     original_get_pool = db_module._get_pool
     original_pool = db_module._pool
+    original_check_qdrant = health_module._check_qdrant
+    original_check_postgres = health_module._check_postgres
     original_start_worker = worker_module.start_worker
     original_stop_worker = worker_module.stop_worker
 
     main_module._ensure_schema_ready = lambda: None
     db_module._get_pool = lambda: None
     db_module._pool = None
+    health_module._check_qdrant = lambda: "ok"
+    health_module._check_postgres = lambda: "ok"
     worker_module.start_worker = lambda: None
     worker_module.stop_worker = lambda: None
     from api.main import app
@@ -36,6 +41,8 @@ def client():
     main_module._ensure_schema_ready = original
     db_module._get_pool = original_get_pool
     db_module._pool = original_pool
+    health_module._check_qdrant = original_check_qdrant
+    health_module._check_postgres = original_check_postgres
     worker_module.start_worker = original_start_worker
     worker_module.stop_worker = original_stop_worker
 
