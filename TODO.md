@@ -31,6 +31,8 @@ Last reviewed: 2026-06-21
 - [x] `tests/test_middleware.py`: cover production CORS validation and a header-level middleware integration path so env drift is caught before deploys.
 - [x] `api/db.py` and `tests/test_db.py`: make pooled connection release idempotent so duplicate cleanup cannot return one physical connection to the pool twice.
 - [x] `api/routers/health.py` and `tests/test_health.py`: run dependency probes concurrently outside the event loop, close probe clients, and cover healthy/degraded responses without live services.
+- [x] `eval/retrieval_metrics.py` and `tests/test_retrieval_metrics.py`: count each relevant document once so repeated chunks cannot push normalized retrieval metrics above 1.0.
+- [ ] Regenerate committed `results/retrieval_metrics*.json` artifacts against the live index; existing files contain inflated pre-fix metrics and should not be used for reporting.
 
 ## Deferred work
 

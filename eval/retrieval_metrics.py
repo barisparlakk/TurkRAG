@@ -33,7 +33,7 @@ def recall_at_k(retrieved: list[str], relevant: set[str], k: int) -> float:
     """Fraction of relevant docs found in the top-k retrieved."""
     if not relevant:
         return 0.0
-    hits = sum(1 for doc in retrieved[:k] if doc in relevant)
+    hits = len(set(retrieved[:k]) & relevant)
     return hits / len(relevant)
 
 
@@ -46,12 +46,13 @@ def mean_reciprocal_rank(retrieved: list[str], relevant: set[str]) -> float:
 
 
 def ndcg_at_k(retrieved: list[str], relevant: set[str], k: int) -> float:
-    """Normalized Discounted Cumulative Gain at K (binary relevance)."""
-    dcg = sum(
-        1.0 / math.log2(rank + 1)
-        for rank, doc in enumerate(retrieved[:k], start=1)
-        if doc in relevant
-    )
+    """Normalized Discounted Cumulative Gain at K (binary document relevance)."""
+    seen_relevant = set()
+    dcg = 0.0
+    for rank, doc in enumerate(retrieved[:k], start=1):
+        if doc in relevant and doc not in seen_relevant:
+            dcg += 1.0 / math.log2(rank + 1)
+            seen_relevant.add(doc)
     # Ideal DCG: all relevant docs at top positions
     ideal_hits = min(len(relevant), k)
     idcg = sum(1.0 / math.log2(rank + 1) for rank in range(1, ideal_hits + 1))
@@ -62,7 +63,7 @@ def precision_at_k(retrieved: list[str], relevant: set[str], k: int) -> float:
     """Fraction of top-k retrieved docs that are relevant."""
     if k == 0:
         return 0.0
-    hits = sum(1 for doc in retrieved[:k] if doc in relevant)
+    hits = len(set(retrieved[:k]) & relevant)
     return hits / k
 
 
@@ -72,10 +73,12 @@ def average_precision(retrieved: list[str], relevant: set[str]) -> float:
         return 0.0
     hits = 0
     total_precision = 0.0
+    seen_relevant = set()
     for rank, doc in enumerate(retrieved, start=1):
-        if doc in relevant:
+        if doc in relevant and doc not in seen_relevant:
             hits += 1
             total_precision += hits / rank
+            seen_relevant.add(doc)
     return total_precision / len(relevant)
 
 
