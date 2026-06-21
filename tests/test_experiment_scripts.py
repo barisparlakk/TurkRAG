@@ -4,6 +4,74 @@ import json
 import os
 
 
+def test_run_experiments_uses_single_unified_eval_pass(tmp_path, monkeypatch):
+    import eval.ragas_eval as ragas
+    import eval.retrieval_metrics as retrieval_metrics
+    import scripts.run_experiments as experiments
+
+    calls = []
+    saved_to_db = []
+
+    def fake_run_eval(**kwargs):
+        calls.append(kwargs)
+        return {
+            "retrieval_mode": kwargs["retrieval_mode"],
+            "run_label": kwargs["run_label"],
+            "faithfulness": 0.5,
+            "answer_relevancy": 0.6,
+            "context_precision": 0.7,
+            "context_recall": 0.8,
+            "mean_mrr": 0.9,
+            "mean_ap": 0.85,
+            "recall@1": 0.4,
+            "recall@3": 0.8,
+            "recall@5": 1.0,
+            "ndcg@1": 0.4,
+            "ndcg@3": 0.7,
+            "ndcg@5": 0.9,
+            "retrieval_latency_ms": 10.0,
+            "generation_latency_ms": 20.0,
+            "total_latency_ms": 30.0,
+            "n_queries": 2,
+            "top_k": kwargs["top_k"],
+            "final_k": kwargs["final_k"],
+            "evaluated_at": "2026-06-21T00:00:00",
+            "per_query": [{"question": "Soru", "recall@5": 1.0}],
+        }
+
+    monkeypatch.setattr(ragas, "run_eval", fake_run_eval)
+    monkeypatch.setattr(ragas, "save_to_db", lambda scores: saved_to_db.append(scores))
+    monkeypatch.setattr(
+        retrieval_metrics,
+        "evaluate_retrieval",
+        lambda **kwargs: (_ for _ in ()).throw(AssertionError("duplicate retrieval pass")),
+    )
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "run_experiments.py",
+            "--tenant",
+            "demo",
+            "--modes",
+            "hybrid",
+            "--save-db",
+            "--output-dir",
+            str(tmp_path),
+        ],
+    )
+
+    experiments.main()
+
+    assert len(calls) == 1
+    assert saved_to_db[0]["mean_mrr"] == 0.9
+    csv_path = next(tmp_path.glob("experiment_*.csv"))
+    csv_text = csv_path.read_text(encoding="utf-8")
+    assert "recall@1" in csv_text
+    assert "ndcg@5" in csv_text
+    mode_result = next(path for path in tmp_path.glob("*_hybrid.json"))
+    assert json.loads(mode_result.read_text(encoding="utf-8"))["per_query"]
+
+
 def test_chunking_experiments_main_writes_results_and_cleans_up(tmp_path, monkeypatch):
     import scripts.chunking_experiments as chunking
 

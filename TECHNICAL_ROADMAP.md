@@ -38,20 +38,21 @@
 
 - `--retrieval-mode` CLI argümanı al
 - `--run-label` argümanı al (run'ı isimlendirmek için)
-- Sonuçları `eval_runs` tablosuna yaz: config JSON + 4 RAGAS metriği
+- Sonuçları `eval_runs` tablosuna yaz: config JSON + RAG metrikleri + MRR/MAP/Recall@K/nDCG@K + latency
+- Tüm metrikleri aynı retrieval sonuçlarından hesapla; ikinci bir retrieval pass çalıştırma
 - Her run'a UUID `run_id` ata
 
 ### 1.3 `scripts/run_experiments.py` — Mevcut
 
 ```
-4 mode × eval seti → eval_runs tablosu
+4 mode × eval seti → mode başına tek retrieval/eval pass → eval_runs tablosu
 Çıktı: results/experiment_<timestamp>.csv
 ```
 
 İçerik:
 - 4 retrieval mode üzerinden döngü
 - Her mode için `ragas_eval.py` çağrısı
-- Pandas DataFrame → CSV + DB
+- Birleşik per-mode JSON + özet CSV + DB
 
 ### 1.4 `scripts/plot_results.py` — Mevcut
 
@@ -63,8 +64,8 @@ Giriş: results/*.csv
   figures/recall_at_k.png          → Recall@K eğrisi
 ```
 
-Not: `eval/ragas_eval.py` artık per-query ve aggregate latency değerlerini persist ettiği için
-`latency_distribution.png` gerçek deney verisiyle üretilebiliyor.
+Not: `eval/ragas_eval.py` per-query ve aggregate RAG, retrieval ve latency değerlerini birlikte
+persist eder. Aynı deney artifact'ı metrik, Recall@K ve latency grafiklerini üretebilir.
 
 ---
 
@@ -101,7 +102,7 @@ RAGAS (end-to-end) yanına retrieval-only metrikler:
 | MRR | Mean Reciprocal Rank |
 | nDCG | Normalized Discounted Cumulative Gain |
 
-Mevcut `eval/ragas_eval.py` ile entegre edilecek, aynı run'da hesaplanacak.
+Mevcut `eval/ragas_eval.py` ile entegredir ve aynı retrieval run'ında hesaplanır.
 
 ---
 

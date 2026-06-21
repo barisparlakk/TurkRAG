@@ -182,7 +182,15 @@ Set `TURKISH_EMBEDDER_PATH` env var to override the default `models/turkish-embe
 python -m eval.ragas_eval --tenant demo
 ```
 
-Metrics: `faithfulness`, `answer_relevancy`, `context_precision`, `context_recall`
+Each query is retrieved once. That ranked result is used for:
+
+- RAG quality: `faithfulness`, `answer_relevancy`, `context_precision`, `context_recall`
+- Retrieval quality: `mean_mrr`, `mean_ap`, `recall@1/3/5`, `ndcg@1/3/5`
+- Performance: retrieval, generation, and total latency
+
+`eval.ragas_eval` persists the complete metric and per-query payload to `eval_runs`. The multi-mode
+runner exports the same payload to per-mode JSON and a combined CSV, so `plot_results.py` can build
+metric, Recall@K, and latency figures without a second retrieval run.
 
 Additional evaluation utilities already in the repo:
 
@@ -203,8 +211,8 @@ Recent generated artifacts in [`/Users/barisparlak/Desktop/TurkRAG/results`](/Us
 
 | Artifact | Purpose |
 |----------|---------|
-| `results/experiment_*.csv` | Multi-mode experiment summary from `scripts/run_experiments.py` |
-| `results/*_hybrid*.json`, `results/*_dense.json`, `results/*_sparse.json` | Per-mode RAGAS run outputs |
+| `results/experiment_*.csv` | Unified RAG, retrieval, and latency summary from `scripts/run_experiments.py` |
+| `results/*_hybrid*.json`, `results/*_dense.json`, `results/*_sparse.json` | Complete per-mode metrics and per-query evidence |
 | `results/retrieval_metrics*.json` | Retrieval-only metrics such as Recall@K, MRR, and nDCG |
 | `results/chunking_experiments.json` | Chunker ablation summary across temporary tenant indexes |
 | `results/embedder_experiments.json` | Dense-retrieval embedder comparison across local model directories |
@@ -214,6 +222,8 @@ Recent generated artifacts in [`/Users/barisparlak/Desktop/TurkRAG/results`](/Us
 | `figures/metrics_radar.png` | Radar overview of the main RAGAS metrics |
 
 Run the commands above to refresh those artifacts for the current dataset or tenant.
+The committed `results/retrieval_metrics*.json` files predate duplicate-document metric correction;
+regenerate them before using those historical values in a report.
 
 ---
 

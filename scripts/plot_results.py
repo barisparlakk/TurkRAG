@@ -138,7 +138,7 @@ def plot_radar(results: list[dict], output_dir: Path) -> None:
 
 
 def plot_recall_at_k(recall_data: list[dict], output_dir: Path) -> None:
-    """Recall@K line plot from retrieval_metrics output."""
+    """Recall@K line plot from unified or retrieval-only output."""
     import matplotlib.pyplot as plt
 
     if not recall_data:
@@ -149,14 +149,16 @@ def plot_recall_at_k(recall_data: list[dict], output_dir: Path) -> None:
     for entry in recall_data:
         mode = entry.get("retrieval_mode", "unknown")
         ks = sorted(int(k) for k in entry.get("recall_at_k", {}))
-        vals = [entry["recall_at_k"][str(k)] for k in ks]
+        if not ks:
+            continue
+        vals = [_to_float(entry["recall_at_k"][str(k)]) for k in ks]
         color = MODE_COLORS.get(mode, "#666666")
         ax.plot(ks, vals, marker="o", linewidth=2, label=mode, color=color)
 
     ax.set_xlabel("K (number of retrieved chunks)", fontsize=12)
-    ax.set_ylabel("Avg. Relevant Chunks Retrieved", fontsize=12)
+    ax.set_ylabel("Recall", fontsize=12)
     ax.set_title("TurkRAG — Recall@K by Retrieval Mode", fontsize=14, fontweight="bold")
-    ax.set_ylim(0, None)
+    ax.set_ylim(0, 1.05)
     ax.legend(fontsize=10)
     ax.grid(alpha=0.3)
     ax.spines[["top", "right"]].set_visible(False)
@@ -166,6 +168,27 @@ def plot_recall_at_k(recall_data: list[dict], output_dir: Path) -> None:
     fig.savefig(out, dpi=150)
     plt.close(fig)
     logger.info("Saved: %s", out)
+
+
+def collect_recall_data(results: list[dict]) -> list[dict]:
+    """Normalize flat recall@K fields and nested retrieval output for plotting."""
+    recall_data = []
+    for result in results:
+        nested = result.get("recall_at_k")
+        if isinstance(nested, dict):
+            values = {str(k): value for k, value in nested.items() if _to_float(value) is not None}
+        else:
+            values = {
+                key.removeprefix("recall@"): value
+                for key, value in result.items()
+                if key.startswith("recall@") and _to_float(value) is not None
+            }
+        if values:
+            recall_data.append({
+                "retrieval_mode": result.get("retrieval_mode", "unknown"),
+                "recall_at_k": values,
+            })
+    return recall_data
 
 
 def collect_latency_series(results: list[dict]) -> dict[str, list[float]]:
@@ -272,6 +295,7 @@ def main():
     plot_radar(results, output_dir)
     plot_latency_distribution(load_latency_results(input_path), output_dir)
 
+    recall_data = collect_recall_data(results)
     if args.recall_input:
         raw = json.loads(Path(args.recall_input).read_text(encoding="utf-8"))
         if isinstance(raw, dict):
@@ -283,7 +307,7 @@ def main():
                 recall_data.append(entry["aggregate"])
             else:
                 recall_data.append(entry)
-        plot_recall_at_k(recall_data, output_dir)
+    plot_recall_at_k(recall_data, output_dir)
 
     logger.info("All plots saved to %s/", output_dir)
 

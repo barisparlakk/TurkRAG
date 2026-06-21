@@ -28,6 +28,13 @@ logger = logging.getLogger(__name__)
 
 POSTGRES_URL = os.getenv("POSTGRES_URL", "postgresql://turkrag:turkrag_secret@localhost/turkrag")
 METRICS = ["faithfulness", "answer_relevancy", "context_precision", "context_recall"]
+RETRIEVAL_KS = (1, 3, 5)
+RETRIEVAL_METRICS = [
+    "mean_mrr",
+    "mean_ap",
+    *(f"recall@{k}" for k in RETRIEVAL_KS),
+    *(f"ndcg@{k}" for k in RETRIEVAL_KS),
+]
 LATENCY_FIELDS = [
     "retrieval_latency_ms",
     "generation_latency_ms",
@@ -66,19 +73,28 @@ def compute_answer_relevancy(question: str, answer: str) -> float:
     return max(0.0, sim)
 
 
-def compute_context_precision(retrieved_docs: list[str], relevant_doc: str) -> float:
+def _relevant_docs(item: dict) -> set[str]:
+    raw = item.get("relevant_docs")
+    if raw is None:
+        raw = item.get("relevant_doc", "")
+    if isinstance(raw, str):
+        return {raw} if raw else set()
+    return {str(doc) for doc in raw if doc}
+
+
+def compute_context_precision(retrieved_docs: list[str], relevant_docs: set[str]) -> float:
     """Precision@K — what fraction of retrieved docs are the expected one."""
-    if not retrieved_docs or not relevant_doc:
+    if not retrieved_docs or not relevant_docs:
         return 0.0
-    hits = sum(1 for d in retrieved_docs if d == relevant_doc)
+    hits = sum(1 for doc in retrieved_docs if doc in relevant_docs)
     return hits / len(retrieved_docs)
 
 
-def compute_context_recall(retrieved_docs: list[str], relevant_doc: str) -> float:
-    """Binary recall — is the expected doc in the retrieved set?"""
-    if not relevant_doc:
+def compute_context_recall(retrieved_docs: list[str], relevant_docs: set[str]) -> float:
+    """Fraction of expected documents represented in the retrieved chunks."""
+    if not relevant_docs:
         return 0.0
-    return 1.0 if relevant_doc in retrieved_docs else 0.0
+    return len(set(retrieved_docs) & relevant_docs) / len(relevant_docs)
 
 
 # ── Main eval runner ───────────────────────────────────────────────────────────
@@ -92,10 +108,21 @@ def run_eval(
     run_label: str = "",
 ) -> dict:
     """Run evaluation and return a results dict."""
+    from eval.retrieval_metrics import (
+        average_precision,
+        mean_reciprocal_rank,
+        ndcg_at_k,
+        recall_at_k,
+    )
     from generation.citations import clean_model_artifact_text
     from generation.llm import generate, is_available
     from generation.prompt import build_prompt
     from retrieval.hybrid import HybridRetriever
+
+    if top_k < max(RETRIEVAL_KS):
+        raise ValueError(f"top_k must be at least {max(RETRIEVAL_KS)} for Recall@K metrics")
+    if final_k < 1 or final_k > top_k:
+        raise ValueError("final_k must be between 1 and top_k")
 
     queries_file = Path(queries_path)
     if not queries_file.exists():
@@ -110,15 +137,23 @@ def run_eval(
     for i, item in enumerate(test_queries):
         question = item["question"]
         ground_truth = item.get("ground_truth", "")
-        relevant_doc = item.get("relevant_doc", "")
+        relevant_docs = _relevant_docs(item)
         logger.info("[%d/%d] %s", i + 1, len(test_queries), question[:70])
 
         query_started_at = time.perf_counter()
         retrieval_started_at = query_started_at
-        chunks = retriever.retrieve(question, tenant_slug, top_k=top_k, final_k=final_k, mode=retrieval_mode)
+        ranked_chunks = retriever.retrieve(
+            question,
+            tenant_slug,
+            top_k=top_k,
+            final_k=max(final_k, max(RETRIEVAL_KS)),
+            mode=retrieval_mode,
+        )
         retrieval_latency_ms = (time.perf_counter() - retrieval_started_at) * 1000
+        chunks = ranked_chunks[:final_k]
         context_texts = [c.get("text", "") for c in chunks]
-        retrieved_docs = [c.get("filename", "") for c in chunks]
+        context_docs = [c.get("filename", "") for c in chunks]
+        retrieved_docs = [c.get("filename", "") for c in ranked_chunks]
 
         generation_latency_ms = 0.0
         if is_available() and chunks:
@@ -134,20 +169,27 @@ def run_eval(
             answer = "LLM modeli mevcut değil."
         total_latency_ms = (time.perf_counter() - query_started_at) * 1000
 
-        per_query.append({
+        query_result = {
             "question": question,
             "answer": answer,
             "ground_truth": ground_truth,
-            "relevant_doc": relevant_doc,
+            "relevant_docs": sorted(relevant_docs),
             "retrieved_docs": retrieved_docs,
+            "context_docs": context_docs,
             "retrieval_latency_ms": retrieval_latency_ms,
             "generation_latency_ms": generation_latency_ms,
             "total_latency_ms": total_latency_ms,
             "faithfulness":       compute_faithfulness(answer, context_texts),
             "answer_relevancy":   compute_answer_relevancy(question, answer),
-            "context_precision":  compute_context_precision(retrieved_docs, relevant_doc),
-            "context_recall":     compute_context_recall(retrieved_docs, relevant_doc),
-        })
+            "context_precision":  compute_context_precision(context_docs, relevant_docs),
+            "context_recall":     compute_context_recall(context_docs, relevant_docs),
+            "mrr": mean_reciprocal_rank(retrieved_docs, relevant_docs),
+            "ap": average_precision(retrieved_docs, relevant_docs),
+        }
+        for k in RETRIEVAL_KS:
+            query_result[f"recall@{k}"] = recall_at_k(retrieved_docs, relevant_docs, k)
+            query_result[f"ndcg@{k}"] = ndcg_at_k(retrieved_docs, relevant_docs, k)
+        per_query.append(query_result)
 
     n = len(per_query)
     scores = {
@@ -163,16 +205,23 @@ def run_eval(
         "answer_relevancy":   sum(q["answer_relevancy"]  for q in per_query) / n if n else 0.0,
         "context_precision":  sum(q["context_precision"] for q in per_query) / n if n else 0.0,
         "context_recall":     sum(q["context_recall"]    for q in per_query) / n if n else 0.0,
+        "mean_mrr": sum(q["mrr"] for q in per_query) / n if n else 0.0,
+        "mean_ap": sum(q["ap"] for q in per_query) / n if n else 0.0,
         "retrieval_latency_ms": sum(q["retrieval_latency_ms"] for q in per_query) / n if n else 0.0,
         "generation_latency_ms": sum(q["generation_latency_ms"] for q in per_query) / n if n else 0.0,
         "total_latency_ms": sum(q["total_latency_ms"] for q in per_query) / n if n else 0.0,
         "per_query":          per_query,
     }
+    for k in RETRIEVAL_KS:
+        scores[f"recall@{k}"] = sum(q[f"recall@{k}"] for q in per_query) / n if n else 0.0
+        scores[f"ndcg@{k}"] = sum(q[f"ndcg@{k}"] for q in per_query) / n if n else 0.0
     return scores
 
 
 def save_to_db(scores: dict) -> None:
     """Persist evaluation results to the eval_runs PostgreSQL table."""
+    conn = None
+    cur = None
     try:
         import psycopg2
         conn = psycopg2.connect(POSTGRES_URL)
@@ -182,7 +231,7 @@ def save_to_db(scores: dict) -> None:
         if not row:
             raise ValueError(f"Tenant not found: {scores['tenant_slug']}")
         tenant_id = row[0]
-        metrics = {k: scores[k] for k in METRICS + LATENCY_FIELDS}
+        metrics = {k: scores.get(k, 0.0) for k in METRICS + RETRIEVAL_METRICS + LATENCY_FIELDS}
         avg_score = sum(scores[k] for k in METRICS) / len(METRICS)
         cur.execute("""
             INSERT INTO eval_runs
@@ -201,11 +250,20 @@ def save_to_db(scores: dict) -> None:
             avg_score,
         ))
         conn.commit()
-        cur.close()
-        conn.close()
         logger.info("Results saved to eval_runs (run_id=%s)", scores["run_id"])
     except Exception as exc:
         logger.warning("Could not save to DB: %s", exc)
+    finally:
+        if cur is not None:
+            try:
+                cur.close()
+            except Exception as exc:
+                logger.warning("Could not close eval cursor: %s", exc)
+        if conn is not None:
+            try:
+                conn.close()
+            except Exception as exc:
+                logger.warning("Could not close eval connection: %s", exc)
 
 
 def _print_table(scores: dict) -> None:
@@ -218,6 +276,8 @@ def _print_table(scores: dict) -> None:
         val = scores.get(m, 0.0)
         bar = "█" * int(val * 20)
         print(f"  {m:<22} {val:.3f}  {bar}")
+    for m in RETRIEVAL_METRICS:
+        print(f"  {m:<22} {scores.get(m, 0.0):.3f}")
     print("=" * 55)
     print(f"  Tenant: {scores['tenant_slug']}  |  Queries: {scores['n_queries']}")
     print(f"  top_k={scores['top_k']}  final_k={scores['final_k']}  run_id={scores['run_id'][:8]}…")
@@ -255,7 +315,5 @@ if __name__ == "__main__":
     out = Path(args.output) if args.output else \
         Path("eval") / f"results_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{args.retrieval_mode}.json"
     out.parent.mkdir(parents=True, exist_ok=True)
-    # Remove per_query from the saved file to keep it clean
-    save_scores = {k: v for k, v in scores.items() if k != "per_query"}
-    out.write_text(json.dumps(save_scores, indent=2, ensure_ascii=False), encoding="utf-8")
+    out.write_text(json.dumps(scores, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"Results saved to: {out}")

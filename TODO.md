@@ -32,9 +32,9 @@ Last reviewed: 2026-06-21
 - [x] `api/db.py` and `tests/test_db.py`: make pooled connection release idempotent so duplicate cleanup cannot return one physical connection to the pool twice.
 - [x] `api/routers/health.py` and `tests/test_health.py`: run dependency probes concurrently outside the event loop, close probe clients, and cover healthy/degraded responses without live services.
 - [x] `eval/retrieval_metrics.py` and `tests/test_retrieval_metrics.py`: count each relevant document once so repeated chunks cannot push normalized retrieval metrics above 1.0.
+- [x] `eval/ragas_eval.py`, `scripts/run_experiments.py`, and `scripts/plot_results.py`: compute, persist, export, and plot RAG/retrieval/latency metrics from one retrieval pass and one artifact set.
 - [ ] Regenerate committed `results/retrieval_metrics*.json` artifacts against the live index; existing files contain inflated pre-fix metrics and should not be used for reporting.
 
 ## Deferred work
 
 - [ ] Tighten CORS defaults for non-local deployments once the canonical dashboard origin(s) are fixed per environment.
-- [ ] Fold retrieval-only metrics into `scripts/run_experiments.py` / `eval.ragas_eval.py` too if the report still needs a single end-to-end experiment artifact.
