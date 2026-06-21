@@ -107,6 +107,8 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 | `DELETE` | `/tenants/{slug}` | Delete tenant + all data (admin) |
 | `GET` | `/analytics/stats` | Query stats (totals, top queries, top docs) |
 | `GET` | `/analytics/recent` | Recent query log entries |
+| `POST` | `/eval/run` | Queue one background evaluation for the tenant (admin, returns `202`) |
+| `GET` | `/eval/history` | List queued/running/completed/failed evaluations (admin) |
 
 Interactive docs at: http://localhost:8000/docs
 
@@ -192,6 +194,11 @@ Each query is retrieved once. That ranked result is used for:
 runner exports the same payload to per-mode JSON and a combined CSV, so `plot_results.py` can build
 metric, Recall@K, and latency figures without a second retrieval run.
 
+The dashboard/API path uses the same evaluator as a persisted background job. Only one queued or
+running evaluation is allowed per tenant; the admin panel polls until completion and displays stored
+failure details. If the API process stops mid-run, the next trigger marks jobs older than
+`EVAL_STALE_JOB_TIMEOUT_SECONDS` as failed before accepting a replacement.
+
 Additional evaluation utilities already in the repo:
 
 ```bash
@@ -252,6 +259,10 @@ regenerate them before using those historical values in a report.
 | `INGESTION_MAX_JOB_ATTEMPTS` | `3` | Maximum attempts before an ingestion job is marked failed |
 | `INGESTION_RETRY_DELAY_SECONDS` | `60` | Delay before retrying a failed ingestion attempt |
 | `INGESTION_STALE_JOB_TIMEOUT_SECONDS` | `900` | Processing heartbeat timeout before a job is recovered |
+| `EVAL_QUERIES_PATH` | `eval/test_queries.json` | Ground-truth query set used by API-triggered evaluations |
+| `EVAL_RETRIEVAL_MODE` | `hybrid+rerank` | Retrieval mode used by API-triggered evaluations |
+| `EVAL_TOP_K` / `EVAL_FINAL_K` | `20` / `5` | Candidate and answer-context depth for API evaluations |
+| `EVAL_STALE_JOB_TIMEOUT_SECONDS` | `3600` | Age after which an abandoned queued/running eval is failed on the next trigger |
 | `BM25_INDEX_DIR` | `indexes` | BM25 index persistence directory |
 
 ---

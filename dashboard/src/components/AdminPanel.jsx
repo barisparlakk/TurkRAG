@@ -427,6 +427,14 @@ function EvaluationSection() {
 
   useEffect(() => { load() }, [load])
 
+  const activeRun = runs.find((run) => run.status === 'queued' || run.status === 'running')
+
+  useEffect(() => {
+    if (!activeRun) return undefined
+    const timer = window.setInterval(load, 3000)
+    return () => window.clearInterval(timer)
+  }, [activeRun?.id, activeRun?.status, load])
+
   const runEval = async () => {
     setLoading(true); setError('')
     try {
@@ -442,23 +450,35 @@ function EvaluationSection() {
     <div className="admin-section">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <SectionTitle>Değerlendirme</SectionTitle>
-        <button className="btn btn-primary" onClick={runEval} disabled={loading}>{loading ? 'Çalışıyor...' : 'Eval çalıştır'}</button>
+        <button className="btn btn-primary" onClick={runEval} disabled={loading || Boolean(activeRun)}>
+          {loading ? 'Yükleniyor...' : activeRun?.status === 'queued' ? 'Eval sırada' : activeRun ? 'Eval çalışıyor' : 'Eval çalıştır'}
+        </button>
       </div>
       {error && <div className="admin-error">{error}</div>}
       <div className="admin-table">
         <div className="admin-row admin-row-head">
-          <span>Etiket</span><span>Skor</span><span>Soru</span><span>Tarih</span>
+          <span>Etiket</span><span>Durum</span><span>Skor / Soru</span><span>Tarih</span>
         </div>
         {runs.length === 0 ? (
           <div className="admin-empty">Eval geçmişi yok</div>
-        ) : runs.map((run) => (
-          <div className="admin-row" key={run.id}>
-            <span>{run.run_label || run.id.slice(0, 8)}</span>
-            <span>{Number(run.avg_score || 0).toFixed(3)}</span>
-            <span>{run.num_queries}</span>
-            <span>{new Date(run.created_at).toLocaleString('tr-TR')}</span>
-          </div>
-        ))}
+        ) : runs.map((run) => {
+          const statusLabels = { queued: 'Sırada', running: 'Çalışıyor', completed: 'Tamamlandı', failed: 'Başarısız' }
+          const isFailed = run.status === 'failed'
+          const isComplete = run.status === 'completed'
+          return (
+            <div className="admin-row" key={run.id}>
+              <span>{run.run_label || run.id.slice(0, 8)}</span>
+              <span
+                className={isFailed ? 'admin-status-warn' : isComplete ? 'admin-status-ok' : ''}
+                title={run.error || ''}
+              >
+                {statusLabels[run.status] || run.status}
+              </span>
+              <span>{isComplete ? `${Number(run.avg_score || 0).toFixed(3)} / ${run.num_queries}` : '-'}</span>
+              <span>{new Date(run.created_at).toLocaleString('tr-TR')}</span>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

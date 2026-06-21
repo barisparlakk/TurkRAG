@@ -145,6 +145,16 @@ class TestAuthEndpoint:
         )
         assert resp.status_code == 403
 
+    def test_evaluation_endpoints_require_admin_token(self, client):
+        member_token = client.post("/auth/token", json={
+            "tenant_id": "00000000-0000-0000-0000-000000000001",
+            "user_id": "member-user",
+        }).json()["access_token"]
+        headers = {"Authorization": f"Bearer {member_token}"}
+
+        assert client.post("/eval/run", headers=headers).status_code == 403
+        assert client.get("/eval/history", headers=headers).status_code == 403
+
     def test_admin_switch_tenant_returns_new_admin_token(self, client):
         class FakeCursor:
             def execute(self, query, params):
