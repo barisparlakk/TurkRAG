@@ -154,6 +154,7 @@ class TestAuthEndpoint:
 
         assert client.post("/eval/run", headers=headers).status_code == 403
         assert client.get("/eval/history", headers=headers).status_code == 403
+        assert client.get("/eval/runs/job-1", headers=headers).status_code == 403
 
     def test_admin_switch_tenant_returns_new_admin_token(self, client):
         class FakeCursor:

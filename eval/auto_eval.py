@@ -23,6 +23,33 @@ class EvalJobAlreadyRunning(Exception):
         super().__init__(f"Evaluation job already active: {run_id}")
 
 
+def _json_value(value, default):
+    if value is None:
+        return default
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except json.JSONDecodeError:
+            return default
+    return value if isinstance(value, type(default)) else default
+
+
+def _eval_run_payload(row) -> dict:
+    config = _json_value(row[2], {})
+    return {
+        "id": str(row[0]),
+        "run_label": row[1],
+        "status": config.get("status", "completed"),
+        "error": config.get("error"),
+        "config": config,
+        "metrics": _json_value(row[3], {}),
+        "per_query": _json_value(row[4], []),
+        "num_queries": row[5],
+        "avg_score": float(row[6]) if row[6] else 0.0,
+        "created_at": str(row[7]),
+    }
+
+
 def _now_iso() -> str:
     return datetime.now(UTC).isoformat()
 
@@ -122,6 +149,44 @@ def _set_job_status(run_id: str, tenant_id: str, status: str, **details) -> None
         conn.close()
 
 
+def _claim_job(run_id: str, tenant_id: str) -> bool:
+    """Move a queued job to running exactly once."""
+    patch = {"status": "running", "started_at": _now_iso(), "error": None}
+    conn = get_conn()
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute(
+                """UPDATE eval_runs
+                   SET config_json = COALESCE(config_json, '{}'::jsonb) || %s::jsonb
+                   WHERE id=%s
+                     AND tenant_id=%s
+                     AND COALESCE(config_json->>'status', 'queued') = 'queued'
+                   RETURNING id""",
+                (json.dumps(patch), run_id, tenant_id),
+            )
+            return cur.fetchone() is not None
+    finally:
+        conn.close()
+
+
+def get_eval_job(run_id: str, tenant_id: str) -> dict | None:
+    """Return one tenant-scoped evaluation run for status polling."""
+    conn = get_conn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                """SELECT id, run_label, config_json, metrics_json, per_query_json,
+                          num_queries, avg_score, created_at
+                   FROM eval_runs
+                   WHERE id=%s AND tenant_id=%s""",
+                (run_id, tenant_id),
+            )
+            row = cur.fetchone()
+    finally:
+        conn.close()
+    return _eval_run_payload(row) if row else None
+
+
 def _complete_job(run_id: str, tenant_id: str, scores: dict) -> None:
     from eval.ragas_eval import LATENCY_FIELDS, METRICS, RETRIEVAL_METRICS
 
@@ -161,7 +226,9 @@ def run_eval_job(run_id: str, tenant_id: str) -> None:
     from eval.ragas_eval import run_eval
 
     try:
-        _set_job_status(run_id, tenant_id, "running", started_at=_now_iso(), error=None)
+        if not _claim_job(run_id, tenant_id):
+            logger.warning("Evaluation job %s was not queued; skipping execution", run_id)
+            return
         scores = run_eval(
             tenant_slug=_tenant_slug(tenant_id),
             queries_path=EVAL_QUERIES_PATH,

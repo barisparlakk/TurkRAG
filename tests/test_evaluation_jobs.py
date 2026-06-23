@@ -5,8 +5,15 @@ from unittest.mock import MagicMock, patch
 import pytest
 from fastapi import BackgroundTasks, HTTPException
 
-from api.routers.evaluation import eval_history, trigger_eval
-from eval.auto_eval import EvalJobAlreadyRunning, _complete_job, create_eval_job, run_eval_job
+from api.routers.evaluation import eval_history, eval_run_status, trigger_eval
+from eval.auto_eval import (
+    EvalJobAlreadyRunning,
+    _claim_job,
+    _complete_job,
+    create_eval_job,
+    get_eval_job,
+    run_eval_job,
+)
 
 
 def _connection(cursor):
@@ -59,29 +66,72 @@ def test_run_eval_job_persists_running_and_completed_states():
     scores = {"run_id": "generated", "n_queries": 2, "per_query": []}
 
     with (
-        patch("eval.auto_eval._set_job_status") as set_status,
+        patch("eval.auto_eval._claim_job", return_value=True) as claim,
         patch("eval.auto_eval._tenant_slug", return_value="demo"),
         patch("eval.ragas_eval.run_eval", return_value=scores) as run_eval,
         patch("eval.auto_eval._complete_job") as complete,
     ):
         run_eval_job("job-1", "tenant-1")
 
-    assert set_status.call_args.args[:3] == ("job-1", "tenant-1", "running")
+    claim.assert_called_once_with("job-1", "tenant-1")
     assert run_eval.call_args.kwargs["tenant_slug"] == "demo"
     assert scores["run_id"] == "job-1"
     complete.assert_called_once_with("job-1", "tenant-1", scores)
 
 
+def test_run_eval_job_skips_when_job_was_already_claimed():
+    with (
+        patch("eval.auto_eval._claim_job", return_value=False),
+        patch("eval.ragas_eval.run_eval") as run_eval,
+    ):
+        run_eval_job("job-1", "tenant-1")
+
+    run_eval.assert_not_called()
+
+
 def test_run_eval_job_persists_failure_without_raising():
     with (
+        patch("eval.auto_eval._claim_job", return_value=True),
         patch("eval.auto_eval._set_job_status") as set_status,
         patch("eval.auto_eval._tenant_slug", side_effect=RuntimeError("tenant lookup failed")),
     ):
         run_eval_job("job-1", "tenant-1")
 
-    assert set_status.call_args_list[0].args[:3] == ("job-1", "tenant-1", "running")
-    assert set_status.call_args_list[1].args[:3] == ("job-1", "tenant-1", "failed")
-    assert set_status.call_args_list[1].kwargs["error"] == "tenant lookup failed"
+    assert set_status.call_args.args[:3] == ("job-1", "tenant-1", "failed")
+    assert set_status.call_args.kwargs["error"] == "tenant lookup failed"
+
+
+def test_claim_job_marks_only_queued_job_as_running():
+    cursor = MagicMock()
+    cursor.fetchone.return_value = ("job-1",)
+    conn = _connection(cursor)
+
+    with (
+        patch("eval.auto_eval.get_conn", return_value=conn),
+        patch("eval.auto_eval._now_iso", return_value="2026-06-23T12:00:00+00:00"),
+    ):
+        claimed = _claim_job("job-1", "tenant-1")
+
+    assert claimed is True
+    query, params = cursor.execute.call_args.args
+    config = json.loads(params[0])
+    assert "COALESCE(config_json->>'status', 'queued') = 'queued'" in query
+    assert "RETURNING id" in query
+    assert config["status"] == "running"
+    assert config["error"] is None
+    assert params[1:] == ("job-1", "tenant-1")
+    conn.close.assert_called_once_with()
+
+
+def test_claim_job_returns_false_when_row_is_not_queued():
+    cursor = MagicMock()
+    cursor.fetchone.return_value = None
+    conn = _connection(cursor)
+
+    with patch("eval.auto_eval.get_conn", return_value=conn):
+        assert _claim_job("job-1", "tenant-1") is False
+
+    conn.close.assert_called_once_with()
 
 
 def test_complete_job_persists_unified_metrics_and_tenant_scope():
@@ -169,3 +219,58 @@ def test_eval_history_handles_decoded_jsonb_and_exposes_lifecycle():
     assert history[0]["metrics"] == {"faithfulness": 0.0}
     assert history[0]["per_query"] == []
     conn.close.assert_called_once_with()
+
+
+def test_get_eval_job_returns_tenant_scoped_run_payload():
+    cursor = MagicMock()
+    cursor.fetchone.return_value = (
+        "job-1",
+        "api-auto-eval",
+        {"status": "running", "started_at": "2026-06-23T12:00:00+00:00"},
+        {"recall@5": 0.75},
+        [{"question": "Soru"}],
+        1,
+        0.5,
+        "2026-06-23 12:00:00+00",
+    )
+    conn = _connection(cursor)
+
+    with patch("eval.auto_eval.get_conn", return_value=conn):
+        payload = get_eval_job("job-1", "tenant-1")
+
+    query, params = cursor.execute.call_args.args
+    assert "WHERE id=%s AND tenant_id=%s" in query
+    assert params == ("job-1", "tenant-1")
+    assert payload["id"] == "job-1"
+    assert payload["status"] == "running"
+    assert payload["metrics"] == {"recall@5": 0.75}
+    assert payload["per_query"] == [{"question": "Soru"}]
+    conn.close.assert_called_once_with()
+
+
+def test_get_eval_job_returns_none_when_missing():
+    cursor = MagicMock()
+    cursor.fetchone.return_value = None
+    conn = _connection(cursor)
+
+    with patch("eval.auto_eval.get_conn", return_value=conn):
+        assert get_eval_job("missing", "tenant-1") is None
+
+    conn.close.assert_called_once_with()
+
+
+def test_eval_run_status_returns_single_run():
+    with patch("api.routers.evaluation.get_eval_job", return_value={"id": "job-1"}):
+        payload = asyncio.run(eval_run_status("job-1", {"tenant_id": "tenant-1", "role": "admin"}))
+
+    assert payload == {"id": "job-1"}
+
+
+def test_eval_run_status_returns_404_for_missing_run():
+    with (
+        patch("api.routers.evaluation.get_eval_job", return_value=None),
+        pytest.raises(HTTPException) as exc_info,
+    ):
+        asyncio.run(eval_run_status("missing", {"tenant_id": "tenant-1", "role": "admin"}))
+
+    assert exc_info.value.status_code == 404

@@ -34,6 +34,7 @@ Last reviewed: 2026-06-21
 - [x] `eval/retrieval_metrics.py` and `tests/test_retrieval_metrics.py`: count each relevant document once so repeated chunks cannot push normalized retrieval metrics above 1.0.
 - [x] `eval/ragas_eval.py`, `scripts/run_experiments.py`, and `scripts/plot_results.py`: compute, persist, export, and plot RAG/retrieval/latency metrics from one retrieval pass and one artifact set.
 - [x] `eval/auto_eval.py`, `api/routers/evaluation.py`, and `dashboard/src/components/AdminPanel.jsx`: replace blocking API evaluation with an admin-only persisted background lifecycle, duplicate suppression, stale recovery, and UI polling.
+- [x] `eval/auto_eval.py`, `api/routers/evaluation.py`, and `tests/test_evaluation_jobs.py`: add single-run status polling and conditional worker claiming so duplicate background invocations cannot re-run terminal evaluation jobs.
 - [ ] Regenerate committed `results/retrieval_metrics*.json` artifacts against the live index; existing files contain inflated pre-fix metrics and should not be used for reporting.
 
 ## Deferred work

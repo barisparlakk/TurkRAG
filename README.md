@@ -109,6 +109,7 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 | `GET` | `/analytics/recent` | Recent query log entries |
 | `POST` | `/eval/run` | Queue one background evaluation for the tenant (admin, returns `202`) |
 | `GET` | `/eval/history` | List queued/running/completed/failed evaluations (admin) |
+| `GET` | `/eval/runs/{id}` | Fetch one evaluation run for focused status polling (admin) |
 
 Interactive docs at: http://localhost:8000/docs
 
@@ -197,7 +198,8 @@ metric, Recall@K, and latency figures without a second retrieval run.
 The dashboard/API path uses the same evaluator as a persisted background job. Only one queued or
 running evaluation is allowed per tenant; the admin panel polls until completion and displays stored
 failure details. If the API process stops mid-run, the next trigger marks jobs older than
-`EVAL_STALE_JOB_TIMEOUT_SECONDS` as failed before accepting a replacement.
+`EVAL_STALE_JOB_TIMEOUT_SECONDS` as failed before accepting a replacement. Workers claim queued
+rows before execution, so duplicate background invocations cannot re-run a completed or failed job.
 
 Additional evaluation utilities already in the repo:
 
