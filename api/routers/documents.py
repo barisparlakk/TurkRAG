@@ -6,10 +6,11 @@ import os
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile, status
 
 from api.auth import get_current_user, get_tenant_id
 from api.db import get_conn
+from api.limits import UPLOAD_RATE_LIMIT, limiter
 from api.rbac import (
     get_accessible_document_ids,
     grant_access,
@@ -27,7 +28,9 @@ MAX_UPLOAD_BYTES = int(os.getenv("MAX_UPLOAD_BYTES", str(50 * 1024 * 1024)))
 
 
 @router.post("/upload", response_model=DocumentUploadResponse, status_code=status.HTTP_202_ACCEPTED)
+@limiter.limit(UPLOAD_RATE_LIMIT)
 async def upload_document(
+    request: Request,
     file: UploadFile = File(...),
     user: dict = Depends(get_current_user),
 ):

@@ -4,6 +4,7 @@ import csv
 
 import pytest
 
+from ingestion import parser
 from ingestion.parser import parse_document
 
 
@@ -86,6 +87,12 @@ class TestCsvParsing:
         path = self._write_csv(tmp_path, [{"A": "1", "B": "2"}])
         assert len(parse_document(path)) > 0
 
+    def test_csv_row_limit_rejects_bomb(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(parser, "MAX_SPREADSHEET_ROWS", 1)
+        path = self._write_csv(tmp_path, [{"A": "1"}, {"A": "2"}])
+        with pytest.raises(ValueError, match="row count"):
+            parse_document(path)
+
 
 class TestExcelParsing:
     def test_basic_xlsx(self, tmp_path):
@@ -143,3 +150,17 @@ class TestExcelParsing:
         wb.save(path)
         text = parse_document(path)
         assert isinstance(text, str)
+
+    def test_xlsx_cell_limit_rejects_bomb(self, tmp_path, monkeypatch):
+        pytest.importorskip("openpyxl")
+        import openpyxl
+
+        monkeypatch.setattr(parser, "MAX_SPREADSHEET_CELLS", 1)
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.append(["A", "B"])
+        path = str(tmp_path / "wide.xlsx")
+        wb.save(path)
+
+        with pytest.raises(ValueError, match="size limits"):
+            parse_document(path)

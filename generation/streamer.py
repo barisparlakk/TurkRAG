@@ -148,5 +148,5 @@ async def stream_rag_response(
 
     except Exception as exc:
         logger.exception("Error during WS RAG streaming: %s", exc)
-        await send({"type": "error", "message": str(exc)})
+        await send({"type": "error", "message": "Streaming failed"})
         return None

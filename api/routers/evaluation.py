@@ -2,10 +2,11 @@
 
 import logging
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
 
 from api.auth import require_admin
 from api.db import get_conn
+from api.limits import EVAL_RATE_LIMIT, limiter
 from eval.auto_eval import _eval_run_payload, get_eval_job
 
 logger = logging.getLogger(__name__)
@@ -13,7 +14,16 @@ router = APIRouter(prefix="/eval", tags=["evaluation"])
 
 
 @router.post("/run", status_code=status.HTTP_202_ACCEPTED)
-async def trigger_eval(background_tasks: BackgroundTasks, user: dict = Depends(require_admin)):
+@limiter.limit(EVAL_RATE_LIMIT)
+async def trigger_eval_endpoint(
+    request: Request,
+    background_tasks: BackgroundTasks,
+    user: dict = Depends(require_admin),
+):
+    return await trigger_eval(background_tasks, user)
+
+
+async def trigger_eval(background_tasks: BackgroundTasks, user: dict):
     """Queue an evaluation job and return without waiting for model execution."""
     from eval.auto_eval import EvalJobAlreadyRunning, create_eval_job, run_eval_job
 

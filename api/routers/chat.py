@@ -5,12 +5,14 @@ import json
 import logging
 import time
 
-from fastapi import APIRouter, Depends, WebSocket
+from fastapi import APIRouter, Depends, Request, WebSocket, status
+from pydantic import ValidationError
 
 from api.auth import get_current_user
 from api.db import get_conn
+from api.limits import CHAT_RATE_LIMIT, limiter, websocket_rate_limited
 from api.rbac import get_accessible_document_ids
-from api.schemas import CitationSource, QueryRequest, QueryResponse
+from api.schemas import ChatStreamRequest, CitationSource, QueryRequest, QueryResponse
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -118,7 +120,8 @@ def _log_query(tenant_id: str, session_id: str, query: str,
 
 
 @router.post("", response_model=QueryResponse)
-async def chat(body: QueryRequest, user: dict = Depends(get_current_user)):
+@limiter.limit(CHAT_RATE_LIMIT)
+async def chat(request: Request, body: QueryRequest, user: dict = Depends(get_current_user)):
     """Synchronous RAG query. Returns full answer with citations."""
     from fastapi import HTTPException
 
@@ -231,36 +234,37 @@ async def chat_stream(websocket: WebSocket):
     try:
         data = await websocket.receive_text()
         payload_json = json.loads(data)
-    except Exception as exc:
-        await websocket.send_text(json.dumps({"type": "error", "message": f"Invalid message: {exc}"}))
+        payload = ChatStreamRequest.model_validate(payload_json)
+    except (json.JSONDecodeError, ValidationError):
+        await websocket.send_text(json.dumps({"type": "error", "message": "Invalid message"}))
         await websocket.close()
         return
 
     from api.auth import decode_token, get_current_user
-    token = payload_json.get("token", "")
+    token = payload.token
+    if websocket_rate_limited(websocket, token):
+        await websocket.send_text(json.dumps({"type": "error", "message": "Rate limit exceeded"}))
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+        return
+
     try:
         claims = decode_token(token)
         # Reuse DB-backed validation so inactive users cannot keep streaming.
         user = await get_current_user(claims)
         tenant_id = user["tenant_id"]
-    except Exception as exc:
-        await websocket.send_text(json.dumps({"type": "error", "message": f"Auth failed: {exc}"}))
+    except Exception:
+        await websocket.send_text(json.dumps({"type": "error", "message": "Authentication failed"}))
         await websocket.close()
         return
 
-    query = payload_json.get("query", "").strip()
-    top_k = int(payload_json.get("top_k", 5))
-    client_session_id = payload_json.get("session_id")
-
-    if not query:
-        await websocket.send_text(json.dumps({"type": "error", "message": "Empty query"}))
-        await websocket.close()
-        return
+    query = payload.query.strip()
+    top_k = payload.top_k
+    client_session_id = payload.session_id
 
     try:
         tenant_slug = _get_tenant_slug(tenant_id)
-    except Exception as exc:
-        await websocket.send_text(json.dumps({"type": "error", "message": str(exc)}))
+    except Exception:
+        await websocket.send_text(json.dumps({"type": "error", "message": "Tenant not found"}))
         await websocket.close()
         return
 

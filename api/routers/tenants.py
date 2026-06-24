@@ -7,7 +7,7 @@ from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from api.auth import require_admin
+from api.auth import require_platform_admin
 from api.db import get_conn
 from api.schemas import TenantCreate, TenantResponse
 
@@ -33,7 +33,7 @@ async def get_tenant_by_slug(slug: str):
 
 
 @router.post("", response_model=TenantResponse, status_code=status.HTTP_201_CREATED)
-async def create_tenant(body: TenantCreate, _=Depends(require_admin)):
+async def create_tenant(body: TenantCreate, _=Depends(require_platform_admin)):
     """Provision a new tenant: create DB row + Qdrant collection."""
     conn = get_conn()
     try:
@@ -60,7 +60,7 @@ async def create_tenant(body: TenantCreate, _=Depends(require_admin)):
 
 
 @router.get("", response_model=list[TenantResponse])
-async def list_tenants(_=Depends(require_admin)):
+async def list_tenants(_=Depends(require_platform_admin)):
     """List all tenants."""
     conn = get_conn()
     try:
@@ -74,7 +74,7 @@ async def list_tenants(_=Depends(require_admin)):
 
 
 @router.delete("/{slug}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_tenant(slug: str, _=Depends(require_admin)):
+async def delete_tenant(slug: str, _=Depends(require_platform_admin)):
     """Delete a tenant and all their data (Qdrant + PostgreSQL)."""
     conn = get_conn()
     try:

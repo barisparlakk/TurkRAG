@@ -23,6 +23,11 @@ ENABLE_DEV_AUTH = os.getenv("ENABLE_DEV_AUTH", "true" if APP_ENV != "production"
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 
 
+def dev_auth_enabled() -> bool:
+    """Return True only for explicit local development dev-auth mode."""
+    return APP_ENV == "development" and ENABLE_DEV_AUTH
+
+
 def hash_password(password: str) -> str:
     """Hash a plaintext password for storage."""
     return pwd_context.hash(password)
@@ -81,7 +86,7 @@ async def get_current_user(payload: dict = Depends(get_current_payload)) -> dict
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing user claims")
 
     if payload.get("dev"):
-        if not ENABLE_DEV_AUTH:
+        if not dev_auth_enabled():
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Development auth is disabled")
         return {
             "id": user_id,
@@ -130,6 +135,13 @@ async def require_admin(user: dict = Depends(get_current_user)) -> dict:
     """FastAPI dependency: require 'admin' role."""
     if user.get("role") != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin role required")
+    return user
+
+
+async def require_platform_admin(user: dict = Depends(get_current_user)) -> dict:
+    """FastAPI dependency: require global platform administrator role."""
+    if user.get("role") != "platform_admin":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Platform admin role required")
     return user
 
 

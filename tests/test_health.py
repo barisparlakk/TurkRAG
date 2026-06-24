@@ -21,7 +21,7 @@ def test_qdrant_check_reports_failure_and_closes_client():
     with patch("qdrant_client.QdrantClient", return_value=client):
         status = _check_qdrant()
 
-    assert status == "error: qdrant unavailable"
+    assert status == "error"
     client.close.assert_called_once_with()
 
 
@@ -36,13 +36,14 @@ def test_postgres_check_closes_connection():
 
 def test_health_response_is_degraded_when_dependency_fails():
     with (
-        patch("api.routers.health._check_qdrant", return_value="error: unavailable"),
+        patch("api.routers.health._check_qdrant", return_value="error"),
         patch("api.routers.health._check_postgres", return_value="ok"),
         patch("generation.llm.is_available", return_value=False),
     ):
         response = asyncio.run(health_check())
 
     assert response.status == "degraded"
-    assert response.qdrant == "error: unavailable"
+    assert response.qdrant == "error"
     assert response.postgres == "ok"
     assert response.llm_available is False
+    assert response.details == {}

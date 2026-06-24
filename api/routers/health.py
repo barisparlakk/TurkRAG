@@ -23,7 +23,7 @@ def _check_qdrant() -> str:
         return "ok"
     except Exception as exc:
         logger.warning("Qdrant health check failed: %s", exc)
-        return f"error: {exc}"
+        return "error"
     finally:
         if client is not None:
             try:
@@ -45,7 +45,7 @@ def _check_postgres() -> str:
         return "ok"
     except Exception as exc:
         logger.warning("PostgreSQL health check failed: %s", exc)
-        return f"error: {exc}"
+        return "error"
 
 
 @router.get("/health", response_model=HealthResponse)
@@ -59,21 +59,20 @@ async def health_check():
     # Check LLM
     from generation.llm import is_available
     llm_ok = is_available()
-    llm_path = os.getenv("LLM_MODEL_PATH", "models/qwen3-8b-instruct-q4_k_m.gguf")
-    embedder_path = os.getenv("TURKISH_EMBEDDER_PATH", "models/turkish-embedder")
-    embedder_exists = os.path.exists(embedder_path)
-
     overall = "ok" if qdrant_status == "ok" and postgres_status == "ok" else "degraded"
+    details = {}
+    if os.getenv("HEALTH_INCLUDE_DETAILS", "false").lower() == "true":
+        llm_path = os.getenv("LLM_MODEL_PATH", "models/qwen3-8b-instruct-q4_k_m.gguf")
+        embedder_path = os.getenv("TURKISH_EMBEDDER_PATH", "models/turkish-embedder")
+        details = {
+            "llm_model_exists": os.path.exists(llm_path),
+            "embedder_exists": os.path.exists(embedder_path),
+        }
 
     return HealthResponse(
         status=overall,
         qdrant=qdrant_status,
         postgres=postgres_status,
         llm_available=llm_ok,
-        details={
-            "llm_model_path": llm_path,
-            "llm_model_exists": os.path.exists(llm_path),
-            "embedder_path": embedder_path,
-            "embedder_exists": embedder_exists,
-        },
+        details=details,
     )

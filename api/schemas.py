@@ -11,6 +11,10 @@ class QueryRequest(BaseModel):
     session_id: str | None = None  # omit to start a new session
 
 
+class ChatStreamRequest(QueryRequest):
+    token: str = Field(..., min_length=1, max_length=8192)
+
+
 class CitationSource(BaseModel):
     filename: str
     chunk_index: int

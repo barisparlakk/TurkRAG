@@ -6,9 +6,8 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException, Request, status
-from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
 
 from api.auth import (
     APP_ENV,
@@ -18,6 +17,7 @@ from api.auth import (
     validate_mock_admin,
     verify_password,
 )
+from api.limits import AUTH_RATE_LIMIT, limiter
 from api.middleware import setup_middleware
 from api.routers import (
     analytics,
@@ -47,9 +47,10 @@ logger = logging.getLogger(__name__)
 POSTGRES_URL = os.getenv("POSTGRES_URL", "postgresql://turkrag:turkrag_secret@localhost/turkrag")
 UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", "/tmp/uploads"))
 BM25_INDEX_DIR = Path(os.getenv("BM25_INDEX_DIR", "indexes"))
-REQUIRED_ALEMBIC_REVISION = "0003_acl_backfill"
+REQUIRED_ALEMBIC_REVISION = "0004_platform_admin_role"
 COMPATIBLE_ALEMBIC_REVISIONS = {
     "0003_backfill_document_permissions",
+    "0003_acl_backfill",
     REQUIRED_ALEMBIC_REVISION,
 }
 AUTO_INIT_SCHEMA = os.getenv("AUTO_INIT_SCHEMA", "false").lower() == "true"
@@ -76,6 +77,8 @@ async def lifespan(app: FastAPI):
         raise RuntimeError("JWT_SECRET must be set before running in production")
     if APP_ENV == "production" and ENABLE_DEV_AUTH:
         raise RuntimeError("ENABLE_DEV_AUTH must be false before running in production")
+    if APP_ENV != "development" and ENABLE_DEV_AUTH:
+        raise RuntimeError("ENABLE_DEV_AUTH is only allowed when APP_ENV=development")
     if APP_ENV == "production" and AUTO_INIT_SCHEMA:
         raise RuntimeError("AUTO_INIT_SCHEMA must be false before running in production")
     if jwt_secret == "change_this_in_production":
@@ -120,6 +123,10 @@ def _run_alembic_upgrade():
     logger.info("AUTO_INIT_SCHEMA enabled — running Alembic upgrade head.")
     cfg = Config("alembic.ini")
     command.upgrade(cfg, "head")
+
+
+def _dev_auth_enabled() -> bool:
+    return APP_ENV == "development" and ENABLE_DEV_AUTH
 
 
 def _ensure_schema_ready():
@@ -169,26 +176,6 @@ def _ensure_schema_ready():
         conn.close()
 
 
-def _rate_limit_key(request: Request) -> str:
-    """Key by tenant_id from JWT if present, otherwise fall back to IP.
-
-    This ensures each tenant has its own independent rate bucket.
-    """
-    auth = request.headers.get("Authorization", "")
-    if auth.startswith("Bearer "):
-        try:
-            from api.auth import decode_token
-            claims = decode_token(auth[7:])
-            return f"tenant:{claims['tenant_id']}"
-        except Exception:
-            pass
-    return get_remote_address(request)
-
-
-# Per-tenant rate limiter — 60 requests/minute per tenant (or IP as fallback)
-RATE_LIMIT = os.getenv("RATE_LIMIT", "60/minute")
-limiter = Limiter(key_func=_rate_limit_key, default_limits=[RATE_LIMIT])
-
 app = FastAPI(
     title="TurkRAG API",
     description="Privacy-first, on-premise RAG for Turkish enterprise",
@@ -216,9 +203,10 @@ app.include_router(users.router)
 
 # Simple token creation endpoint (dev convenience — replace with proper auth in production)
 @app.post("/auth/token", tags=["auth"])
-async def get_token(body: DevTokenRequest):
+@limiter.limit(AUTH_RATE_LIMIT)
+async def get_token(request: Request, body: DevTokenRequest):
     """Issue a member JWT for dev/testing."""
-    if not ENABLE_DEV_AUTH:
+    if not _dev_auth_enabled():
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Development auth is disabled")
     token = create_token(
         tenant_id=body.tenant_id,
@@ -231,7 +219,8 @@ async def get_token(body: DevTokenRequest):
 
 
 @app.post("/auth/login", tags=["auth"])
-async def login(body: LoginRequest):
+@limiter.limit(AUTH_RATE_LIMIT)
+async def login(request: Request, body: LoginRequest):
     """Authenticate a tenant user with email/password."""
     from api.db import get_conn
 
@@ -265,11 +254,12 @@ async def login(body: LoginRequest):
 
 
 @app.post("/auth/mock-login", tags=["auth"])
-async def mock_login(body: MockAdminLoginRequest):
+@limiter.limit(AUTH_RATE_LIMIT)
+async def mock_login(request: Request, body: MockAdminLoginRequest):
     """Issue a mock admin JWT after checking the built-in dashboard credentials."""
     from api.db import get_conn
 
-    if not ENABLE_DEV_AUTH:
+    if not _dev_auth_enabled():
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Development auth is disabled")
     email = body.email.strip()
     password = body.password

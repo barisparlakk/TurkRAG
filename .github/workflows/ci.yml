@@ -27,6 +27,9 @@ jobs:
       - name: Check Python dependencies
         run: python -m pip check
 
+      - name: Audit Python dependencies
+        run: python -m pip_audit -r requirements.txt
+
       - name: Run pytest
         run: python -m pytest
 

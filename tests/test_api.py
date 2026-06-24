@@ -330,10 +330,93 @@ class TestAuthEndpoint:
         ):
             asyncio.run(_start())
 
+    def test_non_development_startup_rejects_dev_auth(self):
+        import api.main as main_module
+
+        async def _start():
+            async with main_module.lifespan(main_module.app):
+                pass
+
+        with (
+            patch("api.main.APP_ENV", "staging"),
+            patch("api.main.ENABLE_DEV_AUTH", True),
+            patch.dict(os.environ, {"JWT_SECRET": "test-secret"}, clear=False),
+            pytest.raises(RuntimeError, match="only allowed"),
+        ):
+            asyncio.run(_start())
+
 
 class TestTenantEndpointAuth:
     def test_tenants_without_token_returns_401_or_403(self, client):
         assert client.get("/tenants").status_code in (401, 403, 422)
+
+    def test_tenant_admin_cannot_list_global_tenants(self, client):
+        from api.auth import create_token
+
+        token = create_token(
+            tenant_id="00000000-0000-0000-0000-000000000001",
+            user_id="admin-user",
+            role="admin",
+            email="admin@example.com",
+            dev=True,
+        )
+
+        resp = client.get("/tenants", headers={"Authorization": f"Bearer {token}"})
+
+        assert resp.status_code == 403
+
+    def test_platform_admin_can_list_global_tenants(self, client):
+        from api.auth import create_token
+
+        class FakeCursor:
+            def execute(self, query, params=None):
+                pass
+
+            def fetchall(self):
+                return [("00000000-0000-0000-0000-000000000001", "Acme", "acme", "2026-06-24T00:00:00Z")]
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+        class FakeConn:
+            def cursor(self):
+                return FakeCursor()
+
+            def close(self):
+                return None
+
+        token = create_token(
+            tenant_id="00000000-0000-0000-0000-000000000001",
+            user_id="platform-admin",
+            role="platform_admin",
+            email="platform@example.com",
+            dev=True,
+        )
+
+        with patch("api.routers.tenants.get_conn", return_value=FakeConn()):
+            resp = client.get("/tenants", headers={"Authorization": f"Bearer {token}"})
+
+        assert resp.status_code == 200
+        assert resp.json()[0]["slug"] == "acme"
+
+
+class TestChatWebSocketValidation:
+    def test_websocket_rejects_invalid_top_k_before_auth(self, client):
+        with client.websocket_connect("/chat/stream") as websocket:
+            websocket.send_json({"query": "Merhaba", "token": "bad-token", "top_k": 999})
+            frame = websocket.receive_json()
+
+        assert frame == {"type": "error", "message": "Invalid message"}
+
+    def test_websocket_suppresses_auth_exception_details(self, client):
+        with client.websocket_connect("/chat/stream") as websocket:
+            websocket.send_json({"query": "Merhaba", "token": "bad-token", "top_k": 5})
+            frame = websocket.receive_json()
+
+        assert frame == {"type": "error", "message": "Authentication failed"}
 
 
 class TestChatEndpointAuth:

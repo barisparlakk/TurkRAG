@@ -124,7 +124,7 @@ class TestStreamerException:
         assert result is None
         errors = ws.frames("error")
         assert errors
-        assert "GPU OOM" in errors[0]["message"]
+        assert errors[0]["message"] == "Streaming failed"
 
 
 async def _stream(ws, session_id=None, top_k=3):

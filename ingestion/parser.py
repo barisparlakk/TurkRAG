@@ -1,10 +1,25 @@
 """Document text extraction for PDF, DOCX, TXT, XLSX, and CSV files."""
 
 import logging
+import os
 import re
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
+
+MAX_PARSED_CHARS = int(os.getenv("MAX_PARSED_CHARS", "2000000"))
+MAX_PDF_PAGES = int(os.getenv("MAX_PDF_PAGES", "250"))
+MAX_SPREADSHEET_ROWS = int(os.getenv("MAX_SPREADSHEET_ROWS", "100000"))
+MAX_SPREADSHEET_CELLS = int(os.getenv("MAX_SPREADSHEET_CELLS", "1000000"))
+MAX_CSV_FIELD_SIZE = int(os.getenv("MAX_CSV_FIELD_SIZE", str(1024 * 1024)))
+
+
+def _append_with_limit(parts: list[str], text: str, total_chars: int) -> int:
+    total_chars += len(text)
+    if total_chars > MAX_PARSED_CHARS:
+        raise ValueError(f"Parsed text exceeds maximum size of {MAX_PARSED_CHARS} characters")
+    parts.append(text)
+    return total_chars
 
 
 def parse_document(file_path: str) -> str:
@@ -32,6 +47,8 @@ def parse_document(file_path: str) -> str:
         raise ValueError(f"Unsupported file type: {suffix}. Supported: .pdf, .docx, .txt, .xlsx, .csv")
 
     text = _clean_text(text)
+    if len(text) > MAX_PARSED_CHARS:
+        raise ValueError(f"Parsed text exceeds maximum size of {MAX_PARSED_CHARS} characters")
     logger.info("Parsed %d characters from %s", len(text), path.name)
     return text
 
@@ -42,10 +59,13 @@ def _parse_pdf(file_path: str) -> str:
 
     pages = []
     with pdfplumber.open(file_path) as pdf:
+        if len(pdf.pages) > MAX_PDF_PAGES:
+            raise ValueError(f"PDF exceeds maximum page count of {MAX_PDF_PAGES}")
+        total_chars = 0
         for i, page in enumerate(pdf.pages):
             page_text = page.extract_text()
             if page_text:
-                pages.append(page_text)
+                total_chars = _append_with_limit(pages, page_text, total_chars)
                 logger.debug("PDF page %d: %d chars", i + 1, len(page_text))
     return "\n\n".join(pages)
 
@@ -66,9 +86,9 @@ def _parse_docx(file_path: str) -> str:
 def _parse_txt(file_path: str) -> str:
     """Read a plain text file with UTF-8 encoding (fallback to latin-1)."""
     try:
-        return Path(file_path).read_text(encoding="utf-8")
+        return Path(file_path).read_text(encoding="utf-8")[: MAX_PARSED_CHARS + 1]
     except UnicodeDecodeError:
-        return Path(file_path).read_text(encoding="latin-1")
+        return Path(file_path).read_text(encoding="latin-1")[: MAX_PARSED_CHARS + 1]
 
 
 def _row_to_sentence(header: list, values: list) -> str:
@@ -88,17 +108,19 @@ def _parse_excel(file_path: str) -> str:
 
     wb = openpyxl.load_workbook(file_path, data_only=True)
     sections = []
+    total_rows = 0
+    total_cells = 0
+    total_chars = 0
 
     for sheet_name in wb.sheetnames:
         ws = wb[sheet_name]
-        rows = list(ws.iter_rows(values_only=True))
-        if not rows:
-            continue
-
-        # Find header row (first row with at least one non-None cell)
         header: list = []
         data_rows: list = []
-        for row in rows:
+        for row in ws.iter_rows(values_only=True):
+            total_rows += 1
+            total_cells += len(row)
+            if total_rows > MAX_SPREADSHEET_ROWS or total_cells > MAX_SPREADSHEET_CELLS:
+                raise ValueError("Spreadsheet exceeds parser size limits")
             values = [str(v).strip() if v is not None else "" for v in row]
             if not any(values):
                 continue
@@ -116,8 +138,10 @@ def _parse_excel(file_path: str) -> str:
                 continue
             sentence = _row_to_sentence(header, row_vals)
             if sentence:
-                section_lines.append(sentence)
-        sections.append("\n".join(section_lines))
+                total_chars = _append_with_limit(section_lines, sentence, total_chars)
+        section = "\n".join(section_lines)
+        if section:
+            sections.append(section)
 
     result = "\n\n".join(sections)
     logger.info("Excel parsed: %d sheet(s), %d chars", len(wb.sheetnames), len(result))
@@ -134,13 +158,19 @@ def _parse_csv(file_path: str) -> str:
 
     def _read(encoding: str) -> str:
         lines = []
+        total_rows = 0
+        total_chars = 0
+        csv.field_size_limit(MAX_CSV_FIELD_SIZE)
         with open(file_path, newline="", encoding=encoding) as f:
             reader = csv.DictReader(f)
             header = reader.fieldnames or []
             for row in reader:
+                total_rows += 1
+                if total_rows > MAX_SPREADSHEET_ROWS:
+                    raise ValueError(f"CSV exceeds maximum row count of {MAX_SPREADSHEET_ROWS}")
                 sentence = _row_to_sentence(header, [row.get(h, "") for h in header])
                 if sentence:
-                    lines.append(sentence)
+                    total_chars = _append_with_limit(lines, sentence, total_chars)
         return "\n".join(lines)
 
     try:
