@@ -1,13 +1,13 @@
 """Backfill ACL rows for legacy documents.
 
-Revision ID: 0003_backfill_document_permissions
+Revision ID: 0003_acl_backfill
 Revises: 0002_ingestion_job_retries
 Create Date: 2026-06-16
 """
 
 from alembic import op
 
-revision = "0003_backfill_document_permissions"
+revision = "0003_acl_backfill"
 down_revision = "0002_ingestion_job_retries"
 branch_labels = None
 depends_on = None

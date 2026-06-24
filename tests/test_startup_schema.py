@@ -6,7 +6,7 @@ import pytest
 
 
 class _Cursor:
-    def __init__(self, version_table=True, revision="0003_backfill_document_permissions", tables=None):
+    def __init__(self, version_table=True, revision="0003_acl_backfill", tables=None):
         self.version_table = version_table
         self.revision = revision
         self.tables = tables or {
@@ -62,6 +62,19 @@ def test_schema_verification_passes_at_required_revision():
     with (
         patch("api.main.AUTO_INIT_SCHEMA", False),
         patch("psycopg2.connect", return_value=_Conn(_Cursor())),
+    ):
+        main_module._ensure_schema_ready()
+
+
+def test_schema_verification_passes_at_legacy_revision_alias():
+    import api.main as main_module
+
+    with (
+        patch("api.main.AUTO_INIT_SCHEMA", False),
+        patch(
+            "psycopg2.connect",
+            return_value=_Conn(_Cursor(revision="0003_backfill_document_permissions")),
+        ),
     ):
         main_module._ensure_schema_ready()
 

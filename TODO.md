@@ -1,6 +1,6 @@
 # TurkRAG TODO
 
-Last reviewed: 2026-06-21
+Last reviewed: 2026-06-24
 
 ## Requirement analysis
 
@@ -35,6 +35,7 @@ Last reviewed: 2026-06-21
 - [x] `eval/ragas_eval.py`, `scripts/run_experiments.py`, and `scripts/plot_results.py`: compute, persist, export, and plot RAG/retrieval/latency metrics from one retrieval pass and one artifact set.
 - [x] `eval/auto_eval.py`, `api/routers/evaluation.py`, and `dashboard/src/components/AdminPanel.jsx`: replace blocking API evaluation with an admin-only persisted background lifecycle, duplicate suppression, stale recovery, and UI polling.
 - [x] `eval/auto_eval.py`, `api/routers/evaluation.py`, and `tests/test_evaluation_jobs.py`: add single-run status polling and conditional worker claiming so duplicate background invocations cannot re-run terminal evaluation jobs.
+- [x] `api/main.py` and `tests/test_startup_schema.py`: accept both the legacy and renamed Alembic revision IDs so existing migrated databases keep starting after the local revision rename.
 - [ ] Regenerate committed `results/retrieval_metrics*.json` artifacts against the live index; existing files contain inflated pre-fix metrics and should not be used for reporting.
 
 ## Deferred work

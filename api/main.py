@@ -47,7 +47,11 @@ logger = logging.getLogger(__name__)
 POSTGRES_URL = os.getenv("POSTGRES_URL", "postgresql://turkrag:turkrag_secret@localhost/turkrag")
 UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", "/tmp/uploads"))
 BM25_INDEX_DIR = Path(os.getenv("BM25_INDEX_DIR", "indexes"))
-REQUIRED_ALEMBIC_REVISION = "0003_backfill_document_permissions"
+REQUIRED_ALEMBIC_REVISION = "0003_acl_backfill"
+COMPATIBLE_ALEMBIC_REVISIONS = {
+    "0003_backfill_document_permissions",
+    REQUIRED_ALEMBIC_REVISION,
+}
 AUTO_INIT_SCHEMA = os.getenv("AUTO_INIT_SCHEMA", "false").lower() == "true"
 REQUIRED_TABLES = {
     "tenants",
@@ -142,10 +146,11 @@ def _ensure_schema_ready():
             cur.execute("SELECT version_num FROM alembic_version")
             row = cur.fetchone()
             current_revision = row[0] if row else None
-            if current_revision != REQUIRED_ALEMBIC_REVISION:
+            if current_revision not in COMPATIBLE_ALEMBIC_REVISIONS:
                 raise RuntimeError(
                     f"Database migration revision mismatch: expected "
-                    f"{REQUIRED_ALEMBIC_REVISION}, got {current_revision or 'none'}"
+                    f"one of {sorted(COMPATIBLE_ALEMBIC_REVISIONS)}, "
+                    f"got {current_revision or 'none'}"
                 )
 
             cur.execute(
@@ -159,7 +164,7 @@ def _ensure_schema_ready():
             if missing:
                 raise RuntimeError(f"Database schema is incomplete. Missing tables: {', '.join(missing)}")
 
-        logger.info("Database schema verified at revision %s.", REQUIRED_ALEMBIC_REVISION)
+        logger.info("Database schema verified at revision %s.", current_revision)
     finally:
         conn.close()
 
