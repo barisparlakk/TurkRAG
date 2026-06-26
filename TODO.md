@@ -1,6 +1,6 @@
 # TurkRAG TODO
 
-Last reviewed: 2026-06-24
+Last reviewed: 2026-06-26
 
 ## Requirement analysis
 
@@ -27,6 +27,7 @@ Last reviewed: 2026-06-24
 
 ## Current gaps
 
+- [x] `scripts/audit_retrieval_artifacts.py` and `tests/test_eval_artifacts.py`: add a deterministic audit for committed `results/retrieval_metrics*.json` files so out-of-range normalized metrics, blank questions, and filename/query-count drift are caught before those artifacts are reused.
 - [x] Generated historical eval artifacts no longer contain model scratchpad text; shared sanitization now covers new eval outputs and the committed artifacts were rewritten.
 - [x] `tests/test_middleware.py`: cover production CORS validation and a header-level middleware integration path so env drift is caught before deploys.
 - [x] `api/db.py` and `tests/test_db.py`: make pooled connection release idempotent so duplicate cleanup cannot return one physical connection to the pool twice.
@@ -36,8 +37,9 @@ Last reviewed: 2026-06-24
 - [x] `eval/auto_eval.py`, `api/routers/evaluation.py`, and `dashboard/src/components/AdminPanel.jsx`: replace blocking API evaluation with an admin-only persisted background lifecycle, duplicate suppression, stale recovery, and UI polling.
 - [x] `eval/auto_eval.py`, `api/routers/evaluation.py`, and `tests/test_evaluation_jobs.py`: add single-run status polling and conditional worker claiming so duplicate background invocations cannot re-run terminal evaluation jobs.
 - [x] `api/main.py` and `tests/test_startup_schema.py`: accept both the legacy and renamed Alembic revision IDs so existing migrated databases keep starting after the local revision rename.
-- [ ] Regenerate committed `results/retrieval_metrics*.json` artifacts against the live index; existing files contain inflated pre-fix metrics and should not be used for reporting.
+- [x] `scripts/repair_retrieval_artifacts.py`, `scripts/repair_generated_eval_csv.py`, committed eval/results artifacts, and focused tests: restore blank generated-eval questions from the fuller CSV export, recompute duplicate-safe normalized metrics from stored `retrieved_docs`/`relevant_docs`, rewrite the stale committed artifacts in place, and gate them with `python scripts/audit_retrieval_artifacts.py`.
 
 ## Deferred work
 
 - [ ] Tighten CORS defaults for non-local deployments once the canonical dashboard origin(s) are fixed per environment.
+- [ ] Re-run `python -m eval.retrieval_metrics --tenant <slug>` against a live indexed tenant when fresh historical retrieval baselines are needed; the repaired committed JSONs now have valid normalized metrics, but they still reflect the original ranked retrieval snapshots.

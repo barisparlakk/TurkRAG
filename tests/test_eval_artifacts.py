@@ -5,6 +5,7 @@ from unittest.mock import patch
 import pytest
 
 from eval.ragas_eval import run_eval, save_to_db
+from scripts.audit_retrieval_artifacts import audit_retrieval_artifact
 from scripts.plot_results import collect_latency_series, collect_recall_data, load_latency_results
 
 
@@ -209,3 +210,30 @@ def test_committed_eval_artifacts_do_not_contain_scratchpad_text():
         lowered = contents.lower()
         assert "<think>" not in contents, f"scratchpad tag found in {path.name}"
         assert "okay, let's see." not in lowered, f"reasoning preamble found in {path.name}"
+
+
+def test_audit_retrieval_artifact_flags_out_of_range_metrics_and_blank_questions(tmp_path):
+    artifact_path = tmp_path / "retrieval_metrics_2q.json"
+    artifact_path.write_text(json.dumps([{
+        "aggregate": {
+            "n_queries": 3,
+            "mean_mrr": 1.2,
+            "mean_ap": 0.5,
+            "recall_at_k": {"1": 1.1},
+            "precision_at_k": {"1": 0.5},
+            "ndcg_at_k": {"1": 0.5},
+        },
+        "per_query": [
+            {"question": "", "mrr": 0.5, "ap": 0.5, "recall@1": 0.0, "precision@1": 0.0, "ndcg@1": 0.0},
+            {"question": "Soru", "mrr": 0.5, "ap": 0.5, "recall@1": 1.5, "precision@1": 0.5, "ndcg@1": 0.5},
+        ],
+    }]), encoding="utf-8")
+
+    issues = audit_retrieval_artifact(artifact_path)
+
+    assert any("n_queries=3" in issue for issue in issues)
+    assert any("filename implies 2 queries" in issue for issue in issues)
+    assert any("mean_mrr" in issue for issue in issues)
+    assert any("recall_at_k.1" in issue for issue in issues)
+    assert any("blank per_query question values" in issue for issue in issues)
+    assert any("per_query row #2" in issue and "recall@1" in issue for issue in issues)

@@ -8,32 +8,32 @@
       "final_k": 20,
       "evaluated_at": "2026-05-22T14:32:10.301510",
       "mean_mrr": 0.37677304964539005,
-      "mean_ap": 2.0118374459236392,
+      "mean_ap": 0.37677304964539005,
       "recall_at_k": {
         "1": 0.14893617021276595,
-        "3": 0.5531914893617021,
-        "5": 1.0425531914893618,
-        "10": 2.0,
-        "20": 5.1063829787234045
+        "3": 0.46808510638297873,
+        "5": 0.7446808510638298,
+        "10": 0.8936170212765957,
+        "20": 0.8936170212765957
       },
       "precision_at_k": {
         "1": 0.14893617021276595,
-        "3": 0.18439716312056736,
-        "5": 0.20851063829787236,
-        "10": 0.2,
-        "20": 0.2553191489361702
+        "3": 0.15602836879432624,
+        "5": 0.14893617021276595,
+        "10": 0.08936170212765958,
+        "20": 0.04468085106382979
       },
       "ndcg_at_k": {
         "1": 0.14893617021276595,
-        "3": 0.37892122416413987,
-        "5": 0.5812860556138926,
-        "10": 0.8844182265300845,
-        "20": 1.6626828034229564
+        "3": 0.33079655379939704,
+        "5": 0.449919857096293,
+        "10": 0.5021051336799922,
+        "20": 0.5021051336799922
       }
     },
     "per_query": [
       {
-        "question": "",
+        "question": "Ürünleri nasıl iade edebilirim?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -60,7 +60,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.16666666666666666,
-        "ap": 0.7857142857142856,
+        "ap": 0.16666666666666666,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -70,15 +70,15 @@
         "recall@5": 0.0,
         "precision@5": 0.0,
         "ndcg@5": 0.0,
-        "recall@10": 3.0,
-        "precision@10": 0.3,
-        "ndcg@10": 0.9905705161053366,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 0.9905705161053366
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.3562071871080222,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.3562071871080222
       },
       {
-        "question": "",
+        "question": "İade talebinizi nasıl bildirebilirsiniz?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -105,7 +105,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.16666666666666666,
-        "ap": 0.7857142857142856,
+        "ap": 0.16666666666666666,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -115,12 +115,12 @@
         "recall@5": 0.0,
         "precision@5": 0.0,
         "ndcg@5": 0.0,
-        "recall@10": 3.0,
-        "precision@10": 0.3,
-        "ndcg@10": 0.9905705161053366,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 0.9905705161053366
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.3562071871080222,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.3562071871080222
       },
       {
         "question": "Müşteri hizmetlerine hangi kanallar aracılığıyla ulaşıl",
@@ -150,25 +150,25 @@
           "urun_katalogu.txt"
         ],
         "mrr": 1.0,
-        "ap": 3.0,
+        "ap": 1.0,
         "recall@1": 1.0,
         "precision@1": 1.0,
         "ndcg@1": 1.0,
-        "recall@3": 3.0,
-        "precision@3": 1.0,
-        "ndcg@3": 2.1309297535714578,
-        "recall@5": 3.0,
-        "precision@5": 0.6,
-        "ndcg@5": 2.1309297535714578,
-        "recall@10": 3.0,
-        "precision@10": 0.3,
-        "ndcg@10": 2.1309297535714578,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 2.1309297535714578
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
       },
       {
-        "question": "",
+        "question": "Lisans yenileme tarihinin nerden öğrenebilirim?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -195,7 +195,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.16666666666666666,
-        "ap": 0.7857142857142856,
+        "ap": 0.16666666666666666,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -205,15 +205,15 @@
         "recall@5": 0.0,
         "precision@5": 0.0,
         "ndcg@5": 0.0,
-        "recall@10": 3.0,
-        "precision@10": 0.3,
-        "ndcg@10": 0.9905705161053366,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 0.9905705161053366
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.3562071871080222,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.3562071871080222
       },
       {
-        "question": "",
+        "question": "Teknik destek talebi sırasında hangi bilgileri hazırlamam gerekir?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -240,7 +240,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.16666666666666666,
-        "ap": 0.7857142857142856,
+        "ap": 0.16666666666666666,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -250,15 +250,15 @@
         "recall@5": 0.0,
         "precision@5": 0.0,
         "ndcg@5": 0.0,
-        "recall@10": 3.0,
-        "precision@10": 0.3,
-        "ndcg@10": 0.9905705161053366,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 0.9905705161053366
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.3562071871080222,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.3562071871080222
       },
       {
-        "question": "",
+        "question": "Veri gizliliğiniz nasıl korunuyor?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -285,7 +285,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.16666666666666666,
-        "ap": 0.7857142857142856,
+        "ap": 0.16666666666666666,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -295,15 +295,15 @@
         "recall@5": 0.0,
         "precision@5": 0.0,
         "ndcg@5": 0.0,
-        "recall@10": 3.0,
-        "precision@10": 0.3,
-        "ndcg@10": 0.9905705161053366,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 0.9905705161053366
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.3562071871080222,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.3562071871080222
       },
       {
-        "question": "",
+        "question": "Deneme sürümü mevcut mudur?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -330,7 +330,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.16666666666666666,
-        "ap": 0.7857142857142856,
+        "ap": 0.16666666666666666,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -340,15 +340,15 @@
         "recall@5": 0.0,
         "precision@5": 0.0,
         "ndcg@5": 0.0,
-        "recall@10": 3.0,
-        "precision@10": 0.3,
-        "ndcg@10": 0.9905705161053366,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 0.9905705161053366
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.3562071871080222,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.3562071871080222
       },
       {
-        "question": "",
+        "question": "Şirketin standart çalışma saatleri ne zamanlardır?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -375,25 +375,25 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.3333333333333333,
-        "ap": 0.7333333333333334,
+        "ap": 0.3333333333333333,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
         "recall@3": 1.0,
         "precision@3": 0.3333333333333333,
         "ndcg@3": 0.5,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 0.8868528072345416,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.8868528072345416,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.8868528072345416
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.5,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.5,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.5
       },
       {
-        "question": "",
+        "question": "Çalışanlar haftada en fazla kaç gün evden çalışabilir?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -420,25 +420,25 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.3333333333333333,
-        "ap": 0.7333333333333334,
+        "ap": 0.3333333333333333,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
         "recall@3": 1.0,
         "precision@3": 0.3333333333333333,
         "ndcg@3": 0.5,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 0.8868528072345416,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.8868528072345416,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.8868528072345416
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.5,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.5,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.5
       },
       {
-        "question": "",
+        "question": "Hangi durumlarda uzaktan çalışma izni askıya alınabilir?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -465,25 +465,25 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.3333333333333333,
-        "ap": 0.7333333333333334,
+        "ap": 0.3333333333333333,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
         "recall@3": 1.0,
         "precision@3": 0.3333333333333333,
         "ndcg@3": 0.5,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 0.8868528072345416,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.8868528072345416,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.8868528072345416
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.5,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.5,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.5
       },
       {
-        "question": "",
+        "question": "Uzaktan çalışmanın hangi koşullarını yerine getirmek zorundadır?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -510,25 +510,25 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.3333333333333333,
-        "ap": 0.7333333333333334,
+        "ap": 0.3333333333333333,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
         "recall@3": 1.0,
         "precision@3": 0.3333333333333333,
         "ndcg@3": 0.5,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 0.8868528072345416,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.8868528072345416,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.8868528072345416
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.5,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.5,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.5
       },
       {
-        "question": "",
+        "question": "İzin talepleri en az kaç hafta öncesinde yöneticiye iletilmelidir?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -555,25 +555,25 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.3333333333333333,
-        "ap": 0.7333333333333334,
+        "ap": 0.3333333333333333,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
         "recall@3": 1.0,
         "precision@3": 0.3333333333333333,
         "ndcg@3": 0.5,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 0.8868528072345416,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.8868528072345416,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.8868528072345416
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.5,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.5,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.5
       },
       {
-        "question": "",
+        "question": "Yılsonuna kadar kullanılmayan izinler nasıl işlemektedir?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -618,7 +618,7 @@
         "ndcg@20": 0.43067655807339306
       },
       {
-        "question": "",
+        "question": "Şirket bilgisayarları sadece iş amaçlı kullanılmalıdır mı?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -645,25 +645,25 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.3333333333333333,
-        "ap": 0.7333333333333334,
+        "ap": 0.3333333333333333,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
         "recall@3": 1.0,
         "precision@3": 0.3333333333333333,
         "ndcg@3": 0.5,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 0.8868528072345416,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.8868528072345416,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.8868528072345416
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.5,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.5,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.5
       },
       {
-        "question": "",
+        "question": "Kişisel verilerin işlenmesinde KVKK hükümlerine uyulmaması ne sonuçlara yol açar?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -690,25 +690,25 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.3333333333333333,
-        "ap": 0.7333333333333334,
+        "ap": 0.3333333333333333,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
         "recall@3": 1.0,
         "precision@3": 0.3333333333333333,
         "ndcg@3": 0.5,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 0.8868528072345416,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.8868528072345416,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.8868528072345416
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.5,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.5,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.5
       },
       {
-        "question": "",
+        "question": "Hangi paketlerin aylık lisans ücretleri KDV dahil olmak üzere belirtilmiştir?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -753,7 +753,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "TechVizyon ERP Pro ve TechVizyon CRM Suite paketlerinin hangi özelliklerini içerdiği belirtilmiştir?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -780,7 +780,7 @@
           "03_kvkk_ve_gizlilik_politikasi.txt"
         ],
         "mrr": 0.125,
-        "ap": 0.2583333333333333,
+        "ap": 0.125,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -793,12 +793,12 @@
         "recall@10": 1.0,
         "precision@10": 0.1,
         "ndcg@10": 0.31546487678572877,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.5654648767857288
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.31546487678572877
       },
       {
-        "question": "",
+        "question": "Hangi hizmetlerin fiyatı kullanıcı başına 400 TL/ay + KDV’dir?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -843,7 +843,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Hangi hizmetin fiyatı proje kapsamına göre teklif bazlıdır?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -888,7 +888,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Hangi eğitimin ücreti daha yüksektir?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -933,7 +933,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Veri Analitiği Bootcamp eğitimi kaç gün sürmektedir?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -978,7 +978,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Bilgi güvenliği kurallarına uygun hareket etmenin amacı nedir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1005,7 +1005,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.25,
-        "ap": 3.915325850619968,
+        "ap": 0.25,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -1015,15 +1015,15 @@
         "recall@5": 1.0,
         "precision@5": 0.2,
         "ndcg@5": 0.43067655807339306,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.7461414348591218,
-        "recall@20": 10.0,
-        "precision@20": 0.5,
-        "ndcg@20": 2.776063352167891
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.43067655807339306,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
       },
       {
-        "question": "",
+        "question": "Yapay zekâ araçlarını nasıl güvenli ve verimli şekilde kullanmalıyız?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1050,7 +1050,7 @@
           "03_kvkk_ve_gizlilik_politikasi.txt"
         ],
         "mrr": 0.5,
-        "ap": 0.7222222222222222,
+        "ap": 0.5,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -1060,15 +1060,15 @@
         "recall@5": 1.0,
         "precision@5": 0.2,
         "ndcg@5": 0.6309297535714575,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.9319597492354388,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.9319597492354388
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.6309297535714575,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.6309297535714575
       },
       {
-        "question": "",
+        "question": "Hangi ilkeler bilgi güvenliği temel ilkeleri kapsamında belirtilmiştir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1095,7 +1095,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.25,
-        "ap": 3.915325850619968,
+        "ap": 0.25,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -1105,15 +1105,15 @@
         "recall@5": 1.0,
         "precision@5": 0.2,
         "ndcg@5": 0.43067655807339306,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.7461414348591218,
-        "recall@20": 10.0,
-        "precision@20": 0.5,
-        "ndcg@20": 2.776063352167891
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.43067655807339306,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
       },
       {
-        "question": "",
+        "question": "Bilgi güvenliği temel ilkelerinden hangisi, çalışanların bilgileri yalnızca görevleri ve yetkileri dahilinde kullanmalarını sağlar?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1140,187 +1140,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 1.0,
-        "ap": 5.853709689003806,
-        "recall@1": 1.0,
-        "precision@1": 1.0,
-        "ndcg@1": 1.0,
-        "recall@3": 2.0,
-        "precision@3": 0.6666666666666666,
-        "ndcg@3": 1.6309297535714575,
-        "recall@5": 3.0,
-        "precision@5": 0.6,
-        "ndcg@5": 2.0177825608059994,
-        "recall@10": 4.0,
-        "precision@10": 0.4,
-        "ndcg@10": 2.31881255646998,
-        "recall@20": 10.0,
-        "precision@20": 0.5,
-        "ndcg@20": 3.7995533737003
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_politikasi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_politikasi.txt",
-          "musteri_hizmetleri.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 0.25,
-        "ap": 3.915325850619968,
-        "recall@1": 0.0,
-        "precision@1": 0.0,
-        "ndcg@1": 0.0,
-        "recall@3": 0.0,
-        "precision@3": 0.0,
-        "ndcg@3": 0.0,
-        "recall@5": 1.0,
-        "precision@5": 0.2,
-        "ndcg@5": 0.43067655807339306,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.7461414348591218,
-        "recall@20": 10.0,
-        "precision@20": 0.5,
-        "ndcg@20": 2.776063352167891
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_politikasi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_politikasi.txt",
-          "musteri_hizmetleri.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 0.25,
-        "ap": 3.915325850619968,
-        "recall@1": 0.0,
-        "precision@1": 0.0,
-        "ndcg@1": 0.0,
-        "recall@3": 0.0,
-        "precision@3": 0.0,
-        "ndcg@3": 0.0,
-        "recall@5": 1.0,
-        "precision@5": 0.2,
-        "ndcg@5": 0.43067655807339306,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.7461414348591218,
-        "recall@20": 10.0,
-        "precision@20": 0.5,
-        "ndcg@20": 2.776063352167891
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_politikasi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_politikasi.txt",
-          "musteri_hizmetleri.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 0.25,
-        "ap": 3.915325850619968,
-        "recall@1": 0.0,
-        "precision@1": 0.0,
-        "ndcg@1": 0.0,
-        "recall@3": 0.0,
-        "precision@3": 0.0,
-        "ndcg@3": 0.0,
-        "recall@5": 1.0,
-        "precision@5": 0.2,
-        "ndcg@5": 0.43067655807339306,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.7461414348591218,
-        "recall@20": 10.0,
-        "precision@20": 0.5,
-        "ndcg@20": 2.776063352167891
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_politikasi.txt",
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "sirket_politikasi.txt",
-          "musteri_hizmetleri.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 1.0,
-        "ap": 4.665325850619968,
+        "ap": 1.0,
         "recall@1": 1.0,
         "precision@1": 1.0,
         "ndcg@1": 1.0,
@@ -1330,15 +1150,15 @@
         "recall@5": 1.0,
         "precision@5": 0.2,
         "ndcg@5": 1.0,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 1.3154648767857289,
-        "recall@20": 10.0,
-        "precision@20": 0.5,
-        "ndcg@20": 3.345386794094498
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
       },
       {
-        "question": "",
+        "question": "Parolaların en az kaç karakterden oluşması gerekiyor?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1365,7 +1185,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.25,
-        "ap": 3.915325850619968,
+        "ap": 0.25,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -1375,15 +1195,195 @@
         "recall@5": 1.0,
         "precision@5": 0.2,
         "ndcg@5": 0.43067655807339306,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.7461414348591218,
-        "recall@20": 10.0,
-        "precision@20": 0.5,
-        "ndcg@20": 2.776063352167891
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.43067655807339306,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
       },
       {
-        "question": "",
+        "question": "Parolaları paylaşmanın hangi yolları yasaklanmıştır?",
+        "relevant_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_politikasi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_politikasi.txt",
+          "musteri_hizmetleri.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 0.25,
+        "ap": 0.25,
+        "recall@1": 0.0,
+        "precision@1": 0.0,
+        "ndcg@1": 0.0,
+        "recall@3": 0.0,
+        "precision@3": 0.0,
+        "ndcg@3": 0.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.43067655807339306,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.43067655807339306,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
+      },
+      {
+        "question": "Hangi tür bilgiler yapay zekâ araçlarına girilmemelidir?",
+        "relevant_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_politikasi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_politikasi.txt",
+          "musteri_hizmetleri.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 0.25,
+        "ap": 0.25,
+        "recall@1": 0.0,
+        "precision@1": 0.0,
+        "ndcg@1": 0.0,
+        "recall@3": 0.0,
+        "precision@3": 0.0,
+        "ndcg@3": 0.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.43067655807339306,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.43067655807339306,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
+      },
+      {
+        "question": "Yapay zekâdan alınan çıktılar ne şekilde kullanılmalıdır?",
+        "relevant_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_politikasi.txt",
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "sirket_politikasi.txt",
+          "musteri_hizmetleri.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 1.0,
+        "ap": 1.0,
+        "recall@1": 1.0,
+        "precision@1": 1.0,
+        "ndcg@1": 1.0,
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
+      },
+      {
+        "question": "Kişisel verilerin yetkisiz üçüncü taraflarla paylaşılması yasaktır mı?",
+        "relevant_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_politikasi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_politikasi.txt",
+          "musteri_hizmetleri.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 0.25,
+        "ap": 0.25,
+        "recall@1": 0.0,
+        "precision@1": 0.0,
+        "ndcg@1": 0.0,
+        "recall@3": 0.0,
+        "precision@3": 0.0,
+        "ndcg@3": 0.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.43067655807339306,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.43067655807339306,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
+      },
+      {
+        "question": "Müşteri destek süreçlerinde kişisel verilerin nasıl korunması gerekiyor?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -1410,637 +1410,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 1.0,
-        "ap": 3.933862229102167,
-        "recall@1": 1.0,
-        "precision@1": 1.0,
-        "ndcg@1": 1.0,
-        "recall@3": 2.0,
-        "precision@3": 0.6666666666666666,
-        "ndcg@3": 1.5,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 1.5,
-        "recall@10": 3.0,
-        "precision@10": 0.3,
-        "ndcg@10": 1.8562071871080221,
-        "recall@20": 8.0,
-        "precision@20": 0.4,
-        "ndcg@20": 3.0699568120784115
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_politikasi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_politikasi.txt",
-          "musteri_hizmetleri.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 0.25,
-        "ap": 3.915325850619968,
-        "recall@1": 0.0,
-        "precision@1": 0.0,
-        "ndcg@1": 0.0,
-        "recall@3": 0.0,
-        "precision@3": 0.0,
-        "ndcg@3": 0.0,
-        "recall@5": 1.0,
-        "precision@5": 0.2,
-        "ndcg@5": 0.43067655807339306,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.7461414348591218,
-        "recall@20": 10.0,
-        "precision@20": 0.5,
-        "ndcg@20": 2.776063352167891
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_politikasi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_politikasi.txt",
-          "musteri_hizmetleri.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 1.0,
-        "ap": 4.906234941529059,
-        "recall@1": 1.0,
-        "precision@1": 1.0,
-        "ndcg@1": 1.0,
-        "recall@3": 1.0,
-        "precision@3": 0.3333333333333333,
-        "ndcg@3": 1.0,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 1.3868528072345416,
-        "recall@10": 3.0,
-        "precision@10": 0.3,
-        "ndcg@10": 1.6878828028985229,
-        "recall@20": 10.0,
-        "precision@20": 0.5,
-        "ndcg@20": 3.4475665657799723
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_politikasi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_politikasi.txt",
-          "musteri_hizmetleri.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 0.25,
-        "ap": 3.915325850619968,
-        "recall@1": 0.0,
-        "precision@1": 0.0,
-        "ndcg@1": 0.0,
-        "recall@3": 0.0,
-        "precision@3": 0.0,
-        "ndcg@3": 0.0,
-        "recall@5": 1.0,
-        "precision@5": 0.2,
-        "ndcg@5": 0.43067655807339306,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.7461414348591218,
-        "recall@20": 10.0,
-        "precision@20": 0.5,
-        "ndcg@20": 2.776063352167891
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_politikasi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_politikasi.txt",
-          "musteri_hizmetleri.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 1.0,
-        "ap": 5.017598577892696,
-        "recall@1": 1.0,
-        "precision@1": 1.0,
-        "ndcg@1": 1.0,
-        "recall@3": 1.0,
-        "precision@3": 0.3333333333333333,
-        "ndcg@3": 1.0,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 1.4306765580733931,
-        "recall@10": 3.0,
-        "precision@10": 0.3,
-        "ndcg@10": 1.7461414348591218,
-        "recall@20": 10.0,
-        "precision@20": 0.5,
-        "ndcg@20": 3.497120406516761
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_politikasi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_politikasi.txt",
-          "musteri_hizmetleri.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 0.25,
-        "ap": 3.915325850619968,
-        "recall@1": 0.0,
-        "precision@1": 0.0,
-        "ndcg@1": 0.0,
-        "recall@3": 0.0,
-        "precision@3": 0.0,
-        "ndcg@3": 0.0,
-        "recall@5": 1.0,
-        "precision@5": 0.2,
-        "ndcg@5": 0.43067655807339306,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.7461414348591218,
-        "recall@20": 10.0,
-        "precision@20": 0.5,
-        "ndcg@20": 2.776063352167891
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_politikasi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_politikasi.txt",
-          "musteri_hizmetleri.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 0.25,
-        "ap": 3.915325850619968,
-        "recall@1": 0.0,
-        "precision@1": 0.0,
-        "ndcg@1": 0.0,
-        "recall@3": 0.0,
-        "precision@3": 0.0,
-        "ndcg@3": 0.0,
-        "recall@5": 1.0,
-        "precision@5": 0.2,
-        "ndcg@5": 0.43067655807339306,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.7461414348591218,
-        "recall@20": 10.0,
-        "precision@20": 0.5,
-        "ndcg@20": 2.776063352167891
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_politikasi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_politikasi.txt",
-          "musteri_hizmetleri.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 0.25,
-        "ap": 3.915325850619968,
-        "recall@1": 0.0,
-        "precision@1": 0.0,
-        "ndcg@1": 0.0,
-        "recall@3": 0.0,
-        "precision@3": 0.0,
-        "ndcg@3": 0.0,
-        "recall@5": 1.0,
-        "precision@5": 0.2,
-        "ndcg@5": 0.43067655807339306,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.7461414348591218,
-        "recall@20": 10.0,
-        "precision@20": 0.5,
-        "ndcg@20": 2.776063352167891
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_politikasi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_politikasi.txt",
-          "musteri_hizmetleri.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 0.25,
-        "ap": 3.915325850619968,
-        "recall@1": 0.0,
-        "precision@1": 0.0,
-        "ndcg@1": 0.0,
-        "recall@3": 0.0,
-        "precision@3": 0.0,
-        "ndcg@3": 0.0,
-        "recall@5": 1.0,
-        "precision@5": 0.2,
-        "ndcg@5": 0.43067655807339306,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.7461414348591218,
-        "recall@20": 10.0,
-        "precision@20": 0.5,
-        "ndcg@20": 2.776063352167891
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_politikasi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_politikasi.txt",
-          "musteri_hizmetleri.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 0.5,
-        "ap": 1.0771929824561401,
-        "recall@1": 0.0,
-        "precision@1": 0.0,
-        "ndcg@1": 0.0,
-        "recall@3": 1.0,
-        "precision@3": 0.3333333333333333,
-        "ndcg@3": 0.6309297535714575,
-        "recall@5": 1.0,
-        "precision@5": 0.2,
-        "ndcg@5": 0.6309297535714575,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.9199945798893454,
-        "recall@20": 4.0,
-        "precision@20": 0.2,
-        "ndcg@20": 1.3867817064157428
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_politikasi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_politikasi.txt",
-          "musteri_hizmetleri.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 0.5,
-        "ap": 1.0771929824561401,
-        "recall@1": 0.0,
-        "precision@1": 0.0,
-        "ndcg@1": 0.0,
-        "recall@3": 1.0,
-        "precision@3": 0.3333333333333333,
-        "ndcg@3": 0.6309297535714575,
-        "recall@5": 1.0,
-        "precision@5": 0.2,
-        "ndcg@5": 0.6309297535714575,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.9199945798893454,
-        "recall@20": 4.0,
-        "precision@20": 0.2,
-        "ndcg@20": 1.3867817064157428
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_politikasi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_politikasi.txt",
-          "musteri_hizmetleri.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 0.5,
-        "ap": 1.0771929824561401,
-        "recall@1": 0.0,
-        "precision@1": 0.0,
-        "ndcg@1": 0.0,
-        "recall@3": 1.0,
-        "precision@3": 0.3333333333333333,
-        "ndcg@3": 0.6309297535714575,
-        "recall@5": 1.0,
-        "precision@5": 0.2,
-        "ndcg@5": 0.6309297535714575,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.9199945798893454,
-        "recall@20": 4.0,
-        "precision@20": 0.2,
-        "ndcg@20": 1.3867817064157428
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_politikasi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_politikasi.txt",
-          "musteri_hizmetleri.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 0.5,
-        "ap": 1.0771929824561401,
-        "recall@1": 0.0,
-        "precision@1": 0.0,
-        "ndcg@1": 0.0,
-        "recall@3": 1.0,
-        "precision@3": 0.3333333333333333,
-        "ndcg@3": 0.6309297535714575,
-        "recall@5": 1.0,
-        "precision@5": 0.2,
-        "ndcg@5": 0.6309297535714575,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.9199945798893454,
-        "recall@20": 4.0,
-        "precision@20": 0.2,
-        "ndcg@20": 1.3867817064157428
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_politikasi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_politikasi.txt",
-          "musteri_hizmetleri.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 0.5,
-        "ap": 1.0771929824561401,
-        "recall@1": 0.0,
-        "precision@1": 0.0,
-        "ndcg@1": 0.0,
-        "recall@3": 1.0,
-        "precision@3": 0.3333333333333333,
-        "ndcg@3": 0.6309297535714575,
-        "recall@5": 1.0,
-        "precision@5": 0.2,
-        "ndcg@5": 0.6309297535714575,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.9199945798893454,
-        "recall@20": 4.0,
-        "precision@20": 0.2,
-        "ndcg@20": 1.3867817064157428
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "sirket_politikasi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_politikasi.txt",
-          "musteri_hizmetleri.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 1.0,
-        "ap": 1.5771929824561404,
+        "ap": 1.0,
         "recall@1": 1.0,
         "precision@1": 1.0,
         "ndcg@1": 1.0,
@@ -2050,15 +1420,375 @@
         "recall@5": 1.0,
         "precision@5": 0.2,
         "ndcg@5": 1.0,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 1.2890648263178879,
-        "recall@20": 4.0,
-        "precision@20": 0.2,
-        "ndcg@20": 1.7558519528442853
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
       },
       {
-        "question": "",
+        "question": "Şirket verisi, hangi yollarla paylaşılması yasaktır?",
+        "relevant_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_politikasi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_politikasi.txt",
+          "musteri_hizmetleri.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 0.25,
+        "ap": 0.25,
+        "recall@1": 0.0,
+        "precision@1": 0.0,
+        "ndcg@1": 0.0,
+        "recall@3": 0.0,
+        "precision@3": 0.0,
+        "ndcg@3": 0.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.43067655807339306,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.43067655807339306,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
+      },
+      {
+        "question": "Dış paydaşlarla dosya paylaşımında hangi kontroller yapılmalıdır?",
+        "relevant_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_politikasi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_politikasi.txt",
+          "musteri_hizmetleri.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 1.0,
+        "ap": 1.0,
+        "recall@1": 1.0,
+        "precision@1": 1.0,
+        "ndcg@1": 1.0,
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
+      },
+      {
+        "question": "Kayıp veya çalıntı cihaz durumunda çalışanlar ne kadar sürede Bilgi Teknolojileri birimine ve yöneticisine haber vermelidir?",
+        "relevant_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_politikasi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_politikasi.txt",
+          "musteri_hizmetleri.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 0.25,
+        "ap": 0.25,
+        "recall@1": 0.0,
+        "precision@1": 0.0,
+        "ndcg@1": 0.0,
+        "recall@3": 0.0,
+        "precision@3": 0.0,
+        "ndcg@3": 0.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.43067655807339306,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.43067655807339306,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
+      },
+      {
+        "question": "Bildirim kanallarından hangileri kullanılabiliyor?",
+        "relevant_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_politikasi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_politikasi.txt",
+          "musteri_hizmetleri.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 1.0,
+        "ap": 1.0,
+        "recall@1": 1.0,
+        "precision@1": 1.0,
+        "ndcg@1": 1.0,
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
+      },
+      {
+        "question": "Hangi birimlerin çalışanları için ek güvenlik eğitimleri düzenlenebilir?",
+        "relevant_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_politikasi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_politikasi.txt",
+          "musteri_hizmetleri.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 0.25,
+        "ap": 0.25,
+        "recall@1": 0.0,
+        "precision@1": 0.0,
+        "ndcg@1": 0.0,
+        "recall@3": 0.0,
+        "precision@3": 0.0,
+        "ndcg@3": 0.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.43067655807339306,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.43067655807339306,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
+      },
+      {
+        "question": "Bilgi güvenliği ve yapay zekâ kullanımı farkındalık eğitimine kimler katılmakla yükümlüdür?",
+        "relevant_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_politikasi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_politikasi.txt",
+          "musteri_hizmetleri.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 0.25,
+        "ap": 0.25,
+        "recall@1": 0.0,
+        "precision@1": 0.0,
+        "ndcg@1": 0.0,
+        "recall@3": 0.0,
+        "precision@3": 0.0,
+        "ndcg@3": 0.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.43067655807339306,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.43067655807339306,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
+      },
+      {
+        "question": "Hangi birimler rehberi yılda en az bir kez gözden geçirir?",
+        "relevant_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_politikasi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_politikasi.txt",
+          "musteri_hizmetleri.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 0.25,
+        "ap": 0.25,
+        "recall@1": 0.0,
+        "precision@1": 0.0,
+        "ndcg@1": 0.0,
+        "recall@3": 0.0,
+        "precision@3": 0.0,
+        "ndcg@3": 0.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.43067655807339306,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.43067655807339306,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
+      },
+      {
+        "question": "Rehberin güncellenmesi ve çalışanlara duyurulması hangi durumlarda gerekir?",
+        "relevant_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_politikasi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_politikasi.txt",
+          "musteri_hizmetleri.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 0.25,
+        "ap": 0.25,
+        "recall@1": 0.0,
+        "precision@1": 0.0,
+        "ndcg@1": 0.0,
+        "recall@3": 0.0,
+        "precision@3": 0.0,
+        "ndcg@3": 0.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.43067655807339306,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.43067655807339306,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
+      },
+      {
+        "question": "Şirket içi oryantasyon ve eğitim sürecinin amacı nedir?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -2085,7 +1815,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.5,
-        "ap": 1.0771929824561401,
+        "ap": 0.5,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -2095,15 +1825,60 @@
         "recall@5": 1.0,
         "precision@5": 0.2,
         "ndcg@5": 0.6309297535714575,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.9199945798893454,
-        "recall@20": 4.0,
-        "precision@20": 0.2,
-        "ndcg@20": 1.3867817064157428
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.6309297535714575,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.6309297535714575
       },
       {
-        "question": "",
+        "question": "Bu rehberin hangi kişilere uygulanması sağlanmaktadır?",
+        "relevant_docs": [
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_politikasi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_politikasi.txt",
+          "musteri_hizmetleri.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 0.5,
+        "ap": 0.5,
+        "recall@1": 0.0,
+        "precision@1": 0.0,
+        "ndcg@1": 0.0,
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 0.6309297535714575,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.6309297535714575,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.6309297535714575,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.6309297535714575
+      },
+      {
+        "question": "Hangi unsurların tamamlanması yeni çalışanın işe başlamasından önce gereklidir?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -2130,7 +1905,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.5,
-        "ap": 1.0771929824561401,
+        "ap": 0.5,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -2140,12 +1915,237 @@
         "recall@5": 1.0,
         "precision@5": 0.2,
         "ndcg@5": 0.6309297535714575,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.9199945798893454,
-        "recall@20": 4.0,
-        "precision@20": 0.2,
-        "ndcg@20": 1.3867817064157428
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.6309297535714575,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.6309297535714575
+      },
+      {
+        "question": "Kurumsal e-posta hesabı oluşturulması, şirket içi iletişim araçlarına erişim tanımlanması ve gerekli yazılım lisansları ve kullanıcı yetkilerinin sağlanması hangi süreçte yer alır?",
+        "relevant_docs": [
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_politikasi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_politikasi.txt",
+          "musteri_hizmetleri.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 0.5,
+        "ap": 0.5,
+        "recall@1": 0.0,
+        "precision@1": 0.0,
+        "ndcg@1": 0.0,
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 0.6309297535714575,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.6309297535714575,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.6309297535714575,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.6309297535714575
+      },
+      {
+        "question": "Erişim yetkileri hangi kişilerin onayıyla açılmalıdır?",
+        "relevant_docs": [
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_politikasi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_politikasi.txt",
+          "musteri_hizmetleri.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 0.5,
+        "ap": 0.5,
+        "recall@1": 0.0,
+        "precision@1": 0.0,
+        "ndcg@1": 0.0,
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 0.6309297535714575,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.6309297535714575,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.6309297535714575,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.6309297535714575
+      },
+      {
+        "question": "İlk gün programının amacı nedir?",
+        "relevant_docs": [
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "sirket_politikasi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_politikasi.txt",
+          "musteri_hizmetleri.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 1.0,
+        "ap": 1.0,
+        "recall@1": 1.0,
+        "precision@1": 1.0,
+        "ndcg@1": 1.0,
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
+      },
+      {
+        "question": "İlk gün sonunda çalışanın hangi sistemlere erişimi test edilmelidir?",
+        "relevant_docs": [
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_politikasi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_politikasi.txt",
+          "musteri_hizmetleri.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 0.5,
+        "ap": 0.5,
+        "recall@1": 0.0,
+        "precision@1": 0.0,
+        "ndcg@1": 0.0,
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 0.6309297535714575,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.6309297535714575,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.6309297535714575,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.6309297535714575
+      },
+      {
+        "question": "Mentorun görevlerinden biri olarak çalışanın hangi konulara yardımcı olması beklenir?",
+        "relevant_docs": [
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_politikasi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_politikasi.txt",
+          "musteri_hizmetleri.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 0.5,
+        "ap": 0.5,
+        "recall@1": 0.0,
+        "precision@1": 0.0,
+        "ndcg@1": 0.0,
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 0.6309297535714575,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.6309297535714575,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.6309297535714575,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.6309297535714575
       }
     ]
   },
@@ -2158,32 +2158,32 @@
       "final_k": 20,
       "evaluated_at": "2026-05-22T14:32:28.412013",
       "mean_mrr": 0.20116291197329997,
-      "mean_ap": 0.5883678729324602,
+      "mean_ap": 0.20116291197329997,
       "recall_at_k": {
         "1": 0.10638297872340426,
-        "3": 0.2553191489361702,
-        "5": 0.44680851063829785,
-        "10": 0.6808510638297872,
-        "20": 2.1702127659574466
+        "3": 0.2127659574468085,
+        "5": 0.2765957446808511,
+        "10": 0.3404255319148936,
+        "20": 0.7021276595744681
       },
       "precision_at_k": {
         "1": 0.10638297872340426,
-        "3": 0.0851063829787234,
-        "5": 0.08936170212765958,
-        "10": 0.06808510638297872,
-        "20": 0.10851063829787233
+        "3": 0.07092198581560283,
+        "5": 0.055319148936170216,
+        "10": 0.03404255319148936,
+        "20": 0.035106382978723406
       },
       "ndcg_at_k": {
         "1": 0.10638297872340426,
-        "3": 0.1919940215805496,
-        "5": 0.27166674009425135,
-        "10": 0.34811665167546474,
-        "20": 0.709880260716618
+        "3": 0.16793168639817813,
+        "5": 0.1954216794666926,
+        "10": 0.21672974756315921,
+        "20": 0.3063447582027228
       }
     },
     "per_query": [
       {
-        "question": "",
+        "question": "Ürünleri nasıl iade edebilirim?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -2228,7 +2228,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "İade talebinizi nasıl bildirebilirsiniz?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -2255,7 +2255,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.25,
-        "ap": 0.7121848739495799,
+        "ap": 0.25,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -2265,12 +2265,12 @@
         "recall@5": 1.0,
         "precision@5": 0.2,
         "ndcg@5": 0.43067655807339306,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.7640098914067264,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 1.0038223579748577
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.43067655807339306,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
       },
       {
         "question": "Müşteri hizmetlerine hangi kanallar aracılığıyla ulaşıl",
@@ -2300,7 +2300,7 @@
           "03_kvkk_ve_gizlilik_politikasi.txt"
         ],
         "mrr": 1.0,
-        "ap": 1.8714285714285714,
+        "ap": 1.0,
         "recall@1": 1.0,
         "precision@1": 1.0,
         "ndcg@1": 1.0,
@@ -2310,15 +2310,15 @@
         "recall@5": 1.0,
         "precision@5": 0.2,
         "ndcg@5": 1.0,
-        "recall@10": 3.0,
-        "precision@10": 0.3,
-        "ndcg@10": 1.6223981596512211,
-        "recall@20": 4.0,
-        "precision@20": 0.2,
-        "ndcg@20": 1.8783561844610368
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
       },
       {
-        "question": "",
+        "question": "Lisans yenileme tarihinin nerden öğrenebilirim?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -2363,7 +2363,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Teknik destek talebi sırasında hangi bilgileri hazırlamam gerekir?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -2390,7 +2390,7 @@
           "musteri_hizmetleri.txt"
         ],
         "mrr": 0.16666666666666666,
-        "ap": 0.26666666666666666,
+        "ap": 0.16666666666666666,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -2403,12 +2403,12 @@
         "recall@10": 1.0,
         "precision@10": 0.1,
         "ndcg@10": 0.3562071871080222,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.5838774358049752
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.3562071871080222
       },
       {
-        "question": "",
+        "question": "Veri gizliliğiniz nasıl korunuyor?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -2453,7 +2453,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Deneme sürümü mevcut mudur?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -2480,7 +2480,7 @@
           "02_bilgi_teknolojileri_kullanim_politikasi.txt"
         ],
         "mrr": 1.0,
-        "ap": 1.1428571428571428,
+        "ap": 1.0,
         "recall@1": 1.0,
         "precision@1": 1.0,
         "ndcg@1": 1.0,
@@ -2493,12 +2493,12 @@
         "recall@10": 1.0,
         "precision@10": 0.1,
         "ndcg@10": 1.0,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 1.2559580248098154
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
       },
       {
-        "question": "",
+        "question": "Şirketin standart çalışma saatleri ne zamanlardır?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -2543,7 +2543,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Çalışanlar haftada en fazla kaç gün evden çalışabilir?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -2588,7 +2588,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Hangi durumlarda uzaktan çalışma izni askıya alınabilir?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -2633,7 +2633,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Uzaktan çalışmanın hangi koşullarını yerine getirmek zorundadır?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -2678,7 +2678,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "İzin talepleri en az kaç hafta öncesinde yöneticiye iletilmelidir?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -2723,7 +2723,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Yılsonuna kadar kullanılmayan izinler nasıl işlemektedir?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -2768,7 +2768,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Şirket bilgisayarları sadece iş amaçlı kullanılmalıdır mı?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -2813,7 +2813,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Kişisel verilerin işlenmesinde KVKK hükümlerine uyulmaması ne sonuçlara yol açar?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -2858,7 +2858,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Hangi paketlerin aylık lisans ücretleri KDV dahil olmak üzere belirtilmiştir?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -2903,7 +2903,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "TechVizyon ERP Pro ve TechVizyon CRM Suite paketlerinin hangi özelliklerini içerdiği belirtilmiştir?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -2930,7 +2930,7 @@
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
         "mrr": 0.16666666666666666,
-        "ap": 0.5627705627705628,
+        "ap": 0.16666666666666666,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -2943,12 +2943,12 @@
         "recall@10": 1.0,
         "precision@10": 0.1,
         "ndcg@10": 0.3562071871080222,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 0.8911081575689676
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.3562071871080222
       },
       {
-        "question": "",
+        "question": "Hangi hizmetlerin fiyatı kullanıcı başına 400 TL/ay + KDV’dir?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -2993,7 +2993,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Hangi hizmetin fiyatı proje kapsamına göre teklif bazlıdır?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -3038,7 +3038,7 @@
         "ndcg@20": 0.43067655807339306
       },
       {
-        "question": "",
+        "question": "Hangi eğitimin ücreti daha yüksektir?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -3083,7 +3083,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Veri Analitiği Bootcamp eğitimi kaç gün sürmektedir?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -3128,7 +3128,7 @@
         "ndcg@20": 0.5
       },
       {
-        "question": "",
+        "question": "Bilgi güvenliği kurallarına uygun hareket etmenin amacı nedir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3155,7 +3155,7 @@
           "08_musteri_basari_ve_destek_sla.txt"
         ],
         "mrr": 0.0625,
-        "ap": 0.33150584795321636,
+        "ap": 0.0625,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -3168,12 +3168,12 @@
         "recall@10": 0.0,
         "precision@10": 0.0,
         "ndcg@10": 0.0,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 0.7114376686446234
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.24465054211822604
       },
       {
-        "question": "",
+        "question": "Yapay zekâ araçlarını nasıl güvenli ve verimli şekilde kullanmalıyız?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3200,7 +3200,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.08333333333333333,
-        "ap": 0.38717948717948714,
+        "ap": 0.08333333333333333,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -3213,12 +3213,12 @@
         "recall@10": 0.0,
         "precision@10": 0.0,
         "ndcg@10": 0.0,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 0.7605579381614663
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.27023815442731974
       },
       {
-        "question": "",
+        "question": "Hangi ilkeler bilgi güvenliği temel ilkeleri kapsamında belirtilmiştir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3245,7 +3245,7 @@
           "08_musteri_basari_ve_destek_sla.txt"
         ],
         "mrr": 0.0625,
-        "ap": 0.33150584795321636,
+        "ap": 0.0625,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -3258,12 +3258,12 @@
         "recall@10": 0.0,
         "precision@10": 0.0,
         "ndcg@10": 0.0,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 0.7114376686446234
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.24465054211822604
       },
       {
-        "question": "",
+        "question": "Bilgi güvenliği temel ilkelerinden hangisi, çalışanların bilgileri yalnızca görevleri ve yetkileri dahilinde kullanmalarını sağlar?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3290,7 +3290,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.058823529411764705,
-        "ap": 0.3199346405228758,
+        "ap": 0.058823529411764705,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -3303,12 +3303,12 @@
         "recall@10": 0.0,
         "precision@10": 0.0,
         "ndcg@10": 0.0,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 0.7028916286317227
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.23981246656813146
       },
       {
-        "question": "",
+        "question": "Parolaların en az kaç karakterden oluşması gerekiyor?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3335,7 +3335,7 @@
           "08_musteri_basari_ve_destek_sla.txt"
         ],
         "mrr": 0.0625,
-        "ap": 0.33150584795321636,
+        "ap": 0.0625,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -3348,12 +3348,12 @@
         "recall@10": 0.0,
         "precision@10": 0.0,
         "ndcg@10": 0.0,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 0.7114376686446234
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.24465054211822604
       },
       {
-        "question": "",
+        "question": "Parolaları paylaşmanın hangi yolları yasaklanmıştır?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3380,25 +3380,25 @@
           "05_satin_alma_ve_tedarikci_yonetimi.txt"
         ],
         "mrr": 0.5,
-        "ap": 1.9861111111111112,
+        "ap": 0.5,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
         "recall@3": 1.0,
         "precision@3": 0.3333333333333333,
         "ndcg@3": 0.6309297535714575,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 1.0616063116448506,
-        "recall@10": 3.0,
-        "precision@10": 0.3,
-        "ndcg@10": 1.3770711884305793,
-        "recall@20": 5.0,
-        "precision@20": 0.25,
-        "ndcg@20": 1.8827182562245373
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.6309297535714575,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.6309297535714575,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.6309297535714575
       },
       {
-        "question": "",
+        "question": "Hangi tür bilgiler yapay zekâ araçlarına girilmemelidir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3425,7 +3425,7 @@
           "08_musteri_basari_ve_destek_sla.txt"
         ],
         "mrr": 0.0625,
-        "ap": 0.33150584795321636,
+        "ap": 0.0625,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -3438,12 +3438,12 @@
         "recall@10": 0.0,
         "precision@10": 0.0,
         "ndcg@10": 0.0,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 0.7114376686446234
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.24465054211822604
       },
       {
-        "question": "",
+        "question": "Yapay zekâdan alınan çıktılar ne şekilde kullanılmalıdır?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3470,7 +3470,7 @@
           "02_bilgi_teknolojileri_kullanim_politikasi.txt"
         ],
         "mrr": 0.06666666666666667,
-        "ap": 0.34220846233230134,
+        "ap": 0.06666666666666667,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -3483,12 +3483,12 @@
         "recall@10": 0.0,
         "precision@10": 0.0,
         "ndcg@10": 0.0,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 0.7211906797278906
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.25
       },
       {
-        "question": "",
+        "question": "Kişisel verilerin yetkisiz üçüncü taraflarla paylaşılması yasaktır mı?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3515,7 +3515,7 @@
           "08_musteri_basari_ve_destek_sla.txt"
         ],
         "mrr": 0.0625,
-        "ap": 0.33150584795321636,
+        "ap": 0.0625,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -3528,12 +3528,12 @@
         "recall@10": 0.0,
         "precision@10": 0.0,
         "ndcg@10": 0.0,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 0.7114376686446234
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.24465054211822604
       },
       {
-        "question": "",
+        "question": "Müşteri destek süreçlerinde kişisel verilerin nasıl korunması gerekiyor?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3560,25 +3560,25 @@
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
         "mrr": 1.0,
-        "ap": 2.0785714285714283,
+        "ap": 1.0,
         "recall@1": 1.0,
         "precision@1": 1.0,
         "ndcg@1": 1.0,
         "recall@3": 1.0,
         "precision@3": 0.3333333333333333,
         "ndcg@3": 1.0,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 1.3868528072345416,
-        "recall@10": 3.0,
-        "precision@10": 0.3,
-        "ndcg@10": 1.7201861405678749,
-        "recall@20": 4.0,
-        "precision@20": 0.2,
-        "ndcg@20": 1.964836682686101
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
       },
       {
-        "question": "",
+        "question": "Şirket verisi, hangi yollarla paylaşılması yasaktır?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3605,7 +3605,7 @@
           "08_musteri_basari_ve_destek_sla.txt"
         ],
         "mrr": 0.0625,
-        "ap": 0.33150584795321636,
+        "ap": 0.0625,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -3618,12 +3618,12 @@
         "recall@10": 0.0,
         "precision@10": 0.0,
         "ndcg@10": 0.0,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 0.7114376686446234
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.24465054211822604
       },
       {
-        "question": "",
+        "question": "Dış paydaşlarla dosya paylaşımında hangi kontroller yapılmalıdır?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3650,7 +3650,7 @@
           "10_yazilim_gelistirme_ve_kodlama_standartlari.txt"
         ],
         "mrr": 0.5,
-        "ap": 0.8007518796992481,
+        "ap": 0.5,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -3663,12 +3663,12 @@
         "recall@10": 1.0,
         "precision@10": 0.1,
         "ndcg@10": 0.6309297535714575,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 1.1182659915410322
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.6309297535714575
       },
       {
-        "question": "",
+        "question": "Kayıp veya çalıntı cihaz durumunda çalışanlar ne kadar sürede Bilgi Teknolojileri birimine ve yöneticisine haber vermelidir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3695,7 +3695,7 @@
           "08_musteri_basari_ve_destek_sla.txt"
         ],
         "mrr": 0.0625,
-        "ap": 0.33150584795321636,
+        "ap": 0.0625,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -3708,12 +3708,12 @@
         "recall@10": 0.0,
         "precision@10": 0.0,
         "ndcg@10": 0.0,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 0.7114376686446234
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.24465054211822604
       },
       {
-        "question": "",
+        "question": "Bildirim kanallarından hangileri kullanılabiliyor?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3740,7 +3740,7 @@
           "01_insan_kaynaklari_el_kitabi.txt"
         ],
         "mrr": 0.25,
-        "ap": 0.40384615384615385,
+        "ap": 0.25,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -3753,12 +3753,12 @@
         "recall@10": 1.0,
         "precision@10": 0.1,
         "ndcg@10": 0.43067655807339306,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.6933260931105867
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
       },
       {
-        "question": "",
+        "question": "Hangi birimlerin çalışanları için ek güvenlik eğitimleri düzenlenebilir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3785,7 +3785,7 @@
           "08_musteri_basari_ve_destek_sla.txt"
         ],
         "mrr": 0.0625,
-        "ap": 0.33150584795321636,
+        "ap": 0.0625,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -3798,12 +3798,12 @@
         "recall@10": 0.0,
         "precision@10": 0.0,
         "ndcg@10": 0.0,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 0.7114376686446234
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.24465054211822604
       },
       {
-        "question": "",
+        "question": "Bilgi güvenliği ve yapay zekâ kullanımı farkındalık eğitimine kimler katılmakla yükümlüdür?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3848,7 +3848,7 @@
         "ndcg@20": 0.25
       },
       {
-        "question": "",
+        "question": "Hangi birimler rehberi yılda en az bir kez gözden geçirir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3875,7 +3875,7 @@
           "08_musteri_basari_ve_destek_sla.txt"
         ],
         "mrr": 0.0625,
-        "ap": 0.33150584795321636,
+        "ap": 0.0625,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -3888,12 +3888,12 @@
         "recall@10": 0.0,
         "precision@10": 0.0,
         "ndcg@10": 0.0,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 0.7114376686446234
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.24465054211822604
       },
       {
-        "question": "",
+        "question": "Rehberin güncellenmesi ve çalışanlara duyurulması hangi durumlarda gerekir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -3920,7 +3920,7 @@
           "01_insan_kaynaklari_el_kitabi.txt"
         ],
         "mrr": 0.1,
-        "ap": 0.20526315789473684,
+        "ap": 0.1,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -3933,12 +3933,12 @@
         "recall@10": 1.0,
         "precision@10": 0.1,
         "ndcg@10": 0.2890648263178879,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.520443039477647
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.2890648263178879
       },
       {
-        "question": "",
+        "question": "Şirket içi oryantasyon ve eğitim sürecinin amacı nedir?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -3965,7 +3965,7 @@
           "08_musteri_basari_ve_destek_sla.txt"
         ],
         "mrr": 0.06666666666666667,
-        "ap": 0.1843137254901961,
+        "ap": 0.06666666666666667,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -3978,12 +3978,12 @@
         "recall@10": 0.0,
         "precision@10": 0.0,
         "ndcg@10": 0.0,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.4898124665681315
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.25
       },
       {
-        "question": "",
+        "question": "Bu rehberin hangi kişilere uygulanması sağlanmaktadır?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -4010,25 +4010,25 @@
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
         "mrr": 0.3333333333333333,
-        "ap": 1.7606909430438844,
+        "ap": 0.3333333333333333,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
         "recall@3": 1.0,
         "precision@3": 0.3333333333333333,
         "ndcg@3": 0.5,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 0.8868528072345416,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.8868528072345416,
-        "recall@20": 6.0,
-        "precision@20": 0.3,
-        "ndcg@20": 1.84570246067608
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.5,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.5,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.5
       },
       {
-        "question": "",
+        "question": "Hangi unsurların tamamlanması yeni çalışanın işe başlamasından önce gereklidir?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -4055,7 +4055,7 @@
           "08_musteri_basari_ve_destek_sla.txt"
         ],
         "mrr": 0.06666666666666667,
-        "ap": 0.1843137254901961,
+        "ap": 0.06666666666666667,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -4068,12 +4068,12 @@
         "recall@10": 0.0,
         "precision@10": 0.0,
         "ndcg@10": 0.0,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.4898124665681315
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.25
       },
       {
-        "question": "",
+        "question": "Kurumsal e-posta hesabı oluşturulması, şirket içi iletişim araçlarına erişim tanımlanması ve gerekli yazılım lisansları ve kullanıcı yetkilerinin sağlanması hangi süreçte yer alır?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -4100,25 +4100,25 @@
           "urun_katalogu.txt"
         ],
         "mrr": 1.0,
-        "ap": 3.8949561403508772,
+        "ap": 1.0,
         "recall@1": 1.0,
         "precision@1": 1.0,
         "ndcg@1": 1.0,
-        "recall@3": 2.0,
-        "precision@3": 0.6666666666666666,
-        "ndcg@3": 1.6309297535714575,
-        "recall@5": 3.0,
-        "precision@5": 0.6,
-        "ndcg@5": 2.0177825608059994,
-        "recall@10": 4.0,
-        "precision@10": 0.4,
-        "ndcg@10": 2.3739897479140213,
-        "recall@20": 6.0,
-        "precision@20": 0.3,
-        "ndcg@20": 2.8500185031920067
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
       },
       {
-        "question": "",
+        "question": "Erişim yetkileri hangi kişilerin onayıyla açılmalıdır?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -4145,7 +4145,7 @@
           "08_musteri_basari_ve_destek_sla.txt"
         ],
         "mrr": 0.06666666666666667,
-        "ap": 0.1843137254901961,
+        "ap": 0.06666666666666667,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -4158,12 +4158,12 @@
         "recall@10": 0.0,
         "precision@10": 0.0,
         "ndcg@10": 0.0,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.4898124665681315
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.25
       },
       {
-        "question": "",
+        "question": "İlk gün programının amacı nedir?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -4190,25 +4190,25 @@
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
         "mrr": 0.5,
-        "ap": 2.845779220779221,
+        "ap": 0.5,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
         "recall@3": 1.0,
         "precision@3": 0.3333333333333333,
         "ndcg@3": 0.6309297535714575,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 1.0616063116448506,
-        "recall@10": 3.0,
-        "precision@10": 0.3,
-        "ndcg@10": 1.3770711884305793,
-        "recall@20": 7.0,
-        "precision@20": 0.35,
-        "ndcg@20": 2.389642407588478
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.6309297535714575,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.6309297535714575,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.6309297535714575
       },
       {
-        "question": "",
+        "question": "İlk gün sonunda çalışanın hangi sistemlere erişimi test edilmelidir?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -4235,7 +4235,7 @@
           "08_musteri_basari_ve_destek_sla.txt"
         ],
         "mrr": 0.06666666666666667,
-        "ap": 0.1843137254901961,
+        "ap": 0.06666666666666667,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -4248,12 +4248,12 @@
         "recall@10": 0.0,
         "precision@10": 0.0,
         "ndcg@10": 0.0,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.4898124665681315
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.25
       },
       {
-        "question": "",
+        "question": "Mentorun görevlerinden biri olarak çalışanın hangi konulara yardımcı olması beklenir?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -4280,22 +4280,22 @@
           "01_insan_kaynaklari_el_kitabi.txt"
         ],
         "mrr": 1.0,
-        "ap": 3.701282051282051,
+        "ap": 1.0,
         "recall@1": 1.0,
         "precision@1": 1.0,
         "ndcg@1": 1.0,
-        "recall@3": 2.0,
-        "precision@3": 0.6666666666666666,
-        "ndcg@3": 1.5,
-        "recall@5": 3.0,
-        "precision@5": 0.6,
-        "ndcg@5": 1.9306765580733931,
-        "recall@10": 4.0,
-        "precision@10": 0.4,
-        "ndcg@10": 2.2461414348591218,
-        "recall@20": 6.0,
-        "precision@20": 0.3,
-        "ndcg@20": 2.7587909698963156
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
       }
     ]
   },
@@ -4308,32 +4308,32 @@
       "final_k": 20,
       "evaluated_at": "2026-05-22T14:39:58.103615",
       "mean_mrr": 0.4624113475177305,
-      "mean_ap": 1.328613644039176,
+      "mean_ap": 0.4624113475177305,
       "recall_at_k": {
         "1": 0.3191489361702128,
-        "3": 0.851063829787234,
-        "5": 1.3617021276595744,
-        "10": 2.3617021276595747,
-        "20": 2.3617021276595747
+        "3": 0.5106382978723404,
+        "5": 0.723404255319149,
+        "10": 0.8723404255319149,
+        "20": 0.8723404255319149
       },
       "precision_at_k": {
         "1": 0.3191489361702128,
-        "3": 0.2836879432624113,
-        "5": 0.2723404255319149,
-        "10": 0.23617021276595743,
-        "20": 0.11808510638297871
+        "3": 0.1702127659574468,
+        "5": 0.1446808510638298,
+        "10": 0.0872340425531915,
+        "20": 0.04361702127659575
       },
       "ndcg_at_k": {
         "1": 0.3191489361702128,
-        "3": 0.621320995668701,
-        "5": 0.8300518974494504,
-        "10": 1.1421895055256823,
-        "20": 1.1421895055256823
+        "3": 0.4232508353343484,
+        "5": 0.5130193051015021,
+        "10": 0.5590820602958608,
+        "20": 0.5590820602958608
       }
     },
     "per_query": [
       {
-        "question": "",
+        "question": "Ürünleri nasıl iade edebilirim?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -4350,25 +4350,25 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 1.0,
-        "ap": 2.0,
+        "ap": 1.0,
         "recall@1": 1.0,
         "precision@1": 1.0,
         "ndcg@1": 1.0,
-        "recall@3": 2.0,
-        "precision@3": 0.6666666666666666,
-        "ndcg@3": 1.6309297535714575,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 1.6309297535714575,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 1.6309297535714575,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 1.6309297535714575
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
       },
       {
-        "question": "",
+        "question": "İade talebinizi nasıl bildirebilirsiniz?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -4385,22 +4385,22 @@
           "10_yazilim_gelistirme_ve_kodlama_standartlari.txt"
         ],
         "mrr": 1.0,
-        "ap": 2.75,
+        "ap": 1.0,
         "recall@1": 1.0,
         "precision@1": 1.0,
         "ndcg@1": 1.0,
-        "recall@3": 2.0,
-        "precision@3": 0.6666666666666666,
-        "ndcg@3": 1.6309297535714575,
-        "recall@5": 3.0,
-        "precision@5": 0.6,
-        "ndcg@5": 2.0616063116448506,
-        "recall@10": 3.0,
-        "precision@10": 0.3,
-        "ndcg@10": 2.0616063116448506,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 2.0616063116448506
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
       },
       {
         "question": "Müşteri hizmetlerine hangi kanallar aracılığıyla ulaşıl",
@@ -4420,25 +4420,25 @@
           "07_pazarlama_ve_sosyal_medya_rehberi.txt"
         ],
         "mrr": 1.0,
-        "ap": 2.4285714285714284,
+        "ap": 1.0,
         "recall@1": 1.0,
         "precision@1": 1.0,
         "ndcg@1": 1.0,
-        "recall@3": 2.0,
-        "precision@3": 0.6666666666666666,
-        "ndcg@3": 1.6309297535714575,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 1.6309297535714575,
-        "recall@10": 3.0,
-        "precision@10": 0.3,
-        "ndcg@10": 1.9642630869047908,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 1.9642630869047908
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
       },
       {
-        "question": "",
+        "question": "Lisans yenileme tarihinin nerden öğrenebilirim?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -4455,25 +4455,25 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 1.0,
-        "ap": 2.0,
+        "ap": 1.0,
         "recall@1": 1.0,
         "precision@1": 1.0,
         "ndcg@1": 1.0,
-        "recall@3": 2.0,
-        "precision@3": 0.6666666666666666,
-        "ndcg@3": 1.6309297535714575,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 1.6309297535714575,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 1.6309297535714575,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 1.6309297535714575
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
       },
       {
-        "question": "",
+        "question": "Teknik destek talebi sırasında hangi bilgileri hazırlamam gerekir?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -4508,7 +4508,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Veri gizliliğiniz nasıl korunuyor?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -4525,25 +4525,25 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 1.0,
-        "ap": 2.0,
+        "ap": 1.0,
         "recall@1": 1.0,
         "precision@1": 1.0,
         "ndcg@1": 1.0,
-        "recall@3": 2.0,
-        "precision@3": 0.6666666666666666,
-        "ndcg@3": 1.6309297535714575,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 1.6309297535714575,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 1.6309297535714575,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 1.6309297535714575
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
       },
       {
-        "question": "",
+        "question": "Deneme sürümü mevcut mudur?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -4560,25 +4560,25 @@
           "sirket_politikasi.txt"
         ],
         "mrr": 1.0,
-        "ap": 2.0,
+        "ap": 1.0,
         "recall@1": 1.0,
         "precision@1": 1.0,
         "ndcg@1": 1.0,
-        "recall@3": 2.0,
-        "precision@3": 0.6666666666666666,
-        "ndcg@3": 1.6309297535714575,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 1.6309297535714575,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 1.6309297535714575,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 1.6309297535714575
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
       },
       {
-        "question": "",
+        "question": "Şirketin standart çalışma saatleri ne zamanlardır?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -4613,7 +4613,7 @@
         "ndcg@20": 0.3010299956639812
       },
       {
-        "question": "",
+        "question": "Çalışanlar haftada en fazla kaç gün evden çalışabilir?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -4630,7 +4630,7 @@
           "01_insan_kaynaklari_el_kitabi.txt"
         ],
         "mrr": 0.3333333333333333,
-        "ap": 0.5555555555555556,
+        "ap": 0.3333333333333333,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -4640,15 +4640,15 @@
         "recall@5": 1.0,
         "precision@5": 0.2,
         "ndcg@5": 0.5,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.8010299956639813,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.8010299956639813
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.5,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.5
       },
       {
-        "question": "",
+        "question": "Hangi durumlarda uzaktan çalışma izni askıya alınabilir?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -4683,7 +4683,7 @@
         "ndcg@20": 0.31546487678572877
       },
       {
-        "question": "",
+        "question": "Uzaktan çalışmanın hangi koşullarını yerine getirmek zorundadır?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -4700,7 +4700,7 @@
           "sirket_politikasi.txt"
         ],
         "mrr": 0.125,
-        "ap": 0.325,
+        "ap": 0.125,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -4710,15 +4710,15 @@
         "recall@5": 0.0,
         "precision@5": 0.0,
         "ndcg@5": 0.0,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.6045297031036166,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.6045297031036166
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.31546487678572877,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.31546487678572877
       },
       {
-        "question": "",
+        "question": "İzin talepleri en az kaç hafta öncesinde yöneticiye iletilmelidir?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -4753,7 +4753,7 @@
         "ndcg@20": 0.3010299956639812
       },
       {
-        "question": "",
+        "question": "Yılsonuna kadar kullanılmayan izinler nasıl işlemektedir?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -4788,7 +4788,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Şirket bilgisayarları sadece iş amaçlı kullanılmalıdır mı?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -4823,7 +4823,7 @@
         "ndcg@20": 0.31546487678572877
       },
       {
-        "question": "",
+        "question": "Kişisel verilerin işlenmesinde KVKK hükümlerine uyulmaması ne sonuçlara yol açar?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -4840,7 +4840,7 @@
           "08_musteri_basari_ve_destek_sla.txt"
         ],
         "mrr": 0.125,
-        "ap": 0.3472222222222222,
+        "ap": 0.125,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -4850,15 +4850,15 @@
         "recall@5": 0.0,
         "precision@5": 0.0,
         "ndcg@5": 0.0,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.6164948724497099,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.6164948724497099
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.31546487678572877,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.31546487678572877
       },
       {
-        "question": "",
+        "question": "Hangi paketlerin aylık lisans ücretleri KDV dahil olmak üzere belirtilmiştir?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -4893,7 +4893,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "TechVizyon ERP Pro ve TechVizyon CRM Suite paketlerinin hangi özelliklerini içerdiği belirtilmiştir?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -4928,7 +4928,7 @@
         "ndcg@20": 0.6309297535714575
       },
       {
-        "question": "",
+        "question": "Hangi hizmetlerin fiyatı kullanıcı başına 400 TL/ay + KDV’dir?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -4963,7 +4963,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Hangi hizmetin fiyatı proje kapsamına göre teklif bazlıdır?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -4998,7 +4998,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Hangi eğitimin ücreti daha yüksektir?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -5033,7 +5033,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Veri Analitiği Bootcamp eğitimi kaç gün sürmektedir?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -5068,7 +5068,7 @@
         "ndcg@20": 0.3010299956639812
       },
       {
-        "question": "",
+        "question": "Bilgi güvenliği kurallarına uygun hareket etmenin amacı nedir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5085,25 +5085,25 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.25,
-        "ap": 0.95,
+        "ap": 0.25,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
         "recall@3": 0.0,
         "precision@3": 0.0,
         "ndcg@3": 0.0,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 0.8175293653079347,
-        "recall@10": 3.0,
-        "precision@10": 0.3,
-        "ndcg@10": 1.1065941916258226,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 1.1065941916258226
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.43067655807339306,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.43067655807339306,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
       },
       {
-        "question": "",
+        "question": "Yapay zekâ araçlarını nasıl güvenli ve verimli şekilde kullanmalıyız?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5120,7 +5120,7 @@
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
         "mrr": 0.2,
-        "ap": 0.7833333333333333,
+        "ap": 0.2,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -5130,15 +5130,15 @@
         "recall@5": 1.0,
         "precision@5": 0.2,
         "ndcg@5": 0.38685280723454163,
-        "recall@10": 3.0,
-        "precision@10": 0.3,
-        "ndcg@10": 1.0033476796842515,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 1.0033476796842515
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.38685280723454163,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.38685280723454163
       },
       {
-        "question": "",
+        "question": "Hangi ilkeler bilgi güvenliği temel ilkeleri kapsamında belirtilmiştir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5155,7 +5155,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.3333333333333333,
-        "ap": 0.5333333333333333,
+        "ap": 0.3333333333333333,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -5165,15 +5165,15 @@
         "recall@5": 1.0,
         "precision@5": 0.2,
         "ndcg@5": 0.5,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.7890648263178879,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.7890648263178879
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.5,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.5
       },
       {
-        "question": "",
+        "question": "Bilgi güvenliği temel ilkelerinden hangisi, çalışanların bilgileri yalnızca görevleri ve yetkileri dahilinde kullanmalarını sağlar?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5190,217 +5190,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 1.0,
-        "ap": 2.5666666666666664,
-        "recall@1": 1.0,
-        "precision@1": 1.0,
-        "ndcg@1": 1.0,
-        "recall@3": 2.0,
-        "precision@3": 0.6666666666666666,
-        "ndcg@3": 1.5,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 1.5,
-        "recall@10": 4.0,
-        "precision@10": 0.4,
-        "ndcg@10": 2.14527201342591,
-        "recall@20": 4.0,
-        "precision@20": 0.2,
-        "ndcg@20": 2.14527201342591
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "musteri_hizmetleri.txt",
-          "musteri_hizmetleri.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "08_musteri_basari_ve_destek_sla.txt",
-          "sirket_politikasi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 0.25,
-        "ap": 0.95,
-        "recall@1": 0.0,
-        "precision@1": 0.0,
-        "ndcg@1": 0.0,
-        "recall@3": 0.0,
-        "precision@3": 0.0,
-        "ndcg@3": 0.0,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 0.8175293653079347,
-        "recall@10": 3.0,
-        "precision@10": 0.3,
-        "ndcg@10": 1.1065941916258226,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 1.1065941916258226
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 1.0,
-        "ap": 3.095238095238095,
-        "recall@1": 1.0,
-        "precision@1": 1.0,
-        "ndcg@1": 1.0,
-        "recall@3": 2.0,
-        "precision@3": 0.6666666666666666,
-        "ndcg@3": 1.5,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 1.5,
-        "recall@10": 5.0,
-        "precision@10": 0.5,
-        "ndcg@10": 2.43786303643695,
-        "recall@20": 5.0,
-        "precision@20": 0.25,
-        "ndcg@20": 2.43786303643695
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "musteri_hizmetleri.txt",
-          "musteri_hizmetleri.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "08_musteri_basari_ve_destek_sla.txt",
-          "sirket_politikasi.txt",
-          "08_musteri_basari_ve_destek_sla.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 0.25,
-        "ap": 0.45,
-        "recall@1": 0.0,
-        "precision@1": 0.0,
-        "ndcg@1": 0.0,
-        "recall@3": 0.0,
-        "precision@3": 0.0,
-        "ndcg@3": 0.0,
-        "recall@5": 1.0,
-        "precision@5": 0.2,
-        "ndcg@5": 0.43067655807339306,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.719741384391281,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.719741384391281
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 1.0,
-        "ap": 5.247619047619048,
-        "recall@1": 1.0,
-        "precision@1": 1.0,
-        "ndcg@1": 1.0,
-        "recall@3": 2.0,
-        "precision@3": 0.6666666666666666,
-        "ndcg@3": 1.5,
-        "recall@5": 3.0,
-        "precision@5": 0.6,
-        "ndcg@5": 1.9306765580733931,
-        "recall@10": 7.0,
-        "precision@10": 0.7,
-        "ndcg@10": 3.2247467816183653,
-        "recall@20": 7.0,
-        "precision@20": 0.35,
-        "ndcg@20": 3.2247467816183653
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "musteri_hizmetleri.txt",
-          "musteri_hizmetleri.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
-          "08_musteri_basari_ve_destek_sla.txt",
-          "sirket_politikasi.txt",
-          "08_musteri_basari_ve_destek_sla.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 0.25,
-        "ap": 0.45,
-        "recall@1": 0.0,
-        "precision@1": 0.0,
-        "ndcg@1": 0.0,
-        "recall@3": 0.0,
-        "precision@3": 0.0,
-        "ndcg@3": 0.0,
-        "recall@5": 1.0,
-        "precision@5": 0.2,
-        "ndcg@5": 0.43067655807339306,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.719741384391281,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.719741384391281
-      },
-      {
-        "question": "",
-        "relevant_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "retrieved_docs": [
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "musteri_hizmetleri.txt",
-          "03_kvkk_ve_gizlilik_politikasi.txt",
-          "sirket_politikasi.txt",
-          "03_kvkk_ve_gizlilik_politikasi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
-          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
-        ],
-        "mrr": 1.0,
-        "ap": 2.7063492063492065,
+        "ap": 1.0,
         "recall@1": 1.0,
         "precision@1": 1.0,
         "ndcg@1": 1.0,
@@ -5410,15 +5200,15 @@
         "recall@5": 1.0,
         "precision@5": 0.2,
         "ndcg@5": 1.0,
-        "recall@10": 5.0,
-        "precision@10": 0.5,
-        "ndcg@10": 2.2796353424232247,
-        "recall@20": 5.0,
-        "precision@20": 0.25,
-        "ndcg@20": 2.2796353424232247
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
       },
       {
-        "question": "",
+        "question": "Parolaların en az kaç karakterden oluşması gerekiyor?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5435,25 +5225,235 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.25,
-        "ap": 0.95,
+        "ap": 0.25,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
         "recall@3": 0.0,
         "precision@3": 0.0,
         "ndcg@3": 0.0,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 0.8175293653079347,
-        "recall@10": 3.0,
-        "precision@10": 0.3,
-        "ndcg@10": 1.1065941916258226,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 1.1065941916258226
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.43067655807339306,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.43067655807339306,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
       },
       {
-        "question": "",
+        "question": "Parolaları paylaşmanın hangi yolları yasaklanmıştır?",
+        "relevant_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 1.0,
+        "ap": 1.0,
+        "recall@1": 1.0,
+        "precision@1": 1.0,
+        "ndcg@1": 1.0,
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
+      },
+      {
+        "question": "Hangi tür bilgiler yapay zekâ araçlarına girilmemelidir?",
+        "relevant_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "musteri_hizmetleri.txt",
+          "musteri_hizmetleri.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "08_musteri_basari_ve_destek_sla.txt",
+          "sirket_politikasi.txt",
+          "08_musteri_basari_ve_destek_sla.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 0.25,
+        "ap": 0.25,
+        "recall@1": 0.0,
+        "precision@1": 0.0,
+        "ndcg@1": 0.0,
+        "recall@3": 0.0,
+        "precision@3": 0.0,
+        "ndcg@3": 0.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.43067655807339306,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.43067655807339306,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
+      },
+      {
+        "question": "Yapay zekâdan alınan çıktılar ne şekilde kullanılmalıdır?",
+        "relevant_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 1.0,
+        "ap": 1.0,
+        "recall@1": 1.0,
+        "precision@1": 1.0,
+        "ndcg@1": 1.0,
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
+      },
+      {
+        "question": "Kişisel verilerin yetkisiz üçüncü taraflarla paylaşılması yasaktır mı?",
+        "relevant_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "musteri_hizmetleri.txt",
+          "musteri_hizmetleri.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "08_musteri_basari_ve_destek_sla.txt",
+          "sirket_politikasi.txt",
+          "08_musteri_basari_ve_destek_sla.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 0.25,
+        "ap": 0.25,
+        "recall@1": 0.0,
+        "precision@1": 0.0,
+        "ndcg@1": 0.0,
+        "recall@3": 0.0,
+        "precision@3": 0.0,
+        "ndcg@3": 0.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.43067655807339306,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.43067655807339306,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
+      },
+      {
+        "question": "Müşteri destek süreçlerinde kişisel verilerin nasıl korunması gerekiyor?",
+        "relevant_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "musteri_hizmetleri.txt",
+          "03_kvkk_ve_gizlilik_politikasi.txt",
+          "sirket_politikasi.txt",
+          "03_kvkk_ve_gizlilik_politikasi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 1.0,
+        "ap": 1.0,
+        "recall@1": 1.0,
+        "precision@1": 1.0,
+        "ndcg@1": 1.0,
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
+      },
+      {
+        "question": "Şirket verisi, hangi yollarla paylaşılması yasaktır?",
+        "relevant_docs": [
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "retrieved_docs": [
+          "musteri_hizmetleri.txt",
+          "musteri_hizmetleri.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt",
+          "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt",
+          "10_yazilim_gelistirme_ve_kodlama_standartlari.txt",
+          "08_musteri_basari_ve_destek_sla.txt",
+          "sirket_politikasi.txt",
+          "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
+        ],
+        "mrr": 0.25,
+        "ap": 0.25,
+        "recall@1": 0.0,
+        "precision@1": 0.0,
+        "ndcg@1": 0.0,
+        "recall@3": 0.0,
+        "precision@3": 0.0,
+        "ndcg@3": 0.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.43067655807339306,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.43067655807339306,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
+      },
+      {
+        "question": "Dış paydaşlarla dosya paylaşımında hangi kontroller yapılmalıdır?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5470,25 +5470,25 @@
           "02_bilgi_teknolojileri_kullanim_politikasi.txt"
         ],
         "mrr": 0.5,
-        "ap": 5.184920634920635,
+        "ap": 0.5,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
-        "recall@3": 2.0,
-        "precision@3": 0.6666666666666666,
-        "ndcg@3": 1.1309297535714575,
-        "recall@5": 4.0,
-        "precision@5": 0.8,
-        "ndcg@5": 1.9484591188793923,
-        "recall@10": 7.0,
-        "precision@10": 0.7,
-        "ndcg@10": 2.939029634984729,
-        "recall@20": 7.0,
-        "precision@20": 0.35,
-        "ndcg@20": 2.939029634984729
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 0.6309297535714575,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.6309297535714575,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.6309297535714575,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.6309297535714575
       },
       {
-        "question": "",
+        "question": "Kayıp veya çalıntı cihaz durumunda çalışanlar ne kadar sürede Bilgi Teknolojileri birimine ve yöneticisine haber vermelidir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5505,7 +5505,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.3333333333333333,
-        "ap": 0.5333333333333333,
+        "ap": 0.3333333333333333,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -5515,15 +5515,15 @@
         "recall@5": 1.0,
         "precision@5": 0.2,
         "ndcg@5": 0.5,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.7890648263178879,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.7890648263178879
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.5,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.5
       },
       {
-        "question": "",
+        "question": "Bildirim kanallarından hangileri kullanılabiliyor?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5540,7 +5540,7 @@
           "sirket_politikasi.txt"
         ],
         "mrr": 1.0,
-        "ap": 1.3333333333333333,
+        "ap": 1.0,
         "recall@1": 1.0,
         "precision@1": 1.0,
         "ndcg@1": 1.0,
@@ -5550,15 +5550,15 @@
         "recall@5": 1.0,
         "precision@5": 0.2,
         "ndcg@5": 1.0,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 1.3562071871080221,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 1.3562071871080221
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
       },
       {
-        "question": "",
+        "question": "Hangi birimlerin çalışanları için ek güvenlik eğitimleri düzenlenebilir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5575,7 +5575,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.25,
-        "ap": 0.45,
+        "ap": 0.25,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -5585,15 +5585,15 @@
         "recall@5": 1.0,
         "precision@5": 0.2,
         "ndcg@5": 0.43067655807339306,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.719741384391281,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.719741384391281
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.43067655807339306,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
       },
       {
-        "question": "",
+        "question": "Bilgi güvenliği ve yapay zekâ kullanımı farkındalık eğitimine kimler katılmakla yükümlüdür?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5610,7 +5610,7 @@
           "sirket_politikasi.txt"
         ],
         "mrr": 0.2,
-        "ap": 0.45,
+        "ap": 0.2,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -5620,15 +5620,15 @@
         "recall@5": 1.0,
         "precision@5": 0.2,
         "ndcg@5": 0.38685280723454163,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.7023176840202704,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.7023176840202704
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.38685280723454163,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.38685280723454163
       },
       {
-        "question": "",
+        "question": "Hangi birimler rehberi yılda en az bir kez gözden geçirir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5645,7 +5645,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.25,
-        "ap": 0.45,
+        "ap": 0.25,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -5655,15 +5655,15 @@
         "recall@5": 1.0,
         "precision@5": 0.2,
         "ndcg@5": 0.43067655807339306,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.719741384391281,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.719741384391281
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.43067655807339306,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
       },
       {
-        "question": "",
+        "question": "Rehberin güncellenmesi ve çalışanlara duyurulması hangi durumlarda gerekir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -5698,7 +5698,7 @@
         "ndcg@20": 0.6309297535714575
       },
       {
-        "question": "",
+        "question": "Şirket içi oryantasyon ve eğitim sürecinin amacı nedir?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -5715,25 +5715,25 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.3333333333333333,
-        "ap": 0.7333333333333334,
+        "ap": 0.3333333333333333,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
         "recall@3": 1.0,
         "precision@3": 0.3333333333333333,
         "ndcg@3": 0.5,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 0.8868528072345416,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.8868528072345416,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.8868528072345416
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.5,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.5,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.5
       },
       {
-        "question": "",
+        "question": "Bu rehberin hangi kişilere uygulanması sağlanmaktadır?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -5750,25 +5750,25 @@
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
         "mrr": 1.0,
-        "ap": 4.326984126984127,
+        "ap": 1.0,
         "recall@1": 1.0,
         "precision@1": 1.0,
         "ndcg@1": 1.0,
-        "recall@3": 2.0,
-        "precision@3": 0.6666666666666666,
-        "ndcg@3": 1.6309297535714575,
-        "recall@5": 3.0,
-        "precision@5": 0.6,
-        "ndcg@5": 2.0177825608059994,
-        "recall@10": 6.0,
-        "precision@10": 0.6,
-        "ndcg@10": 2.9412107161212013,
-        "recall@20": 6.0,
-        "precision@20": 0.3,
-        "ndcg@20": 2.9412107161212013
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
       },
       {
-        "question": "",
+        "question": "Hangi unsurların tamamlanması yeni çalışanın işe başlamasından önce gereklidir?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -5785,25 +5785,25 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.3333333333333333,
-        "ap": 0.7333333333333334,
+        "ap": 0.3333333333333333,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
         "recall@3": 1.0,
         "precision@3": 0.3333333333333333,
         "ndcg@3": 0.5,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 0.8868528072345416,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.8868528072345416,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.8868528072345416
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.5,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.5,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.5
       },
       {
-        "question": "",
+        "question": "Kurumsal e-posta hesabı oluşturulması, şirket içi iletişim araçlarına erişim tanımlanması ve gerekli yazılım lisansları ve kullanıcı yetkilerinin sağlanması hangi süreçte yer alır?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -5820,25 +5820,25 @@
           "06_satis_sureci_ve_teklif_yonetimi.txt"
         ],
         "mrr": 1.0,
-        "ap": 3.5,
+        "ap": 1.0,
         "recall@1": 1.0,
         "precision@1": 1.0,
         "ndcg@1": 1.0,
-        "recall@3": 3.0,
-        "precision@3": 1.0,
-        "ndcg@3": 2.1309297535714578,
-        "recall@5": 3.0,
-        "precision@5": 0.6,
-        "ndcg@5": 2.1309297535714578,
-        "recall@10": 4.0,
-        "precision@10": 0.4,
-        "ndcg@10": 2.446394630357186,
-        "recall@20": 4.0,
-        "precision@20": 0.2,
-        "ndcg@20": 2.446394630357186
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
       },
       {
-        "question": "",
+        "question": "Erişim yetkileri hangi kişilerin onayıyla açılmalıdır?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -5855,25 +5855,25 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.3333333333333333,
-        "ap": 0.7333333333333334,
+        "ap": 0.3333333333333333,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
         "recall@3": 1.0,
         "precision@3": 0.3333333333333333,
         "ndcg@3": 0.5,
-        "recall@5": 2.0,
-        "precision@5": 0.4,
-        "ndcg@5": 0.8868528072345416,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.8868528072345416,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.8868528072345416
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 0.5,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.5,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.5
       },
       {
-        "question": "",
+        "question": "İlk gün programının amacı nedir?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -5890,25 +5890,25 @@
           "06_satis_sureci_ve_teklif_yonetimi.txt"
         ],
         "mrr": 1.0,
-        "ap": 4.633333333333333,
+        "ap": 1.0,
         "recall@1": 1.0,
         "precision@1": 1.0,
         "ndcg@1": 1.0,
-        "recall@3": 3.0,
-        "precision@3": 1.0,
-        "ndcg@3": 2.1309297535714578,
-        "recall@5": 4.0,
-        "precision@5": 0.8,
-        "ndcg@5": 2.5177825608059994,
-        "recall@10": 5.0,
-        "precision@10": 0.5,
-        "ndcg@10": 2.8739897479140213,
-        "recall@20": 5.0,
-        "precision@20": 0.25,
-        "ndcg@20": 2.8739897479140213
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
       },
       {
-        "question": "",
+        "question": "İlk gün sonunda çalışanın hangi sistemlere erişimi test edilmelidir?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -5925,7 +5925,7 @@
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
         "mrr": 0.25,
-        "ap": 0.5357142857142857,
+        "ap": 0.25,
         "recall@1": 0.0,
         "precision@1": 0.0,
         "ndcg@1": 0.0,
@@ -5935,15 +5935,15 @@
         "recall@5": 1.0,
         "precision@5": 0.2,
         "ndcg@5": 0.43067655807339306,
-        "recall@10": 2.0,
-        "precision@10": 0.2,
-        "ndcg@10": 0.7640098914067264,
-        "recall@20": 2.0,
-        "precision@20": 0.1,
-        "ndcg@20": 0.7640098914067264
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 0.43067655807339306,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 0.43067655807339306
       },
       {
-        "question": "",
+        "question": "Mentorun görevlerinden biri olarak çalışanın hangi konulara yardımcı olması beklenir?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -5960,22 +5960,22 @@
           "sirket_politikasi.txt"
         ],
         "mrr": 1.0,
-        "ap": 4.175,
+        "ap": 1.0,
         "recall@1": 1.0,
         "precision@1": 1.0,
         "ndcg@1": 1.0,
-        "recall@3": 2.0,
-        "precision@3": 0.6666666666666666,
-        "ndcg@3": 1.6309297535714575,
-        "recall@5": 4.0,
-        "precision@5": 0.8,
-        "ndcg@5": 2.4484591188793923,
-        "recall@10": 5.0,
-        "precision@10": 0.5,
-        "ndcg@10": 2.763923995665121,
-        "recall@20": 5.0,
-        "precision@20": 0.25,
-        "ndcg@20": 2.763923995665121
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
       }
     ]
   },
@@ -5988,32 +5988,32 @@
       "final_k": 20,
       "evaluated_at": "2026-05-22T14:47:06.675888",
       "mean_mrr": 0.0425531914893617,
-      "mean_ap": 0.0851063829787234,
+      "mean_ap": 0.0425531914893617,
       "recall_at_k": {
         "1": 0.0425531914893617,
-        "3": 0.0851063829787234,
-        "5": 0.0851063829787234,
-        "10": 0.0851063829787234,
-        "20": 0.0851063829787234
+        "3": 0.0425531914893617,
+        "5": 0.0425531914893617,
+        "10": 0.0425531914893617,
+        "20": 0.0425531914893617
       },
       "precision_at_k": {
         "1": 0.0425531914893617,
-        "3": 0.028368794326241134,
-        "5": 0.01702127659574468,
-        "10": 0.00851063829787234,
-        "20": 0.00425531914893617
+        "3": 0.014184397163120567,
+        "5": 0.00851063829787234,
+        "10": 0.00425531914893617,
+        "20": 0.002127659574468085
       },
       "ndcg_at_k": {
         "1": 0.0425531914893617,
-        "3": 0.06661552667173315,
-        "5": 0.06661552667173315,
-        "10": 0.06661552667173315,
-        "20": 0.06661552667173315
+        "3": 0.0425531914893617,
+        "5": 0.0425531914893617,
+        "10": 0.0425531914893617,
+        "20": 0.0425531914893617
       }
     },
     "per_query": [
       {
-        "question": "",
+        "question": "Ürünleri nasıl iade edebilirim?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -6037,7 +6037,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "İade talebinizi nasıl bildirebilirsiniz?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -6078,25 +6078,25 @@
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
         "mrr": 1.0,
-        "ap": 3.0,
+        "ap": 1.0,
         "recall@1": 1.0,
         "precision@1": 1.0,
         "ndcg@1": 1.0,
-        "recall@3": 3.0,
-        "precision@3": 1.0,
-        "ndcg@3": 2.1309297535714578,
-        "recall@5": 3.0,
-        "precision@5": 0.6,
-        "ndcg@5": 2.1309297535714578,
-        "recall@10": 3.0,
-        "precision@10": 0.3,
-        "ndcg@10": 2.1309297535714578,
-        "recall@20": 3.0,
-        "precision@20": 0.15,
-        "ndcg@20": 2.1309297535714578
+        "recall@3": 1.0,
+        "precision@3": 0.3333333333333333,
+        "ndcg@3": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.2,
+        "ndcg@5": 1.0,
+        "recall@10": 1.0,
+        "precision@10": 0.1,
+        "ndcg@10": 1.0,
+        "recall@20": 1.0,
+        "precision@20": 0.05,
+        "ndcg@20": 1.0
       },
       {
-        "question": "",
+        "question": "Lisans yenileme tarihinin nerden öğrenebilirim?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -6120,7 +6120,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Teknik destek talebi sırasında hangi bilgileri hazırlamam gerekir?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -6144,7 +6144,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Veri gizliliğiniz nasıl korunuyor?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -6168,7 +6168,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Deneme sürümü mevcut mudur?",
         "relevant_docs": [
           "musteri_hizmetleri.txt"
         ],
@@ -6192,7 +6192,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Şirketin standart çalışma saatleri ne zamanlardır?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -6216,7 +6216,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Çalışanlar haftada en fazla kaç gün evden çalışabilir?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -6240,7 +6240,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Hangi durumlarda uzaktan çalışma izni askıya alınabilir?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -6264,7 +6264,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Uzaktan çalışmanın hangi koşullarını yerine getirmek zorundadır?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -6288,7 +6288,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "İzin talepleri en az kaç hafta öncesinde yöneticiye iletilmelidir?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -6312,7 +6312,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Yılsonuna kadar kullanılmayan izinler nasıl işlemektedir?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -6336,7 +6336,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Şirket bilgisayarları sadece iş amaçlı kullanılmalıdır mı?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -6360,7 +6360,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Kişisel verilerin işlenmesinde KVKK hükümlerine uyulmaması ne sonuçlara yol açar?",
         "relevant_docs": [
           "sirket_politikasi.txt"
         ],
@@ -6384,7 +6384,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Hangi paketlerin aylık lisans ücretleri KDV dahil olmak üzere belirtilmiştir?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -6408,7 +6408,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "TechVizyon ERP Pro ve TechVizyon CRM Suite paketlerinin hangi özelliklerini içerdiği belirtilmiştir?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -6443,7 +6443,7 @@
         "ndcg@20": 1.0
       },
       {
-        "question": "",
+        "question": "Hangi hizmetlerin fiyatı kullanıcı başına 400 TL/ay + KDV’dir?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -6467,7 +6467,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Hangi hizmetin fiyatı proje kapsamına göre teklif bazlıdır?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -6491,7 +6491,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Hangi eğitimin ücreti daha yüksektir?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -6515,7 +6515,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Veri Analitiği Bootcamp eğitimi kaç gün sürmektedir?",
         "relevant_docs": [
           "urun_katalogu.txt"
         ],
@@ -6539,7 +6539,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Bilgi güvenliği kurallarına uygun hareket etmenin amacı nedir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6563,7 +6563,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Yapay zekâ araçlarını nasıl güvenli ve verimli şekilde kullanmalıyız?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6587,7 +6587,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Hangi ilkeler bilgi güvenliği temel ilkeleri kapsamında belirtilmiştir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6611,7 +6611,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Bilgi güvenliği temel ilkelerinden hangisi, çalışanların bilgileri yalnızca görevleri ve yetkileri dahilinde kullanmalarını sağlar?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6635,7 +6635,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Parolaların en az kaç karakterden oluşması gerekiyor?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6659,7 +6659,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Parolaları paylaşmanın hangi yolları yasaklanmıştır?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6683,7 +6683,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Hangi tür bilgiler yapay zekâ araçlarına girilmemelidir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6707,7 +6707,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Yapay zekâdan alınan çıktılar ne şekilde kullanılmalıdır?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6731,7 +6731,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Kişisel verilerin yetkisiz üçüncü taraflarla paylaşılması yasaktır mı?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6755,7 +6755,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Müşteri destek süreçlerinde kişisel verilerin nasıl korunması gerekiyor?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6779,7 +6779,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Şirket verisi, hangi yollarla paylaşılması yasaktır?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6803,7 +6803,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Dış paydaşlarla dosya paylaşımında hangi kontroller yapılmalıdır?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6827,7 +6827,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Kayıp veya çalıntı cihaz durumunda çalışanlar ne kadar sürede Bilgi Teknolojileri birimine ve yöneticisine haber vermelidir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6851,7 +6851,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Bildirim kanallarından hangileri kullanılabiliyor?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6875,7 +6875,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Hangi birimlerin çalışanları için ek güvenlik eğitimleri düzenlenebilir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6899,7 +6899,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Bilgi güvenliği ve yapay zekâ kullanımı farkındalık eğitimine kimler katılmakla yükümlüdür?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6923,7 +6923,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Hangi birimler rehberi yılda en az bir kez gözden geçirir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6947,7 +6947,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Rehberin güncellenmesi ve çalışanlara duyurulması hangi durumlarda gerekir?",
         "relevant_docs": [
           "bilgi_guvenligi_ve_yapay_zeka_kullanim_rehberi.txt"
         ],
@@ -6971,7 +6971,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Şirket içi oryantasyon ve eğitim sürecinin amacı nedir?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -6995,7 +6995,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Bu rehberin hangi kişilere uygulanması sağlanmaktadır?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -7019,7 +7019,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Hangi unsurların tamamlanması yeni çalışanın işe başlamasından önce gereklidir?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -7043,7 +7043,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Kurumsal e-posta hesabı oluşturulması, şirket içi iletişim araçlarına erişim tanımlanması ve gerekli yazılım lisansları ve kullanıcı yetkilerinin sağlanması hangi süreçte yer alır?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -7067,7 +7067,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Erişim yetkileri hangi kişilerin onayıyla açılmalıdır?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -7091,7 +7091,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "İlk gün programının amacı nedir?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -7115,7 +7115,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "İlk gün sonunda çalışanın hangi sistemlere erişimi test edilmelidir?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],
@@ -7139,7 +7139,7 @@
         "ndcg@20": 0.0
       },
       {
-        "question": "",
+        "question": "Mentorun görevlerinden biri olarak çalışanın hangi konulara yardımcı olması beklenir?",
         "relevant_docs": [
           "sirket_ici_oryantasyon_ve_egitim_sureci_rehberi.txt"
         ],

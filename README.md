@@ -231,8 +231,11 @@ Recent generated artifacts in [`/Users/barisparlak/Desktop/TurkRAG/results`](/Us
 | `figures/metrics_radar.png` | Radar overview of the main RAGAS metrics |
 
 Run the commands above to refresh those artifacts for the current dataset or tenant.
-The committed `results/retrieval_metrics*.json` files predate duplicate-document metric correction;
-regenerate them before using those historical values in a report.
+The committed `results/retrieval_metrics*.json` files have been repaired to use duplicate-safe
+normalized metrics derived from their stored ranked retrieval snapshots.
+Use `python scripts/repair_retrieval_artifacts.py` to rewrite legacy retrieval artifacts in place,
+then `python scripts/audit_retrieval_artifacts.py` to verify they stay within normalized metric
+bounds and still match their declared query counts.
 
 ---
 
