@@ -14,25 +14,46 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-
-from eval.retrieval_metrics import (
-    DEFAULT_KS,
-    average_precision,
-    mean_reciprocal_rank,
-    ndcg_at_k,
-    precision_at_k,
-    recall_at_k,
-)
-from scripts.audit_retrieval_artifacts import DEFAULT_PATHS
 
 QUESTION_SOURCE_BY_COUNT = {
     47: ROOT / "eval" / "eval_set_generated.csv",
 }
 
 
+def _load_retrieval_metric_functions():
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+
+    from eval.retrieval_metrics import (
+        DEFAULT_KS,
+        average_precision,
+        mean_reciprocal_rank,
+        ndcg_at_k,
+        precision_at_k,
+        recall_at_k,
+    )
+
+    return {
+        "DEFAULT_KS": DEFAULT_KS,
+        "average_precision": average_precision,
+        "mean_reciprocal_rank": mean_reciprocal_rank,
+        "ndcg_at_k": ndcg_at_k,
+        "precision_at_k": precision_at_k,
+        "recall_at_k": recall_at_k,
+    }
+
+
+def _default_paths() -> list[str]:
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+
+    from scripts.audit_retrieval_artifacts import DEFAULT_PATHS
+
+    return list(DEFAULT_PATHS)
+
+
 def _ks_for_result(result: dict) -> list[int]:
+    retrieval_metrics = _load_retrieval_metric_functions()
     aggregate = result.get("aggregate", {})
     recall_group = aggregate.get("recall_at_k", {})
     ks: set[int] = set()
@@ -43,7 +64,7 @@ def _ks_for_result(result: dict) -> list[int]:
             except (TypeError, ValueError):
                 continue
     if not ks:
-        ks.update(DEFAULT_KS)
+        ks.update(retrieval_metrics["DEFAULT_KS"])
     return sorted(ks)
 
 
@@ -57,6 +78,13 @@ def _question_backfill_rows(query_count: int) -> list[dict[str, str]]:
 
 
 def repair_retrieval_artifact(path: str | Path) -> None:
+    retrieval_metrics = _load_retrieval_metric_functions()
+    average_precision = retrieval_metrics["average_precision"]
+    mean_reciprocal_rank = retrieval_metrics["mean_reciprocal_rank"]
+    ndcg_at_k = retrieval_metrics["ndcg_at_k"]
+    precision_at_k = retrieval_metrics["precision_at_k"]
+    recall_at_k = retrieval_metrics["recall_at_k"]
+
     artifact_path = Path(path)
     payload = json.loads(artifact_path.read_text(encoding="utf-8"))
     if not isinstance(payload, list):
@@ -115,7 +143,7 @@ def main() -> int:
     parser.add_argument(
         "--paths",
         nargs="+",
-        default=list(DEFAULT_PATHS),
+        default=_default_paths(),
         help="Artifact paths to rewrite in place (default: committed retrieval_metrics*.json files)",
     )
     args = parser.parse_args()

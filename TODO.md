@@ -1,6 +1,6 @@
 # TurkRAG TODO
 
-Last reviewed: 2026-06-26
+Last reviewed: 2026-06-27
 
 ## Requirement analysis
 
@@ -27,6 +27,7 @@ Last reviewed: 2026-06-26
 
 ## Current gaps
 
+- [x] `scripts/repair_retrieval_artifacts.py`: defer project imports until runtime so the artifact-repair CLI remains importable in tests but also passes `ruff` without module-level import-order violations.
 - [x] `scripts/audit_retrieval_artifacts.py` and `tests/test_eval_artifacts.py`: add a deterministic audit for committed `results/retrieval_metrics*.json` files so out-of-range normalized metrics, blank questions, and filename/query-count drift are caught before those artifacts are reused.
 - [x] Generated historical eval artifacts no longer contain model scratchpad text; shared sanitization now covers new eval outputs and the committed artifacts were rewritten.
 - [x] `tests/test_middleware.py`: cover production CORS validation and a header-level middleware integration path so env drift is caught before deploys.
