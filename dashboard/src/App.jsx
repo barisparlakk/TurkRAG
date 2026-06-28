@@ -316,6 +316,9 @@ export default function App() {
           <main className="main-stage">
             <div className="main-view chat-view" style={{ display: tab === 'chat' ? 'flex' : 'none' }}>
               <ChatWindow
+                tenant={tenant}
+                role={role}
+                sessions={sessions}
                 selectedSession={selectedSession}
                 onSessionChange={setSelectedSession}
                 onNewSession={() => setSessionRefresh((n) => n + 1)}

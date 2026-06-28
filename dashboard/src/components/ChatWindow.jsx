@@ -55,63 +55,197 @@ function stripThink(text) {
 const EXAMPLE_QUESTIONS = [
   {
     label: 'İzin prosedürü nasıl işler?',
-    meta: 'İK politikası',
+    meta: 'İK',
   },
   {
-    label: 'Satın alma süreci nedir?',
-    meta: 'Operasyon',
+    label: '3 yıllık kıdemde izin hakkı kaç gündür?',
+    meta: 'İK',
   },
   {
-    label: 'KVKK kapsamında verilerimi nasıl koruyabilirim?',
+    label: 'Tedarikçi seçimi için hangi kriterler geçerli?',
+    meta: 'Satın alma',
+  },
+  {
+    label: 'KVKK kapsamında kişisel veri nasıl işlenir?',
     meta: 'Uyum',
+  },
+  {
+    label: 'Ürün iade süresi ve istisnaları neler?',
+    meta: 'Müşteri',
+  },
+  {
+    label: 'Muhasebe onay akışı hangi belgeleri ister?',
+    meta: 'Finans',
   },
 ]
 
-function EmptyState({ onSend }) {
+function statusLabel(status) {
+  if (status === 'ready') return 'Hazır'
+  if (status === 'completed') return 'Tamamlandı'
+  if (status === 'failed' || status === 'error') return 'Hata'
+  if (status === 'running') return 'Çalışıyor'
+  if (status === 'queued') return 'Sırada'
+  if (status === 'processing') return 'İşleniyor'
+  if (status === 'pending') return 'Bekliyor'
+  return status || 'Yok'
+}
+
+function formatDate(iso) {
+  if (!iso) return 'Kayıt yok'
+  return new Date(iso).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })
+}
+
+function WorkbenchEmpty({ tenant, sessions = [], context, contextLoading, onSend }) {
+  const docs = context?.documents || []
+  const jobs = context?.jobs || []
+  const evalRuns = context?.evalRuns || []
+  const readyDocs = docs.filter((doc) => doc.status === 'ready')
+  const activeJob = jobs.find((job) => ['pending', 'processing'].includes(job.status))
+  const lastJob = jobs[0]
+  const lastEval = evalRuns[0]
+  const recentSessions = sessions.slice(0, 4)
+
+  return (
+    <div className="workbench-empty">
+      <div className="workbench-grid">
+        <section className="workbench-command">
+          <div className="workbench-stamp">
+            <span>Tenant</span>
+            <strong>{tenant?.name || tenant?.slug || 'Çalışma alanı'}</strong>
+            <code>{tenant?.slug || 'tenant'}</code>
+          </div>
+
+          <div className="workbench-query">
+            <div>
+              <span className="workbench-kicker">Belge sorgu tezgahı</span>
+              <h2>Kaynak isteyen soruyu buradan başlat.</h2>
+            </div>
+            <p>
+              Cevap üretildiğinde kaynak parçaları ve cümle dayanakları kanıt paneline düşer.
+            </p>
+          </div>
+
+          <div className="workbench-ledger">
+            <div>
+              <span>İndeks</span>
+              <strong>{contextLoading ? '...' : `${readyDocs.length}/${docs.length}`}</strong>
+              <small>hazır belge</small>
+            </div>
+            <div>
+              <span>İş kuyruğu</span>
+              <strong>{activeJob ? statusLabel(activeJob.status) : statusLabel(lastJob?.status)}</strong>
+              <small>{activeJob?.filename || lastJob?.filename || 'bekleyen yok'}</small>
+            </div>
+            <div>
+              <span>Eval</span>
+              <strong>{statusLabel(lastEval?.status)}</strong>
+              <small>{lastEval?.run_label || formatDate(lastEval?.created_at)}</small>
+            </div>
+          </div>
+        </section>
+
+        <aside className="workbench-evidence">
+          <div className="evidence-ruler">
+            <span>Kanıt rafı</span>
+            <strong>{readyDocs.length ? `${readyDocs.length} belge sorgulanabilir` : 'Hazır kaynak yok'}</strong>
+          </div>
+          <div className="evidence-stack">
+            {readyDocs.slice(0, 4).map((doc) => (
+              <div className="evidence-line" key={doc.id}>
+                <span>{doc.filename}</span>
+                <small>{doc.chunk_count ?? 0} parça</small>
+              </div>
+            ))}
+            {!readyDocs.length && (
+              <div className="evidence-line muted">
+                <span>Kaynak üretmek için önce belge indeksi gerekir.</span>
+                <small>{contextLoading ? 'yükleniyor' : 'boş'}</small>
+              </div>
+            )}
+          </div>
+        </aside>
+      </div>
+
+      <div className="workbench-lower">
+        <section className="prompt-docket">
+          <div className="section-label">Sorgu dosyaları</div>
+          <div className="prompt-chips">
+            {EXAMPLE_QUESTIONS.map((q, i) => (
+              <button
+                key={i}
+                onClick={() => onSend(q.label)}
+                className="prompt-chip"
+              >
+                <span>{q.meta}</span>
+                <strong>{q.label}</strong>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section className="recent-docket">
+          <div className="section-label">Son oturumlar</div>
+          <div className="recent-session-list">
+            {recentSessions.map((s) => (
+              <div className="recent-session-row" key={s.id}>
+                <span>{s.preview || 'Boş oturum'}</span>
+                <small>{formatDate(s.created_at)}</small>
+              </div>
+            ))}
+            {!recentSessions.length && (
+              <div className="recent-session-row muted">
+                <span>Henüz oturum yok</span>
+                <small>bugün</small>
+              </div>
+            )}
+          </div>
+        </section>
+      </div>
+    </div>
+  )
+}
+
+function InlineWorkbenchComposer({ input, setInput, textareaRef, isStreaming, abort, handleSend, handleKey }) {
+  return (
+    <div className="workbench-composer">
+      <textarea
+        ref={textareaRef}
+        value={input}
+        onChange={(e) => {
+          setInput(e.target.value)
+          e.target.style.height = 'auto'
+          e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'
+        }}
+        onKeyDown={handleKey}
+        placeholder="Belgeye dayalı soru yazın..."
+        rows={2}
+        disabled={isStreaming}
+      />
+      <button
+        onClick={isStreaming ? abort : () => handleSend()}
+        disabled={!isStreaming && !input.trim()}
+        className={`btn btn-primary composer-send ${input.trim() || isStreaming ? 'ready' : ''}`}
+        title={isStreaming ? 'Durdur' : 'Gönder'}
+      >
+        {isStreaming ? <IconStop /> : <IconSend />}
+      </button>
+    </div>
+  )
+}
+
+function EmptyState({ tenant, sessions, context, contextLoading, onSend, input, setInput, textareaRef, isStreaming, abort, handleSend, handleKey }) {
   return (
     <div className="chat-empty">
-      <div className="chat-empty-card">
-        <div className="chat-empty-logo">
-          <img src="/logo-light.png" className="logo-light" alt="" />
-          <img src="/logo-dark.png" className="logo-dark" alt="" />
-        </div>
-
-        <div className="chat-empty-copy">
-          <span className="chat-eyebrow">TurkRAG çalışma masası</span>
-          <h2>Kaynaklı kurumsal yanıt merkezi</h2>
-          <p>
-            Tenant sınırları, belge izinleri ve Türkçe arama hattı tek ekranda birleşir.
-          </p>
-        </div>
-
-        <div className="chat-empty-metrics">
-          <div>
-            <strong>ACL</strong>
-            <span>Belge yetkisi</span>
-          </div>
-          <div>
-            <strong>RAG</strong>
-            <span>Kaynaklı cevap</span>
-          </div>
-          <div>
-            <strong>TR</strong>
-            <span>Türkçe arama</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="prompt-chips">
-        {EXAMPLE_QUESTIONS.map((q, i) => (
-          <button
-            key={i}
-            onClick={() => onSend(q.label)}
-            className="prompt-chip"
-          >
-            <span>{q.meta}</span>
-            <strong>{q.label}</strong>
-          </button>
-        ))}
-      </div>
+      <WorkbenchEmpty tenant={tenant} sessions={sessions} context={context} contextLoading={contextLoading} onSend={onSend} />
+      <InlineWorkbenchComposer
+        input={input}
+        setInput={setInput}
+        textareaRef={textareaRef}
+        isStreaming={isStreaming}
+        abort={abort}
+        handleSend={handleSend}
+        handleKey={handleKey}
+      />
     </div>
   )
 }
@@ -252,6 +386,8 @@ function Message({ msg, isLast, onRegenerate, onFollowUp, isStreaming }) {
 
 /* ── Main chat window ───────────────────────────────────── */
 export function ChatWindow({
+  tenant,
+  sessions = [],
   selectedSession,
   onSessionChange,
   onNewSession,
@@ -261,6 +397,8 @@ export function ChatWindow({
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [elapsed, setElapsed] = useState(0)
+  const [context, setContext] = useState({ documents: [], jobs: [], evalRuns: [] })
+  const [contextLoading, setContextLoading] = useState(true)
 
   const { send, abort, tokens, citations, attribution, queryTime, sessionId, messageId,
           followUps, isStreaming, error, reset, resetSession } = useStream()
@@ -270,6 +408,25 @@ export function ChatWindow({
   const streamMsgIdRef = useRef(null)
   const sessionIdRef = useRef(null)
   const streamStartRef = useRef(null)
+
+  useEffect(() => {
+    let alive = true
+    setContextLoading(true)
+    Promise.allSettled([
+      api.listDocuments(),
+      api.listJobs(8),
+      api.getEvalHistory(),
+    ]).then(([documents, jobs, evalRuns]) => {
+      if (!alive) return
+      setContext({
+        documents: documents.status === 'fulfilled' ? documents.value || [] : [],
+        jobs: jobs.status === 'fulfilled' ? jobs.value || [] : [],
+        evalRuns: evalRuns.status === 'fulfilled' ? evalRuns.value || [] : [],
+      })
+      setContextLoading(false)
+    })
+    return () => { alive = false }
+  }, [])
 
   // Elapsed timer
   useEffect(() => {
@@ -472,7 +629,22 @@ export function ChatWindow({
 
       <div className={`message-list ${hasMessages ? 'has-messages' : ''}`}>
         {!hasMessages
-          ? <EmptyState onSend={handleSend} />
+          ? (
+            <EmptyState
+              tenant={tenant}
+              sessions={sessions}
+              context={context}
+              contextLoading={contextLoading}
+              onSend={handleSend}
+              input={input}
+              setInput={setInput}
+              textareaRef={textareaRef}
+              isStreaming={isStreaming}
+              abort={abort}
+              handleSend={handleSend}
+              handleKey={handleKey}
+            />
+          )
           : messages.map((msg) => (
             <Message
               key={msg.id}
@@ -487,7 +659,7 @@ export function ChatWindow({
         <div ref={bottomRef} />
       </div>
 
-      <div className="composer-shell">
+      {hasMessages && <div className="composer-shell">
         <div className="composer"
           onFocusCapture={(e) => {
             e.currentTarget.style.borderColor = 'var(--accent)'
@@ -526,7 +698,7 @@ export function ChatWindow({
             {isStreaming ? <IconStop /> : <IconSend />}
           </button>
         </div>
-      </div>
+      </div>}
     </div>
   )
 }

@@ -27,8 +27,11 @@ const IconFile = () => (
 
 function statusStyle(status) {
   if (status === 'ready')      return { cls: 'badge-success', label: 'Hazır' }
+  if (status === 'completed')  return { cls: 'badge-success', label: 'Tamam' }
+  if (status === 'failed')     return { cls: 'badge-error',   label: 'Hata'  }
   if (status === 'error')      return { cls: 'badge-error',   label: 'Hata'  }
-  return                              { cls: 'badge-warning',  label: 'İşleniyor' }
+  if (status === 'pending')    return { cls: 'badge-warning', label: 'Sırada' }
+  return                              { cls: 'badge-warning', label: 'İşleniyor' }
 }
 
 function FileTypeTag({ filename }) {
@@ -54,6 +57,7 @@ function FileTypeTag({ filename }) {
 
 export function DocumentUpload() {
   const [documents, setDocuments] = useState([])
+  const [jobs, setJobs] = useState([])
   const [dragging, setDragging] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -63,7 +67,14 @@ export function DocumentUpload() {
   const pollRef = useRef()
 
   const loadDocuments = async () => {
-    try { setDocuments(await api.listDocuments() || []) } catch {}
+    try {
+      const [docs, recentJobs] = await Promise.all([
+        api.listDocuments(),
+        api.listJobs(12),
+      ])
+      setDocuments(docs || [])
+      setJobs(recentJobs || [])
+    } catch {}
   }
 
   useEffect(() => {
@@ -96,36 +107,53 @@ export function DocumentUpload() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      <div className="view-header">
-        <h2>Belgeler</h2>
-        <span>{documents.length}</span>
+    <div className="document-workspace">
+      <div className="view-header document-header">
+        <div>
+          <h2>Belge İndeksi</h2>
+          <p>Yükleme, parçalama ve sorgulanabilir kaynak durumları</p>
+        </div>
+        <span>{documents.filter((doc) => doc.status === 'ready').length}/{documents.length}</span>
       </div>
 
-      <div
-        className={`upload-zone ${dragging ? 'dragging' : ''}`}
-        onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
-        onDragLeave={() => setDragging(false)}
-        onDrop={(e) => { e.preventDefault(); setDragging(false); handleFiles(e.dataTransfer.files) }}
-        onClick={() => fileInputRef.current?.click()}
-      >
-        <div className="upload-icon">
-          <IconUpload />
+      <div className="ingestion-board">
+        <div
+          className={`upload-zone ${dragging ? 'dragging' : ''}`}
+          onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={(e) => { e.preventDefault(); setDragging(false); handleFiles(e.dataTransfer.files) }}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <div className="upload-icon">
+            <IconUpload />
+          </div>
+          <div className="upload-copy">
+            <div className="upload-title">
+              {dragging ? 'İndeks kuyruğuna bırak' : 'Yeni kaynak ekle'}
+            </div>
+            <div className="upload-meta">
+              PDF, DOCX, TXT, XLSX, XLS, CSV
+            </div>
+          </div>
+          <button className="btn btn-primary" type="button">Dosya seç</button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.docx,.txt,.xlsx,.xls,.csv"
+            multiple
+            style={{ display: 'none' }}
+            onChange={(e) => handleFiles(e.target.files)}
+          />
         </div>
-        <div className="upload-title">
-          {dragging ? 'Bırakın' : 'Dosya bırakın'}
+
+        <div className="pipeline-strip">
+          {['Yükleme', 'Ayrıştırma', 'Parçalama', 'Vektör + BM25', 'Hazır'].map((step, i) => (
+            <div key={step} className="pipeline-step">
+              <span>{String(i + 1).padStart(2, '0')}</span>
+              <strong>{step}</strong>
+            </div>
+          ))}
         </div>
-        <div className="upload-meta">
-          PDF · DOCX · TXT · XLSX · CSV
-        </div>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".pdf,.docx,.txt,.xlsx,.xls,.csv"
-          multiple
-          style={{ display: 'none' }}
-          onChange={(e) => handleFiles(e.target.files)}
-        />
       </div>
 
       {uploading && (
@@ -163,56 +191,29 @@ export function DocumentUpload() {
         </div>
       )}
 
-      <div>
-        <div className="section-label">
-          Liste
-        </div>
-
-        {documents.length === 0 ? (
-          <div style={{
-            background: 'var(--surface-1)', border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-md)', padding: '28px',
-            textAlign: 'center', color: 'var(--text-3)', fontSize: '13px',
-          }}>
-            Belge yok
+      <div className="document-main-grid">
+        <section>
+          <div className="section-label">
+            Kaynak kayıtları
           </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+
+          {documents.length === 0 ? (
+            <div className="empty-ledger">İndekste belge yok</div>
+          ) : (
+          <div className="document-ledger">
             {documents.map((doc) => {
               const s = statusStyle(doc.status)
               return (
-                <div key={doc.id} className="fade-in" style={{
-                  display: 'flex', alignItems: 'center', gap: '12px',
-                  padding: '12px 14px',
-                  background: 'var(--surface-1)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius-md)',
-                  transition: 'border-color 0.15s',
-                }}
-                  onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--text-3)'}
-                  onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
-                >
-                  <div style={{
-                    width: 34, height: 34, flexShrink: 0,
-                    background: 'var(--surface-2)', border: '1px solid var(--border)',
-                    borderRadius: 8,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: 'var(--text-3)',
-                  }}>
+                <div key={doc.id} className="document-row fade-in">
+                  <div className="document-file-icon">
                     <IconFile />
                   </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' }}>
-                      <span style={{ fontSize: '13.5px', fontWeight: 500, color: 'var(--text-1)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {doc.filename}
-                      </span>
+                  <div className="document-row-main">
+                    <div className="document-title-line">
+                      <span>{doc.filename}</span>
                       <FileTypeTag filename={doc.filename} />
                     </div>
-                    {doc.chunk_count && (
-                      <div style={{ fontSize: '11px', color: 'var(--text-3)' }}>
-                        {doc.chunk_count} bölüm
-                      </div>
-                    )}
+                    <small>{doc.chunk_count ?? 0} parça · {new Date(doc.created_at).toLocaleDateString('tr-TR')}</small>
                   </div>
                   <span className={`badge ${s.cls}`}>{s.label}</span>
                   <button
@@ -226,7 +227,21 @@ export function DocumentUpload() {
               )
             })}
           </div>
-        )}
+          )}
+        </section>
+
+        <aside className="job-ledger">
+          <div className="section-label">Son iş kayıtları</div>
+          {jobs.length === 0 ? (
+            <div className="empty-ledger">Kuyruk boş</div>
+          ) : jobs.slice(0, 8).map((job) => (
+            <div className="job-row" key={job.id}>
+              <span>{job.filename}</span>
+              <strong>{statusStyle(job.status).label}</strong>
+              <small>{job.attempts}/{job.max_attempts} deneme</small>
+            </div>
+          ))}
+        </aside>
       </div>
     </div>
   )

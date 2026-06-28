@@ -48,44 +48,25 @@ function SourceCard({ citation, index }) {
 
   return (
     <div
+      className={`source-record ${expanded ? 'expanded' : ''}`}
       onClick={() => setExpanded((v) => !v)}
-      style={{
-        border: '1px solid var(--border)',
-        borderRadius: 'var(--radius-lg)',
-        padding: '10px 12px',
-        cursor: 'pointer',
-        background: expanded ? 'var(--surface-2)' : 'var(--bg)',
-        transition: 'background 0.12s',
-      }}
-      onMouseEnter={(e) => { if (!expanded) e.currentTarget.style.background = 'var(--surface-1)' }}
-      onMouseLeave={(e) => { if (!expanded) e.currentTarget.style.background = 'var(--bg)' }}
     >
       {/* Top row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div className="source-record-head">
+        <span className="source-index">K{String(index + 1).padStart(2, '0')}</span>
         <FileIcon filename={citation.filename} />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{
-            fontSize: '12px', fontWeight: 600, color: 'var(--text-1)',
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          }}>
+        <div className="source-record-meta">
+          <div>
             {citation.filename}
           </div>
-          <div style={{ fontSize: '11px', color: 'var(--text-3)', marginTop: 1 }}>
-            Bölüm {citation.chunk_index}
-          </div>
+          <small>Parça {citation.chunk_index}</small>
         </div>
         <RelevancePill score={citation.score} />
       </div>
 
       {/* Preview snippet */}
       {citation.text_preview && (
-        <div style={{
-          marginTop: '8px',
-          fontSize: '12px', color: 'var(--text-2)', lineHeight: 1.55,
-          display: '-webkit-box', WebkitLineClamp: expanded ? 999 : 2,
-          WebkitBoxOrient: 'vertical', overflow: 'hidden',
-          fontStyle: 'italic',
-        }}>
+        <div className="source-preview" style={{ WebkitLineClamp: expanded ? 999 : 3 }}>
           "{citation.text_preview}{!expanded && citation.text_preview.length >= 119 ? '…' : ''}"
         </div>
       )}
@@ -147,7 +128,7 @@ export function SourcesPanel({ citations, attribution }) {
   return (
     <aside className="sources-panel">
       <div className="sources-header">
-        <span>Kaynaklar</span>
+        <span>Kanıt Paneli</span>
         {citations?.length > 0 && (
           <span className="badge badge-accent">{citations.length}</span>
         )}
