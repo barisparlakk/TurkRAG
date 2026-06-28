@@ -8,12 +8,13 @@ from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile, status
 
-from api.auth import get_current_user, get_tenant_id
+from api.auth import get_current_user
 from api.db import get_conn
 from api.limits import UPLOAD_RATE_LIMIT, limiter
 from api.rbac import (
     get_accessible_document_ids,
     grant_access,
+    user_has_document_access,
     user_has_document_management_access,
 )
 from api.schemas import DocumentListItem, DocumentUploadResponse
@@ -222,37 +223,60 @@ async def delete_document(doc_id: str, user: dict = Depends(get_current_user)):
 
 
 @router.get("/jobs/{job_id}")
-async def get_job_status(job_id: str, tenant_id: str = Depends(get_tenant_id)):
+async def get_job_status(job_id: str, user: dict = Depends(get_current_user)):
     """Get ingestion job status."""
     from ingestion.queue import get_job_status as _get_job_status
+
+    tenant_id = user["tenant_id"]
     conn = get_conn()
     try:
         result = _get_job_status(job_id, conn)
+        if not result:
+            raise HTTPException(status_code=404, detail="Job not found")
+        if result["tenant_id"] != tenant_id:
+            raise HTTPException(status_code=403, detail="Access denied")
+        if (
+            user.get("role") != "admin"
+            and result.get("document_id")
+            and not user_has_document_access(user, result["document_id"], conn)
+        ):
+            raise HTTPException(status_code=403, detail="Document access required")
     finally:
         conn.close()
-    if not result:
-        raise HTTPException(status_code=404, detail="Job not found")
-    if result["tenant_id"] != tenant_id:
-        raise HTTPException(status_code=403, detail="Access denied")
     return result
 
 
 @router.get("/jobs")
-async def list_jobs(limit: int = 30, tenant_id: str = Depends(get_tenant_id)):
+async def list_jobs(limit: int = 30, user: dict = Depends(get_current_user)):
     """List recent ingestion jobs for the current tenant."""
     limit = min(max(limit, 1), 100)
+    tenant_id = user["tenant_id"]
     conn = get_conn()
     try:
         with conn.cursor() as cur:
-            cur.execute(
-                """SELECT id, tenant_id, document_id, filename, status, error_message,
-                          created_at, started_at, completed_at, attempts, max_attempts,
-                          last_heartbeat_at, retry_after
-                   FROM ingestion_jobs
-                   WHERE tenant_id=%s
-                   ORDER BY created_at DESC LIMIT %s""",
-                (tenant_id, limit),
-            )
+            if user.get("role") == "admin":
+                cur.execute(
+                    """SELECT id, tenant_id, document_id, filename, status, error_message,
+                              created_at, started_at, completed_at, attempts, max_attempts,
+                              last_heartbeat_at, retry_after
+                       FROM ingestion_jobs
+                       WHERE tenant_id=%s
+                       ORDER BY created_at DESC LIMIT %s""",
+                    (tenant_id, limit),
+                )
+            else:
+                accessible_ids = get_accessible_document_ids(user["id"], tenant_id, conn)
+                if not accessible_ids:
+                    return []
+                cur.execute(
+                    """SELECT id, tenant_id, document_id, filename, status, error_message,
+                              created_at, started_at, completed_at, attempts, max_attempts,
+                              last_heartbeat_at, retry_after
+                       FROM ingestion_jobs
+                       WHERE tenant_id=%s AND document_id = ANY(%s)
+                       ORDER BY created_at DESC LIMIT %s""",
+                    (tenant_id, accessible_ids, limit),
+                )
             rows = cur.fetchall()
     finally:
         conn.close()

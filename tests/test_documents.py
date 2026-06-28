@@ -1,10 +1,12 @@
 """Regression tests for document upload safety and queue behaviour."""
 
+import asyncio
 import os
 from io import BytesIO
 from unittest.mock import MagicMock, patch
 
 import pytest
+from fastapi import HTTPException
 
 os.environ.setdefault("POSTGRES_URL", "postgresql://test:test@localhost/test_unused")
 os.environ.setdefault("LLM_MODEL_PATH", "/dev/null")
@@ -102,6 +104,24 @@ class _Conn:
 
 def _delete_queries(state):
     return [query for query, _ in state.queries if "DELETE FROM documents" in query]
+
+
+def _job_row(job_id="job-1", tenant_id="tenant-1", document_id="doc-1", filename="sample.txt"):
+    return (
+        job_id,
+        tenant_id,
+        document_id,
+        filename,
+        "pending",
+        None,
+        "2026-06-29T10:00:00",
+        None,
+        None,
+        0,
+        3,
+        None,
+        None,
+    )
 
 
 def test_upload_enqueues_once_and_does_not_run_inline_ingestion(client, tmp_path):
@@ -272,3 +292,106 @@ def test_unsupported_extension_rejected_before_file_write(client, tmp_path):
     assert resp.status_code == 422
     get_conn.assert_not_called()
     assert list(tmp_path.iterdir()) == []
+
+
+def test_job_status_denies_member_without_document_access():
+    from api.routers import documents
+
+    conn = _Conn()
+    job = {
+        "id": "job-1",
+        "tenant_id": "tenant-1",
+        "document_id": "doc-1",
+        "filename": "sample.txt",
+        "status": "pending",
+    }
+
+    with (
+        patch("api.routers.documents.get_conn", return_value=conn),
+        patch("ingestion.queue.get_job_status", return_value=job),
+        patch("api.routers.documents.user_has_document_access", return_value=False),
+        pytest.raises(HTTPException) as exc,
+    ):
+        asyncio.run(documents.get_job_status("job-1", {
+            "id": "member-1",
+            "tenant_id": "tenant-1",
+            "role": "member",
+        }))
+
+    assert exc.value.status_code == 403
+    assert exc.value.detail == "Document access required"
+
+
+def test_job_status_allows_admin_without_acl_check():
+    from api.routers import documents
+
+    job = {
+        "id": "job-1",
+        "tenant_id": "tenant-1",
+        "document_id": "doc-1",
+        "filename": "sample.txt",
+        "status": "pending",
+    }
+
+    with (
+        patch("api.routers.documents.get_conn", return_value=_Conn()),
+        patch("ingestion.queue.get_job_status", return_value=job),
+        patch("api.routers.documents.user_has_document_access") as user_has_document_access,
+    ):
+        result = asyncio.run(documents.get_job_status("job-1", {
+            "id": "admin-1",
+            "tenant_id": "tenant-1",
+            "role": "admin",
+        }))
+
+    assert result == job
+    user_has_document_access.assert_not_called()
+
+
+def test_job_history_filters_member_to_accessible_documents():
+    from api.routers import documents
+
+    state = _DbState()
+    rows = [_job_row(document_id="doc-1")]
+
+    class JobsCursor(_Cursor):
+        def fetchall(self):
+            return rows
+
+    class JobsConn(_Conn):
+        def __init__(self):
+            super().__init__(state=state)
+            self.cursor_obj = JobsCursor(state)
+
+    with (
+        patch("api.routers.documents.get_conn", return_value=JobsConn()),
+        patch("api.routers.documents.get_accessible_document_ids", return_value=["doc-1"]),
+    ):
+        result = asyncio.run(documents.list_jobs(limit=10, user={
+            "id": "member-1",
+            "tenant_id": "tenant-1",
+            "role": "member",
+        }))
+
+    assert [job["document_id"] for job in result] == ["doc-1"]
+    assert "document_id = ANY(%s)" in state.queries[-1][0]
+    assert state.queries[-1][1] == ("tenant-1", ["doc-1"], 10)
+
+
+def test_job_history_returns_empty_for_member_without_accessible_documents():
+    from api.routers import documents
+
+    get_conn = MagicMock(return_value=_Conn())
+
+    with (
+        patch("api.routers.documents.get_conn", get_conn),
+        patch("api.routers.documents.get_accessible_document_ids", return_value=[]),
+    ):
+        result = asyncio.run(documents.list_jobs(limit=10, user={
+            "id": "member-1",
+            "tenant_id": "tenant-1",
+            "role": "member",
+        }))
+
+    assert result == []
+    assert get_conn.return_value.state.queries == []
