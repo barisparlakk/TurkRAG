@@ -20,11 +20,25 @@ POSTGRES_URL = os.getenv("POSTGRES_URL", "postgresql://turkrag:turkrag_secret@lo
 _pool: ThreadedConnectionPool | None = None
 
 
+def _pool_bounds() -> tuple[int, int]:
+    """Read and validate connection-pool limits from the environment."""
+    minconn = int(os.getenv("DB_POOL_MIN", "2"))
+    maxconn = int(os.getenv("DB_POOL_MAX", "10"))
+    if minconn < 1:
+        raise RuntimeError("DB_POOL_MIN must be at least 1")
+    if maxconn < 1:
+        raise RuntimeError("DB_POOL_MAX must be at least 1")
+    if minconn > maxconn:
+        raise RuntimeError("DB_POOL_MIN must be less than or equal to DB_POOL_MAX")
+    return minconn, maxconn
+
+
 def _get_pool() -> ThreadedConnectionPool:
     global _pool
     if _pool is None:
-        _pool = ThreadedConnectionPool(minconn=2, maxconn=10, dsn=POSTGRES_URL)
-        logger.info("DB connection pool created (min=2, max=10)")
+        minconn, maxconn = _pool_bounds()
+        _pool = ThreadedConnectionPool(minconn=minconn, maxconn=maxconn, dsn=POSTGRES_URL)
+        logger.info("DB connection pool created (min=%d, max=%d)", minconn, maxconn)
     return _pool
 
 

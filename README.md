@@ -244,6 +244,8 @@ bounds and still match their declared query counts.
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `POSTGRES_URL` | `postgresql://turkrag:turkrag_secret@localhost/turkrag` | PostgreSQL connection string |
+| `DB_POOL_MIN` | `2` | Minimum psycopg2 pooled PostgreSQL connections; must be `>= 1` and `<= DB_POOL_MAX` |
+| `DB_POOL_MAX` | `10` | Maximum psycopg2 pooled PostgreSQL connections; must be `>= DB_POOL_MIN` |
 | `LLM_MODEL_PATH` | `models/qwen3-8b-instruct-q4_k_m.gguf` | Path to GGUF model file |
 | `LLM_N_CTX` | `4096` | LLM context window (tokens) |
 | `LLM_N_GPU_LAYERS` | `-1` | GPU layers (-1 = all) |
