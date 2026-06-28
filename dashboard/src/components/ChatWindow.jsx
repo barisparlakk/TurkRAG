@@ -71,23 +71,16 @@ function EmptyState({ onSend }) {
   return (
     <div className="chat-empty">
       <div className="chat-empty-card">
-        <div className="chat-empty-orbit" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-        </div>
-
         <div className="chat-empty-logo">
           <img src="/logo-light.png" className="logo-light" alt="" />
           <img src="/logo-dark.png" className="logo-dark" alt="" />
         </div>
 
         <div className="chat-empty-copy">
-          <span className="chat-eyebrow">Belge zekası hazır</span>
-          <h2>Soruyu yaz, kaynaklı yanıtı al.</h2>
+          <span className="chat-eyebrow">TurkRAG çalışma masası</span>
+          <h2>Kaynaklı kurumsal yanıt merkezi</h2>
           <p>
-            TurkRAG şirket belgelerini tenant sınırları içinde arar, yanıtı üretir
-            ve dayandığı parçaları sağ panelde gösterir.
+            Tenant sınırları, belge izinleri ve Türkçe arama hattı tek ekranda birleşir.
           </p>
         </div>
 
@@ -258,7 +251,13 @@ function Message({ msg, isLast, onRegenerate, onFollowUp, isStreaming }) {
 }
 
 /* ── Main chat window ───────────────────────────────────── */
-export function ChatWindow({ selectedSession, onSessionChange, onNewSession, onCitationsChange }) {
+export function ChatWindow({
+  selectedSession,
+  onSessionChange,
+  onNewSession,
+  onCitationsChange,
+  onMessageStateChange,
+}) {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [elapsed, setElapsed] = useState(0)
@@ -440,8 +439,12 @@ export function ChatWindow({ selectedSession, onSessionChange, onNewSession, onC
   const hasMessages = messages.length > 0
   const lastAsstMsg = [...messages].reverse().find((m) => m.role === 'assistant' && !m.streaming)
 
+  useEffect(() => {
+    onMessageStateChange?.(hasMessages)
+  }, [hasMessages, onMessageStateChange])
+
   return (
-    <div className="chat-shell">
+    <div className={`chat-shell ${hasMessages ? 'has-messages' : 'is-empty'}`}>
       {hasMessages && (
         <div className="chat-topbar">
           <span>
@@ -504,7 +507,7 @@ export function ChatWindow({ selectedSession, onSessionChange, onNewSession, onC
               e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'
             }}
             onKeyDown={handleKey}
-            placeholder="Sorunuzu yazın… (Enter ile gönderin)"
+            placeholder="Kurumsal belgelerde arayın..."
             rows={1}
             disabled={isStreaming}
             style={{
@@ -518,8 +521,7 @@ export function ChatWindow({ selectedSession, onSessionChange, onNewSession, onC
           <button
             onClick={isStreaming ? abort : () => handleSend()}
             disabled={!isStreaming && !input.trim()}
-            className="btn btn-primary"
-            style={{ padding: '7px 12px', flexShrink: 0, alignSelf: 'flex-end' }}
+            className={`btn btn-primary composer-send ${input.trim() || isStreaming ? 'ready' : ''}`}
           >
             {isStreaming ? <IconStop /> : <IconSend />}
           </button>

@@ -38,13 +38,17 @@ export function Header({ tenant, tenants = [], role, onTenantSwitch, onLogout, t
           <img src="/logo-light.png" className="logo-light" alt="" />
           <img src="/logo-dark.png" className="logo-dark" alt="" />
         </div>
-        <span>TurkRAG</span>
+        <div className="app-brand-copy">
+          <span>TurkRAG</span>
+          <small>Kurumsal RAG Operasyonları</small>
+        </div>
       </div>
 
       <div style={{ position: 'relative' }}>
         <button
           onClick={() => setTenantOpen((v) => !v)}
           className="tenant-switch"
+          title="Çalışma alanı"
         >
           <span className="status-dot" />
           <span>{tenant?.name || tenant?.slug || 'Kiracı'}</span>
@@ -82,6 +86,7 @@ export function Header({ tenant, tenants = [], role, onTenantSwitch, onLogout, t
         <button
           onClick={() => setUserOpen((v) => !v)}
           className="avatar-btn"
+          title="Hesap menüsü"
         >
           {(tenant?.slug?.[0] || 'U').toUpperCase()}
         </button>

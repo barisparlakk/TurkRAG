@@ -39,11 +39,16 @@ async function request(method, path, body = null, isFormData = false) {
   const headers = { ...authHeaders() }
   if (body && !isFormData) headers['Content-Type'] = 'application/json'
 
-  const res = await fetch(`${API_BASE}${path}`, {
-    method,
-    headers,
-    body: isFormData ? body : body ? JSON.stringify(body) : undefined,
-  })
+  let res
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      method,
+      headers,
+      body: isFormData ? body : body ? JSON.stringify(body) : undefined,
+    })
+  } catch {
+    throw new Error(`API sunucusuna ulaşılamıyor (${API_BASE}). Backend çalışıyor mu?`)
+  }
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }))

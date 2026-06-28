@@ -172,6 +172,7 @@ export default function App() {
   const [sessions, setSessions] = useState([])
   const [citations, setCitations] = useState([])
   const [attribution, setAttribution] = useState(null)
+  const [hasChatMessages, setHasChatMessages] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [theme, setTheme] = useState(() => localStorage.getItem('turkrag_theme') || 'light')
 
@@ -183,6 +184,8 @@ export default function App() {
     setTenants([])
     setSessions([])
     setCitations([])
+    setAttribution(null)
+    setHasChatMessages(false)
     setSelectedSession(null)
     localStorage.removeItem('turkrag_tenant')
     localStorage.removeItem(AUTH_STORAGE_KEY)
@@ -255,6 +258,8 @@ export default function App() {
       localStorage.setItem('turkrag_tenant', JSON.stringify(nextTenant))
       setSelectedSession(null)
       setCitations([])
+      setAttribution(null)
+      setHasChatMessages(false)
       setSessionRefresh((n) => n + 1)
     } catch {}
   }
@@ -273,7 +278,7 @@ export default function App() {
 
   return (
     <ToastProvider>
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+      <div className="app-shell">
 
         <Header
           tenant={tenant}
@@ -288,27 +293,17 @@ export default function App() {
         <div
           className="dashboard-body"
           data-view={tab}
-          onPointerMove={(event) => {
-            const rect = event.currentTarget.getBoundingClientRect()
-            const x = ((event.clientX - rect.left) / rect.width) * 100
-            const y = ((event.clientY - rect.top) / rect.height) * 100
-            event.currentTarget.style.setProperty('--pointer-x', `${x.toFixed(2)}%`)
-            event.currentTarget.style.setProperty('--pointer-y', `${y.toFixed(2)}%`)
-          }}
-          onPointerLeave={(event) => {
-            event.currentTarget.style.setProperty('--pointer-x', '50%')
-            event.currentTarget.style.setProperty('--pointer-y', '45%')
-          }}
+          data-chat-state={hasChatMessages ? 'active' : 'empty'}
         >
-          <div className="ambient-scene" aria-hidden="true">
-            <span className="ambient-field ambient-field-a" />
-            <span className="ambient-field ambient-field-b" />
-            <span className="ambient-field ambient-field-c" />
-          </div>
-
           <Sidebar
             tab={tab}
-            onTabChange={(t) => { setTab(t); if (t !== 'chat') setCitations([]) }}
+            onTabChange={(t) => {
+              setTab(t)
+              if (t !== 'chat') {
+                setCitations([])
+                setAttribution(null)
+              }
+            }}
             onUploadClick={() => setTab('documents')}
             collapsed={sidebarCollapsed}
             onCollapseToggle={() => setSidebarCollapsed((v) => !v)}
@@ -319,46 +314,35 @@ export default function App() {
           />
 
           <main className="main-stage">
-            <div style={{
-              display: tab === 'chat' ? 'flex' : 'none',
-              flex: 1, overflow: 'hidden', flexDirection: 'column',
-            }}>
+            <div className="main-view chat-view" style={{ display: tab === 'chat' ? 'flex' : 'none' }}>
               <ChatWindow
                 selectedSession={selectedSession}
                 onSessionChange={setSelectedSession}
                 onNewSession={() => setSessionRefresh((n) => n + 1)}
                 onCitationsChange={(cits, attr) => { setCitations(cits); setAttribution(attr || null) }}
+                onMessageStateChange={setHasChatMessages}
               />
             </div>
 
-            <div style={{
-              display: tab === 'documents' ? 'block' : 'none',
-              flex: 1, overflow: 'auto', padding: '20px',
-            }}>
+            <div className="main-view scroll-view" style={{ display: tab === 'documents' ? 'block' : 'none' }}>
               <div className="view-pane">
                 <DocumentUpload />
               </div>
             </div>
 
-            <div style={{
-              display: tab === 'analytics' ? 'block' : 'none',
-              flex: 1, overflow: 'auto', padding: '20px',
-            }}>
+            <div className="main-view scroll-view" style={{ display: tab === 'analytics' ? 'block' : 'none' }}>
               <div className="view-pane">
                 <AnalyticsDashboard />
               </div>
             </div>
 
-            <div style={{
-              display: tab === 'admin' && role === 'admin' ? 'flex' : 'none',
-              flex: 1, overflow: 'auto', padding: '20px',
-            }}>
+            <div className="main-view scroll-view admin-view" style={{ display: tab === 'admin' && role === 'admin' ? 'block' : 'none' }}>
               <div className="view-pane">
                 <AdminPanel />
               </div>
             </div>
 
-            {tab === 'chat' && (
+            {tab === 'chat' && (citations.length > 0 || attribution?.length > 0) && (
               <SourcesPanel citations={citations} attribution={attribution} />
             )}
           </main>

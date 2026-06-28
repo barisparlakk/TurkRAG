@@ -45,10 +45,10 @@ const IconExpand = () => (
 )
 
 const NAV_ITEMS = [
-  { key: 'chat',      icon: <IconChat />,      label: 'Sohbet'   },
-  { key: 'documents', icon: <IconDocs />,      label: 'Belgeler' },
-  { key: 'analytics', icon: <IconAnalytics />, label: 'Analitik' },
-  { key: 'admin',     icon: <IconAdmin />,     label: 'Yönetim'  },
+  { key: 'chat',      icon: <IconChat />,      label: 'Sohbet',   description: 'Kaynaklı yanıt' },
+  { key: 'documents', icon: <IconDocs />,      label: 'Belgeler', description: 'İndeks ve işler' },
+  { key: 'analytics', icon: <IconAnalytics />, label: 'Analitik', description: 'Kullanım metrikleri' },
+  { key: 'admin',     icon: <IconAdmin />,     label: 'Yönetim',  description: 'Tenant ve sistem' },
 ]
 
 function NavItem({ item, active, collapsed, onClick }) {
@@ -59,7 +59,12 @@ function NavItem({ item, active, collapsed, onClick }) {
       className={`sidebar-nav-item ${active ? 'active' : ''} ${collapsed ? 'collapsed' : ''}`}
     >
       <span className="sidebar-nav-icon">{item.icon}</span>
-      {!collapsed && <span className="sidebar-nav-label">{item.label}</span>}
+      {!collapsed && (
+        <span className="sidebar-nav-copy">
+          <span className="sidebar-nav-label">{item.label}</span>
+          <span className="sidebar-nav-description">{item.description}</span>
+        </span>
+      )}
     </button>
   )
 }
@@ -80,6 +85,7 @@ export function Sidebar({
   return (
     <aside className={`app-sidebar ${collapsed ? 'collapsed' : ''}`}>
       <nav className="sidebar-nav">
+        {!collapsed && <div className="sidebar-section-label">Çalışma alanı</div>}
         {navItems.map((item) => (
           <NavItem
             key={item.key}
@@ -93,7 +99,7 @@ export function Sidebar({
         {tab === 'chat' && !collapsed && sessions?.length > 0 && (
           <>
             <div className="divider" style={{ margin: '8px 4px' }} />
-            <div className="sidebar-section-label">Geçmiş</div>
+            <div className="sidebar-section-label">Sohbet geçmişi</div>
             <div className="session-list">
               {sessions.map((s) => (
                 <button
@@ -119,6 +125,7 @@ export function Sidebar({
           <button
             onClick={onUploadClick}
             className="btn btn-outline sidebar-upload"
+            title="Belge yükle"
           >
             <IconUpload /> Yükle
           </button>
