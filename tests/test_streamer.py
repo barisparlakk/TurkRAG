@@ -70,6 +70,7 @@ class TestStreamerSuccess:
             patch("retrieval.hybrid.HybridRetriever.retrieve", return_value=_CHUNKS),
             patch("generation.llm.is_available", return_value=True),
             patch("generation.llm.generate_stream", side_effect=fake_generate),
+            patch("generation.followups.generate_followups", return_value=[]),
         ):
             result = _run(_stream(ws, session_id="sess-1"))
         return ws, result
@@ -103,6 +104,48 @@ class TestStreamerSuccess:
 
     def test_no_error_frames_on_success(self):
         ws, _ = self._run_success()
+        assert not ws.frames("error")
+
+    def test_attribution_frame_sent_after_done(self):
+        ws = FakeWebSocket()
+
+        def fake_generate(prompt):
+            yield "Merhaba."
+
+        attr_payload = {
+            "sentences": [{"text": "Merhaba.", "sentence_index": 0, "sources": []}],
+        }
+        with (
+            patch("retrieval.hybrid.HybridRetriever.retrieve", return_value=_CHUNKS),
+            patch("generation.llm.is_available", return_value=True),
+            patch("generation.llm.generate_stream", side_effect=fake_generate),
+            patch("generation.attribution.attribute_answer", return_value=attr_payload),
+            patch("generation.followups.generate_followups", return_value=[]),
+        ):
+            result = _run(_stream(ws))
+
+        assert result is not None
+        frame_types = [frame["type"] for frame in ws.frames()]
+        assert frame_types.index("done") < frame_types.index("attribution")
+
+    def test_attribution_failure_does_not_block_result(self):
+        ws = FakeWebSocket()
+
+        def fake_generate(prompt):
+            yield "Merhaba."
+
+        with (
+            patch("retrieval.hybrid.HybridRetriever.retrieve", return_value=_CHUNKS),
+            patch("generation.llm.is_available", return_value=True),
+            patch("generation.llm.generate_stream", side_effect=fake_generate),
+            patch("generation.attribution.attribute_answer", side_effect=RuntimeError("embed failed")),
+            patch("generation.followups.generate_followups", return_value=[]),
+        ):
+            result = _run(asyncio.wait_for(_stream(ws), timeout=1))
+
+        assert result is not None
+        assert ws.frames("done")
+        assert not ws.frames("attribution")
         assert not ws.frames("error")
 
 

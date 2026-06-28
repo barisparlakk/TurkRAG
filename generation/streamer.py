@@ -87,6 +87,22 @@ async def stream_rag_response(
 
         threading.Thread(target=_produce, daemon=True).start()
         loop = asyncio.get_running_loop()
+
+        async def run_background(func):
+            result_queue: stdlib_queue.SimpleQueue = stdlib_queue.SimpleQueue()
+
+            def _run():
+                try:
+                    result_queue.put(func())
+                except BaseException as exc:
+                    result_queue.put(exc)
+
+            threading.Thread(target=_run, daemon=True).start()
+            result = await loop.run_in_executor(None, result_queue.get)
+            if isinstance(result, BaseException):
+                raise result
+            return result
+
         try:
             while True:
                 item = await loop.run_in_executor(None, token_queue.get)
@@ -115,13 +131,7 @@ async def stream_rag_response(
         # Attribution — sentence-level source attribution (XAI), sent after done frame
         try:
             from generation.attribution import attribute_answer
-            attr_queue: stdlib_queue.SimpleQueue = stdlib_queue.SimpleQueue()
-
-            def _gen_attribution():
-                attr_queue.put(attribute_answer(response_text, chunks))
-
-            threading.Thread(target=_gen_attribution, daemon=True).start()
-            attr_result = await loop.run_in_executor(None, attr_queue.get)
+            attr_result = await run_background(lambda: attribute_answer(response_text, chunks))
             if attr_result and attr_result.get("sentences"):
                 await send({"type": "attribution", "sentences": attr_result["sentences"]})
         except Exception as exc:
@@ -132,13 +142,7 @@ async def stream_rag_response(
             import os as _os
             if _os.getenv("FOLLOWUP_ENABLED", "true").lower() == "true":
                 from generation.followups import generate_followups
-                followup_queue: stdlib_queue.SimpleQueue = stdlib_queue.SimpleQueue()
-
-                def _gen_followups():
-                    followup_queue.put(generate_followups(query, response_text))
-
-                threading.Thread(target=_gen_followups, daemon=True).start()
-                follow_ups = await loop.run_in_executor(None, followup_queue.get)
+                follow_ups = await run_background(lambda: generate_followups(query, response_text))
                 if follow_ups:
                     await send({"type": "follow_ups", "questions": follow_ups})
         except Exception as exc:

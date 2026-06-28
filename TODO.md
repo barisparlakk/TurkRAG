@@ -40,6 +40,7 @@ Last reviewed: 2026-06-28
 - [x] `eval/auto_eval.py`, `api/routers/evaluation.py`, and `tests/test_evaluation_jobs.py`: add single-run status polling and conditional worker claiming so duplicate background invocations cannot re-run terminal evaluation jobs.
 - [x] `api/main.py` and `tests/test_startup_schema.py`: accept both the legacy and renamed Alembic revision IDs so existing migrated databases keep starting after the local revision rename.
 - [x] `scripts/repair_retrieval_artifacts.py`, `scripts/repair_generated_eval_csv.py`, committed eval/results artifacts, and focused tests: restore blank generated-eval questions from the fuller CSV export, recompute duplicate-safe normalized metrics from stored `retrieved_docs`/`relevant_docs`, rewrite the stale committed artifacts in place, and gate them with `python scripts/audit_retrieval_artifacts.py`.
+- [x] `generation/streamer.py`, `generation/attribution.py`, `tests/test_streamer.py`, and `tests/test_attribution.py`: make post-answer attribution/follow-up worker failures exception-safe so streaming responses cannot hang after the `done` frame, and keep low-confidence fallback source metadata consistent.
 
 ## Deferred work
 

@@ -83,7 +83,7 @@ def attribute_answer(
       cited_docs  : deduplicated list of cited filenames
       has_sources : bool — True if at least one sentence has a source
     """
-    if not answer or not chunks:
+    if not answer or not answer.strip() or not chunks:
         return {
             "answer": answer,
             "sentences": [],
@@ -141,6 +141,9 @@ def attribute_answer(
 
         sources.sort(key=lambda x: x["score"], reverse=True)
         sources = sources[:max_sources]
+        for source in sources:
+            if source["filename"]:
+                all_cited.add(source["filename"])
 
         if not sources:
             # Fall back: attribute to the best-scoring chunk even below threshold
@@ -156,6 +159,8 @@ def attribute_answer(
                     "source_snippet": c["text"][:120],
                     "low_confidence": True,
                 }]
+                if c.get("filename", ""):
+                    all_cited.add(c.get("filename", ""))
 
         attributed_sentences.append({
             "text": sent,
