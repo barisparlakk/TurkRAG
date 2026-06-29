@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { api } from '../api/client.js'
 
-/* ── Icons ─────────────────────────────────────────────────────────────────── */
 const IconCheck = () => (
   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="20 6 9 17 4 12"/>
@@ -18,56 +17,61 @@ const IconRefresh = () => (
   </svg>
 )
 
-/* ── Section title ──────────────────────────────────────────────────────────── */
-function SectionTitle({ children }) {
-  return (
-    <div className="section-label">
-      {children}
-    </div>
-  )
+function statusTone(status) {
+  if (['ok', 'ready', 'completed', 'active', true].includes(status)) return 'ok'
+  if (['queued', 'running', 'processing', 'pending'].includes(status)) return 'watch'
+  return 'bad'
 }
 
-/* ── Status pill ────────────────────────────────────────────────────────────── */
 function StatusPill({ ok, label }) {
   return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: '6px',
-      background: ok ? 'var(--success-muted)' : 'var(--error-muted)',
-      border: `1px solid ${ok ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}`,
-      color: ok ? 'var(--success)' : 'var(--error)',
-      borderRadius: 20, padding: '4px 10px', fontSize: '12px', fontWeight: 600,
-    }}>
+    <span className={`ops-status ${ok ? 'ok' : 'bad'}`}>
       {ok ? <IconCheck /> : <IconX />}
       {label}
+    </span>
+  )
+}
+
+function PanelTitle({ title, meta, action }) {
+  return (
+    <div className="ops-panel-head">
+      <span>{title}</span>
+      {action || <strong>{meta}</strong>}
     </div>
   )
 }
 
-/* ── Health section ─────────────────────────────────────────────────────────── */
+function fmtDate(iso) {
+  if (!iso) return '-'
+  return new Date(iso).toLocaleString('tr-TR', {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
 function HealthSection({ health }) {
-  if (!health) return null
+  if (!health) return (
+    <section className="ops-panel">
+      <PanelTitle title="Sistem durumu" meta="bekleniyor" />
+      <div className="ops-empty compact">Health bilgisi alınamadı</div>
+    </section>
+  )
+
   return (
-    <div style={{
-      background: 'var(--surface-1)', border: '1px solid var(--border)',
-      borderRadius: 'var(--radius-lg)', padding: '20px 22px',
-    }}>
-      <SectionTitle>Sistem Durumu</SectionTitle>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+    <section className="ops-panel">
+      <PanelTitle title="Sistem durumu" meta={health.version ? `v${health.version}` : 'canlı'} />
+      <div className="health-matrix">
         <StatusPill ok={health.status === 'ok'} label="API" />
         <StatusPill ok={health.qdrant === 'ok'} label="Qdrant" />
         <StatusPill ok={health.postgres === 'ok'} label="PostgreSQL" />
-        <StatusPill ok={health.llm_available} label="LLM" />
+        <StatusPill ok={Boolean(health.llm_available)} label="LLM" />
       </div>
-      {health.version && (
-        <div style={{ fontSize: '11px', color: 'var(--text-3)', marginTop: '10px' }}>
-          v{health.version}
-        </div>
-      )}
-    </div>
+    </section>
   )
 }
 
-/* ── Tenant create section ──────────────────────────────────────────────────── */
 function TenantSection({ onCreated }) {
   const [name, setName] = useState('')
   const [slug, setSlug] = useState('')
@@ -96,88 +100,59 @@ function TenantSection({ onCreated }) {
     }
   }
 
-  // Auto-generate slug from name
   const handleNameChange = (val) => {
     setName(val)
     setSlug(val.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''))
   }
 
   return (
-    <div style={{
-      background: 'var(--surface-1)', border: '1px solid var(--border)',
-      borderRadius: 'var(--radius-lg)', padding: '20px 22px',
-    }}>
-      <SectionTitle>Kiracı Yönetimi</SectionTitle>
+    <section className="ops-panel">
+      <PanelTitle title="Tenant defteri" meta={`${tenants.length} tenant`} />
 
       {tenants.length > 0 && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
-          {tenants.map((t) => (
-            <div key={t.id} style={{
-              background: 'var(--surface-2)', border: '1px solid var(--border)',
-              borderRadius: 'var(--radius-md)', padding: '6px 12px',
-              fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '2px',
-            }}>
-              <span style={{ fontWeight: 600, color: 'var(--text-1)' }}>{t.name}</span>
-              <span style={{ color: 'var(--text-3)', fontFamily: 'monospace' }}>{t.slug}</span>
+        <div className="tenant-register">
+          {tenants.map((t, index) => (
+            <div key={t.id} className="tenant-record">
+              <code>T{String(index + 1).padStart(2, '0')}</code>
+              <span>{t.name}</span>
+              <small>{t.slug}</small>
             </div>
           ))}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-          <input
-            type="text"
-            placeholder="Kiracı adı"
-            value={name}
-            onChange={(e) => handleNameChange(e.target.value)}
-            className="input-field"
-            style={{ flex: '1 1 160px' }}
-            required
-          />
-          <input
-            type="text"
-            placeholder="slug (otomatik)"
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-            className="input-field"
-            style={{ flex: '1 1 140px', fontFamily: 'monospace', fontSize: '13px' }}
-            required
-          />
-          <button
-            type="submit"
-            disabled={loading || !name.trim() || !slug.trim()}
-            className="btn btn-primary"
-            style={{ padding: '8px 16px', fontSize: '13px', flexShrink: 0 }}
-          >
-            {loading ? '...' : 'Oluştur'}
-          </button>
-        </div>
-
-        {error && (
-          <div style={{
-            background: 'var(--error-muted)', border: '1px solid rgba(239,68,68,0.2)',
-            color: 'var(--error)', fontSize: '12px',
-            borderRadius: 'var(--radius-md)', padding: '8px 12px',
-          }}>
-            {error}
-          </div>
-        )}
-        {success && (
-          <div style={{
-            background: 'var(--success-muted)', border: '1px solid rgba(16,185,129,0.2)',
-            color: 'var(--success)', fontSize: '12px',
-            borderRadius: 'var(--radius-md)', padding: '8px 12px',
-          }}>
-            {success}
-          </div>
-        )}
+      <form onSubmit={handleSubmit} className="ops-form-row">
+        <input
+          type="text"
+          placeholder="Kiracı adı"
+          value={name}
+          onChange={(e) => handleNameChange(e.target.value)}
+          className="input-field"
+          required
+        />
+        <input
+          type="text"
+          placeholder="slug"
+          value={slug}
+          onChange={(e) => setSlug(e.target.value)}
+          className="input-field mono"
+          required
+        />
+        <button
+          type="submit"
+          disabled={loading || !name.trim() || !slug.trim()}
+          className="btn btn-primary"
+        >
+          {loading ? '...' : 'Oluştur'}
+        </button>
       </form>
-    </div>
+
+      {error && <div className="ops-alert error">{error}</div>}
+      {success && <div className="ops-alert success">{success}</div>}
+    </section>
   )
 }
 
-/* ── Documents section ──────────────────────────────────────────────────────── */
 function DocumentsSection() {
   const [docs, setDocs] = useState([])
   const [loading, setLoading] = useState(true)
@@ -190,93 +165,32 @@ function DocumentsSection() {
 
   useEffect(() => { load() }, [load])
 
-  const statusBadge = (status) => {
-    if (status === 'ready') return { label: 'Hazır', color: 'var(--success)', bg: 'var(--success-muted)' }
-    if (status === 'error') return { label: 'Hata', color: 'var(--error)', bg: 'var(--error-muted)' }
-    return { label: 'İşleniyor', color: 'var(--warning)', bg: 'var(--warning-muted)' }
-  }
-
   return (
-    <div style={{
-      background: 'var(--surface-1)', border: '1px solid var(--border)',
-      borderRadius: 'var(--radius-lg)', overflow: 'hidden',
-    }}>
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '16px 20px', borderBottom: '1px solid var(--border)',
-        background: 'var(--surface-2)',
-      }}>
-        <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-          Belgeler ({docs.length})
-        </div>
-        <button onClick={load} disabled={loading} className="btn" style={{
-          fontSize: '11px', padding: '4px 10px', border: '1px solid var(--border)',
-          borderRadius: 'var(--radius-md)', color: 'var(--text-2)',
-          display: 'flex', alignItems: 'center', gap: '5px',
-          opacity: loading ? 0.5 : 1,
-        }}>
-          <IconRefresh />
-        </button>
-      </div>
-
+    <section className="ops-panel">
+      <PanelTitle
+        title="Kaynak erişim kaydı"
+        action={<button onClick={load} disabled={loading} className="btn btn-outline tight"><IconRefresh /> Yenile</button>}
+      />
       {loading ? (
-        <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-3)', fontSize: '13px' }}>
-          Yükleniyor
-        </div>
+        <div className="ops-empty compact">Belgeler yükleniyor</div>
       ) : docs.length === 0 ? (
-        <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-3)', fontSize: '13px' }}>
-          Belge yok
-        </div>
+        <div className="ops-empty compact">Belge yok</div>
       ) : (
-        <>
-          <div style={{
-            display: 'grid', gridTemplateColumns: '1fr 80px 60px 100px',
-            padding: '8px 20px', borderBottom: '1px solid var(--border)',
-            fontSize: '11px', fontWeight: 700, color: 'var(--text-3)',
-            letterSpacing: '0.06em', textTransform: 'uppercase',
-          }}>
-            <div>Dosya</div>
-            <div style={{ textAlign: 'center' }}>Durum</div>
-            <div style={{ textAlign: 'right' }}>Parça</div>
-            <div style={{ textAlign: 'right' }}>Tarih</div>
+        <div className="ops-table docs-admin-table">
+          <div className="ops-table-head">
+            <span>Dosya</span><span>Durum</span><span>Parça</span><span>Tarih</span>
           </div>
-
-          {docs.map((doc, i) => {
-            const badge = statusBadge(doc.status)
-            return (
-              <div key={doc.id} style={{
-                display: 'grid', gridTemplateColumns: '1fr 80px 60px 100px',
-                padding: '10px 20px', alignItems: 'center',
-                borderBottom: i < docs.length - 1 ? '1px solid var(--border)' : 'none',
-                fontSize: '13px',
-              }}>
-                <div style={{
-                  color: 'var(--text-1)', overflow: 'hidden',
-                  textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: 12,
-                }}>
-                  {doc.filename}
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'center' }}>
-                  <span style={{
-                    fontSize: '11px', fontWeight: 600,
-                    background: badge.bg, color: badge.color,
-                    borderRadius: 20, padding: '2px 8px',
-                  }}>
-                    {badge.label}
-                  </span>
-                </div>
-                <div style={{ textAlign: 'right', color: 'var(--text-2)' }}>
-                  {doc.chunk_count ?? '—'}
-                </div>
-                <div style={{ textAlign: 'right', color: 'var(--text-3)', fontSize: '11px' }}>
-                  {new Date(doc.created_at).toLocaleDateString('tr-TR', { month: 'short', day: 'numeric' })}
-                </div>
-              </div>
-            )
-          })}
-        </>
+          {docs.map((doc) => (
+            <div className="ops-table-row" key={doc.id}>
+              <span className="ops-table-primary">{doc.filename}</span>
+              <span className={`ops-status ${statusTone(doc.status)}`}>{doc.status === 'ready' ? 'Hazır' : doc.status}</span>
+              <span>{doc.chunk_count ?? '-'}</span>
+              <span>{fmtDate(doc.created_at)}</span>
+            </div>
+          ))}
+        </div>
       )}
-    </div>
+    </section>
   )
 }
 
@@ -328,9 +242,9 @@ function UserSection() {
   }
 
   return (
-    <div className="admin-section">
-      <SectionTitle>Kullanıcılar</SectionTitle>
-      <form onSubmit={create} className="admin-inline-form">
+    <section className="ops-panel">
+      <PanelTitle title="Kullanıcı ve rol defteri" meta={`${users.length} kullanıcı`} />
+      <form onSubmit={create} className="ops-form-row user-form">
         <input className="input-field" type="email" placeholder="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         <input className="input-field" type="password" placeholder="ilk şifre" value={password} onChange={(e) => setPassword(e.target.value)} />
         <select className="input-field" value={role} onChange={(e) => setRole(e.target.value)}>
@@ -339,33 +253,34 @@ function UserSection() {
         </select>
         <button className="btn btn-primary" disabled={!email.trim() || password.length < 8}>Ekle</button>
       </form>
-      {message && <div className="admin-success">{message}</div>}
-      {error && <div className="admin-error">{error}</div>}
-      <div className="admin-table">
-        <div className="admin-row admin-row-head">
+      {message && <div className="ops-alert success">{message}</div>}
+      {error && <div className="ops-alert error">{error}</div>}
+
+      <div className="ops-table user-admin-table">
+        <div className="ops-table-head">
           <span>Email</span><span>Rol</span><span>Durum</span><span>İşlem</span>
         </div>
         {loading ? (
-          <div className="admin-empty">Yükleniyor</div>
+          <div className="ops-empty compact">Yükleniyor</div>
         ) : users.length === 0 ? (
-          <div className="admin-empty">Kullanıcı yok</div>
+          <div className="ops-empty compact">Kullanıcı yok</div>
         ) : users.map((u) => (
-          <div className="admin-row" key={u.id}>
-            <span>{u.email}</span>
+          <div className="ops-table-row" key={u.id}>
+            <span className="ops-table-primary">{u.email}</span>
             <span>{u.role}</span>
-            <span className={u.is_active ? 'admin-status-ok' : 'admin-status-warn'}>{u.is_active ? 'Aktif' : 'Pasif'}</span>
-            <span className="admin-actions">
-              <button className="btn btn-outline" onClick={() => update(u, { role: u.role === 'admin' ? 'member' : 'admin' })}>
+            <span className={`ops-status ${u.is_active ? 'ok' : 'watch'}`}>{u.is_active ? 'Aktif' : 'Pasif'}</span>
+            <span className="ops-actions">
+              <button className="btn btn-outline tight" onClick={() => update(u, { role: u.role === 'admin' ? 'member' : 'admin' })}>
                 {u.role === 'admin' ? 'Member yap' : 'Admin yap'}
               </button>
-              <button className="btn btn-danger" onClick={() => update(u, { is_active: !u.is_active })}>
+              <button className="btn btn-danger tight" onClick={() => update(u, { is_active: !u.is_active })}>
                 {u.is_active ? 'Pasifleştir' : 'Aktifleştir'}
               </button>
             </span>
           </div>
         ))}
       </div>
-    </div>
+    </section>
   )
 }
 
@@ -382,29 +297,29 @@ function JobsSection() {
   useEffect(() => { load() }, [load])
 
   return (
-    <div className="admin-section">
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <SectionTitle>İşleme İşleri</SectionTitle>
-        <button className="btn btn-outline" onClick={load} disabled={loading}><IconRefresh /> Yenile</button>
-      </div>
-      <div className="admin-table">
-        <div className="admin-row admin-row-head">
+    <section className="ops-panel">
+      <PanelTitle
+        title="İndeks iş kuyruğu"
+        action={<button className="btn btn-outline tight" onClick={load} disabled={loading}><IconRefresh /> Yenile</button>}
+      />
+      <div className="ops-table jobs-admin-table">
+        <div className="ops-table-head">
           <span>Dosya</span><span>Durum</span><span>Başlangıç</span><span>Hata</span>
         </div>
         {loading ? (
-          <div className="admin-empty">Yükleniyor</div>
+          <div className="ops-empty compact">Yükleniyor</div>
         ) : jobs.length === 0 ? (
-          <div className="admin-empty">İş yok</div>
+          <div className="ops-empty compact">İş yok</div>
         ) : jobs.map((job) => (
-          <div className="admin-row" key={job.id}>
-            <span>{job.filename}</span>
-            <span className={job.status === 'failed' ? 'admin-status-warn' : 'admin-status-ok'}>{job.status}</span>
-            <span>{job.started_at ? new Date(job.started_at).toLocaleString('tr-TR') : '-'}</span>
+          <div className="ops-table-row" key={job.id}>
+            <span className="ops-table-primary">{job.filename}</span>
+            <span className={`ops-status ${statusTone(job.status)}`}>{job.status}</span>
+            <span>{fmtDate(job.started_at)}</span>
             <span title={job.error_message || ''}>{job.error_message || '-'}</span>
           </div>
         ))}
       </div>
-    </div>
+    </section>
   )
 }
 
@@ -447,85 +362,66 @@ function EvaluationSection() {
   }
 
   return (
-    <div className="admin-section">
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <SectionTitle>Değerlendirme</SectionTitle>
-        <button className="btn btn-primary" onClick={runEval} disabled={loading || Boolean(activeRun)}>
-          {loading ? 'Yükleniyor...' : activeRun?.status === 'queued' ? 'Eval sırada' : activeRun ? 'Eval çalışıyor' : 'Eval çalıştır'}
-        </button>
-      </div>
-      {error && <div className="admin-error">{error}</div>}
-      <div className="admin-table">
-        <div className="admin-row admin-row-head">
+    <section className="ops-panel">
+      <PanelTitle
+        title="Eval kayıtları"
+        action={(
+          <button className="btn btn-primary tight" onClick={runEval} disabled={loading || Boolean(activeRun)}>
+            {loading ? 'Yükleniyor' : activeRun?.status === 'queued' ? 'Sırada' : activeRun ? 'Çalışıyor' : 'Eval çalıştır'}
+          </button>
+        )}
+      />
+      {error && <div className="ops-alert error">{error}</div>}
+      <div className="ops-table eval-admin-table">
+        <div className="ops-table-head">
           <span>Etiket</span><span>Durum</span><span>Skor / Soru</span><span>Tarih</span>
         </div>
         {runs.length === 0 ? (
-          <div className="admin-empty">Eval geçmişi yok</div>
+          <div className="ops-empty compact">Eval geçmişi yok</div>
         ) : runs.map((run) => {
-          const statusLabels = { queued: 'Sırada', running: 'Çalışıyor', completed: 'Tamamlandı', failed: 'Başarısız' }
-          const isFailed = run.status === 'failed'
-          const isComplete = run.status === 'completed'
+          const labels = { queued: 'Sırada', running: 'Çalışıyor', completed: 'Tamamlandı', failed: 'Başarısız' }
+          const complete = run.status === 'completed'
           return (
-            <div className="admin-row" key={run.id}>
-              <span>{run.run_label || run.id.slice(0, 8)}</span>
-              <span
-                className={isFailed ? 'admin-status-warn' : isComplete ? 'admin-status-ok' : ''}
-                title={run.error || ''}
-              >
-                {statusLabels[run.status] || run.status}
-              </span>
-              <span>{isComplete ? `${Number(run.avg_score || 0).toFixed(3)} / ${run.num_queries}` : '-'}</span>
-              <span>{new Date(run.created_at).toLocaleString('tr-TR')}</span>
+            <div className="ops-table-row" key={run.id}>
+              <span className="ops-table-primary">{run.run_label || run.id.slice(0, 8)}</span>
+              <span className={`ops-status ${statusTone(run.status)}`} title={run.error || ''}>{labels[run.status] || run.status}</span>
+              <span>{complete ? `${Number(run.avg_score || 0).toFixed(3)} / ${run.num_queries}` : '-'}</span>
+              <span>{fmtDate(run.created_at)}</span>
             </div>
           )
         })}
       </div>
-    </div>
+    </section>
   )
 }
 
-/* ── RAG Config section ─────────────────────────────────────────────────────── */
 function ConfigSection() {
   const configs = [
-    { label: 'HyDE', desc: 'Hypothetical Document Embedding', env: 'HYDE_ENABLED', default: 'true' },
-    { label: 'Güven Eşiği', desc: 'Rerank confidence threshold', env: 'RERANK_CONFIDENCE_THRESHOLD', default: '-2.0' },
-    { label: 'Maks Token', desc: 'LLM max output tokens', env: 'LLM_MAX_TOKENS', default: '512' },
-    { label: 'İş Parçacığı', desc: 'LLM CPU threads', env: 'LLM_N_THREADS', default: '8' },
-    { label: 'Hız Limiti', desc: 'Per-tenant rate limit', env: 'RATE_LIMIT', default: '60/minute' },
+    { label: 'HyDE', desc: 'Hypothetical Document Embedding', env: 'HYDE_ENABLED', value: 'true' },
+    { label: 'Güven Eşiği', desc: 'Rerank confidence threshold', env: 'RERANK_CONFIDENCE_THRESHOLD', value: '-2.0' },
+    { label: 'Maks Token', desc: 'LLM max output tokens', env: 'LLM_MAX_TOKENS', value: '512' },
+    { label: 'İş Parçacığı', desc: 'LLM CPU threads', env: 'LLM_N_THREADS', value: '8' },
+    { label: 'Hız Limiti', desc: 'Per-tenant rate limit', env: 'RATE_LIMIT', value: '60/minute' },
   ]
 
   return (
-    <div style={{
-      background: 'var(--surface-1)', border: '1px solid var(--border)',
-      borderRadius: 'var(--radius-lg)', padding: '20px 22px',
-    }}>
-      <SectionTitle>RAG Konfigürasyonu</SectionTitle>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-        {configs.map((c, i) => (
-          <div key={c.env} style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '10px 0',
-            borderBottom: i < configs.length - 1 ? '1px solid var(--border)' : 'none',
-          }}>
+    <section className="ops-panel">
+      <PanelTitle title="RAG konfigürasyon fişi" meta={`${configs.length} parametre`} />
+      <div className="config-ledger">
+        {configs.map((c) => (
+          <div key={c.env} className="config-row">
             <div>
-              <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-1)' }}>{c.label}</div>
-              <div style={{ fontSize: '11px', color: 'var(--text-3)', marginTop: 2 }}>{c.desc}</div>
+              <strong>{c.label}</strong>
+              <span>{c.desc}</span>
             </div>
-            <div style={{
-              fontFamily: 'monospace', fontSize: '12px',
-              background: 'var(--surface-2)', border: '1px solid var(--border)',
-              borderRadius: 'var(--radius-sm)', padding: '3px 8px', color: 'var(--accent-hover)',
-            }}>
-              {c.default}
-            </div>
+            <code title={c.env}>{c.value}</code>
           </div>
         ))}
       </div>
-    </div>
+    </section>
   )
 }
 
-/* ── Main ───────────────────────────────────────────────────────────────────── */
 export default function AdminPanel() {
   const [health, setHealth] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -540,26 +436,38 @@ export default function AdminPanel() {
   useEffect(() => { load() }, [load, refreshKey])
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      <div className="view-header">
-        <h2>Yönetim</h2>
+    <div className="ops-page admin-ops">
+      <header className="ops-page-header">
+        <div>
+          <span className="ops-kicker">Yetki, indeks ve sistem kontrolü</span>
+          <h2>Operasyon yönetim defteri</h2>
+          <p>Tenant, kullanıcı, ingestion, eval ve sağlık kayıtları aynı yönetim yüzeyinde tutulur.</p>
+        </div>
         <button
           onClick={() => { load(); setRefreshKey((n) => n + 1) }}
           disabled={loading}
-          className="btn btn-outline"
-          style={{ opacity: loading ? 0.5 : 1 }}
+          className="btn btn-outline ops-refresh"
         >
-          <IconRefresh /> {loading ? '...' : 'Yenile'}
+          <IconRefresh /> {loading ? 'Yenileniyor' : 'Yenile'}
         </button>
-      </div>
+      </header>
 
-      <HealthSection health={health} />
-      <TenantSection onCreated={() => setRefreshKey((n) => n + 1)} />
+      <section className="ops-grid two">
+        <HealthSection health={health} />
+        <TenantSection onCreated={() => setRefreshKey((n) => n + 1)} />
+      </section>
+
       <UserSection />
-      <JobsSection />
-      <EvaluationSection />
-      <DocumentsSection key={refreshKey} />
-      <ConfigSection />
+
+      <section className="ops-grid two">
+        <JobsSection />
+        <EvaluationSection />
+      </section>
+
+      <section className="ops-grid two">
+        <DocumentsSection key={refreshKey} />
+        <ConfigSection />
+      </section>
     </div>
   )
 }
