@@ -45,10 +45,10 @@ const IconExpand = () => (
 )
 
 const NAV_ITEMS = [
-  { key: 'chat',      icon: <IconChat />,      label: 'Sorgu Masası',   description: 'Yanıt ve kanıt' },
-  { key: 'documents', icon: <IconDocs />,      label: 'Kaynak İndeksi', description: 'Belge ve işler' },
-  { key: 'analytics', icon: <IconAnalytics />, label: 'Kalite Ölçümü',  description: 'Kullanım ve eval' },
-  { key: 'admin',     icon: <IconAdmin />,     label: 'Yetki Defteri',  description: 'Tenant ve sistem' },
+  { key: 'chat',      icon: <IconChat />,      label: 'Sorgu',     description: 'Yanıt ve kanıt' },
+  { key: 'documents', icon: <IconDocs />,      label: 'Kaynaklar', description: 'İndeks ve işler' },
+  { key: 'analytics', icon: <IconAnalytics />, label: 'Kalite',    description: 'Kullanım ve eval' },
+  { key: 'admin',     icon: <IconAdmin />,     label: 'Yetki',     description: 'Tenant ve sistem' },
 ]
 
 function NavItem({ item, active, collapsed, onClick }) {
