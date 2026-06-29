@@ -1,6 +1,6 @@
 # TurkRAG TODO
 
-Last reviewed: 2026-06-28
+Last reviewed: 2026-06-29
 
 ## Requirement analysis
 
@@ -44,6 +44,7 @@ Last reviewed: 2026-06-28
 - [x] `scripts/repair_retrieval_artifacts.py`, `scripts/repair_generated_eval_csv.py`, committed eval/results artifacts, and focused tests: restore blank generated-eval questions from the fuller CSV export, recompute duplicate-safe normalized metrics from stored `retrieved_docs`/`relevant_docs`, rewrite the stale committed artifacts in place, and gate them with `python scripts/audit_retrieval_artifacts.py`.
 - [x] `generation/streamer.py`, `generation/attribution.py`, `tests/test_streamer.py`, and `tests/test_attribution.py`: make post-answer attribution/follow-up worker failures exception-safe so streaming responses cannot hang after the `done` frame, and keep low-confidence fallback source metadata consistent.
 - [x] `api/routers/documents.py` and `tests/test_documents.py`: make ingestion job status/history enforce document ACLs for tenant members while preserving tenant-admin visibility.
+- [x] `api/routers/documents.py` and `tests/test_documents.py`: reject upload requests with path-only or extension-only filenames before writing temporary files or opening DB connections.
 
 ## Deferred work
 

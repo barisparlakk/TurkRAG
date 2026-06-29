@@ -28,6 +28,23 @@ UPLOAD_CHUNK_BYTES = 1024 * 1024
 MAX_UPLOAD_BYTES = int(os.getenv("MAX_UPLOAD_BYTES", str(50 * 1024 * 1024)))
 
 
+def _sanitize_upload_filename(filename: str | None) -> tuple[str, str]:
+    """Return a safe basename and suffix, or reject unusable upload names."""
+    safe_filename = Path(filename or "").name.strip()
+    suffix = Path(safe_filename).suffix.lower()
+    stem = Path(safe_filename).stem.strip()
+    if not safe_filename or not stem or safe_filename in {".", ".."} or (
+        safe_filename.startswith(".") and not suffix
+    ):
+        raise HTTPException(status_code=422, detail="Uploaded file must have a valid filename")
+    if suffix not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Unsupported file type '{suffix}'. Allowed: {', '.join(ALLOWED_EXTENSIONS)}",
+        )
+    return safe_filename, suffix
+
+
 @router.post("/upload", response_model=DocumentUploadResponse, status_code=status.HTTP_202_ACCEPTED)
 @limiter.limit(UPLOAD_RATE_LIMIT)
 async def upload_document(
@@ -37,13 +54,7 @@ async def upload_document(
 ):
     """Upload a document for ingestion. Returns immediately; processing is async."""
     tenant_id = user["tenant_id"]
-    safe_filename = Path(file.filename or "upload").name
-    suffix = Path(safe_filename).suffix.lower()
-    if suffix not in ALLOWED_EXTENSIONS:
-        raise HTTPException(
-            status_code=422,
-            detail=f"Unsupported file type '{suffix}'. Allowed: {', '.join(ALLOWED_EXTENSIONS)}",
-        )
+    safe_filename, suffix = _sanitize_upload_filename(file.filename)
 
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     temp_path = UPLOAD_DIR / f"upload_{uuid.uuid4().hex}{suffix}.tmp"

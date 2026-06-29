@@ -294,6 +294,36 @@ def test_unsupported_extension_rejected_before_file_write(client, tmp_path):
     assert list(tmp_path.iterdir()) == []
 
 
+def test_extension_only_filename_rejected_before_file_write(client, tmp_path):
+    token = _token(client)
+
+    with (
+        patch("api.routers.documents.UPLOAD_DIR", tmp_path),
+        patch("api.routers.documents.get_conn") as get_conn,
+    ):
+        resp = client.post(
+            "/documents/upload",
+            files={"file": (".txt", BytesIO(b"nameless"), "text/plain")},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+    assert resp.status_code == 422
+    assert resp.json()["detail"] == "Uploaded file must have a valid filename"
+    get_conn.assert_not_called()
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_upload_filename_sanitizer_requires_usable_basename():
+    from api.routers.documents import _sanitize_upload_filename
+
+    assert _sanitize_upload_filename("../safe.txt") == ("safe.txt", ".txt")
+    with pytest.raises(HTTPException) as exc:
+        _sanitize_upload_filename(".pdf")
+
+    assert exc.value.status_code == 422
+    assert exc.value.detail == "Uploaded file must have a valid filename"
+
+
 def test_job_status_denies_member_without_document_access():
     from api.routers import documents
 
