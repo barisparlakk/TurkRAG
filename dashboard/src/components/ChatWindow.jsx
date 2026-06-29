@@ -56,26 +56,32 @@ const EXAMPLE_QUESTIONS = [
   {
     label: 'İzin prosedürü nasıl işler?',
     meta: 'İK',
+    intent: 'Politika maddesi bul',
   },
   {
     label: '3 yıllık kıdemde izin hakkı kaç gündür?',
     meta: 'İK',
+    intent: 'Hak hesabı doğrula',
   },
   {
     label: 'Tedarikçi seçimi için hangi kriterler geçerli?',
     meta: 'Satın alma',
+    intent: 'Kriter karşılaştır',
   },
   {
     label: 'KVKK kapsamında kişisel veri nasıl işlenir?',
     meta: 'Uyum',
+    intent: 'Uyum dayanağı çıkar',
   },
   {
     label: 'Ürün iade süresi ve istisnaları neler?',
     meta: 'Müşteri',
+    intent: 'Süre/istisna ayır',
   },
   {
     label: 'Muhasebe onay akışı hangi belgeleri ister?',
     meta: 'Finans',
+    intent: 'Akış belgesi listele',
   },
 ]
 
@@ -104,102 +110,106 @@ function WorkbenchEmpty({ tenant, sessions = [], context, contextLoading, onSend
   const lastJob = jobs[0]
   const lastEval = evalRuns[0]
   const recentSessions = sessions.slice(0, 4)
+  const displayDocs = readyDocs.slice(0, 5)
 
   return (
-    <div className="workbench-empty">
-      <div className="workbench-grid">
-        <section className="workbench-command">
-          <div className="workbench-stamp">
-            <span>Tenant</span>
-            <strong>{tenant?.name || tenant?.slug || 'Çalışma alanı'}</strong>
-            <code>{tenant?.slug || 'tenant'}</code>
-          </div>
-
-          <div className="workbench-query">
-            <div>
-              <span className="workbench-kicker">Belge sorgu tezgahı</span>
-              <h2>Kaynak isteyen soruyu buradan başlat.</h2>
-            </div>
-            <p>
-              Cevap üretildiğinde kaynak parçaları ve cümle dayanakları kanıt paneline düşer.
-            </p>
-          </div>
-
-          <div className="workbench-ledger">
-            <div>
-              <span>İndeks</span>
-              <strong>{contextLoading ? '...' : `${readyDocs.length}/${docs.length}`}</strong>
-              <small>hazır belge</small>
-            </div>
-            <div>
-              <span>İş kuyruğu</span>
-              <strong>{activeJob ? statusLabel(activeJob.status) : statusLabel(lastJob?.status)}</strong>
-              <small>{activeJob?.filename || lastJob?.filename || 'bekleyen yok'}</small>
-            </div>
-            <div>
-              <span>Eval</span>
-              <strong>{statusLabel(lastEval?.status)}</strong>
-              <small>{lastEval?.run_label || formatDate(lastEval?.created_at)}</small>
-            </div>
-          </div>
-        </section>
-
-        <aside className="workbench-evidence">
-          <div className="evidence-ruler">
-            <span>Kanıt rafı</span>
-            <strong>{readyDocs.length ? `${readyDocs.length} belge sorgulanabilir` : 'Hazır kaynak yok'}</strong>
-          </div>
-          <div className="evidence-stack">
-            {readyDocs.slice(0, 4).map((doc) => (
-              <div className="evidence-line" key={doc.id}>
-                <span>{doc.filename}</span>
-                <small>{doc.chunk_count ?? 0} parça</small>
-              </div>
-            ))}
-            {!readyDocs.length && (
-              <div className="evidence-line muted">
-                <span>Kaynak üretmek için önce belge indeksi gerekir.</span>
-                <small>{contextLoading ? 'yükleniyor' : 'boş'}</small>
-              </div>
-            )}
-          </div>
-        </aside>
+    <div className="caseboard">
+      <div className="caseboard-strip" aria-label="Çalışma alanı durumu">
+        <div className="caseboard-tenant">
+          <span>Tenant</span>
+          <strong>{tenant?.name || tenant?.slug || 'Çalışma alanı'}</strong>
+          <code>{tenant?.slug || 'tenant'}</code>
+        </div>
+        <div className="caseboard-signal">
+          <span>İndeks</span>
+          <strong>{contextLoading ? '...' : `${readyDocs.length}/${docs.length}`}</strong>
+          <small>hazır kaynak</small>
+        </div>
+        <div className="caseboard-signal">
+          <span>Kuyruk</span>
+          <strong>{activeJob ? statusLabel(activeJob.status) : statusLabel(lastJob?.status)}</strong>
+          <small>{activeJob?.filename || lastJob?.filename || 'bekleyen yok'}</small>
+        </div>
+        <div className="caseboard-signal">
+          <span>Eval</span>
+          <strong>{statusLabel(lastEval?.status)}</strong>
+          <small>{lastEval?.run_label || formatDate(lastEval?.created_at)}</small>
+        </div>
       </div>
 
-      <div className="workbench-lower">
-        <section className="prompt-docket">
-          <div className="section-label">Sorgu dosyaları</div>
-          <div className="prompt-chips">
+      <div className="caseboard-main">
+        <section className="caseboard-query">
+          <div className="caseboard-titleline">
+            <span className="caseboard-code">TR-RAG / SORGU MASASI</span>
+            <h2>Belgeye sor, dayanağıyla denetle.</h2>
+          </div>
+          <div className="caseboard-rule">
+            <span>yanıt</span>
+            <span>alıntı</span>
+            <span>yetki</span>
+            <span>iz</span>
+          </div>
+          <p>
+            Üretilen her yanıt, kaynak parça ve dosya iziyle birlikte kanıt paneline bağlanır.
+          </p>
+
+          <div className="query-register">
             {EXAMPLE_QUESTIONS.map((q, i) => (
               <button
                 key={i}
                 onClick={() => onSend(q.label)}
-                className="prompt-chip"
+                className="query-register-row"
               >
-                <span>{q.meta}</span>
+                <span className="query-register-code">{String(i + 1).padStart(2, '0')}</span>
+                <span className="query-register-unit">{q.meta}</span>
                 <strong>{q.label}</strong>
+                <small>{q.intent}</small>
               </button>
             ))}
           </div>
         </section>
 
-        <section className="recent-docket">
-          <div className="section-label">Son oturumlar</div>
-          <div className="recent-session-list">
+        <aside className="caseboard-ledger">
+          <div className="ledger-title">
+            <span>Kanıt kayıtları</span>
+            <strong>{readyDocs.length ? `${readyDocs.length} kaynak hazır` : 'Kaynak bekleniyor'}</strong>
+          </div>
+          <div className="ledger-lines">
+            {displayDocs.map((doc, index) => (
+              <div className="ledger-line" key={doc.id}>
+                <code>K{String(index + 1).padStart(2, '0')}</code>
+                <span>{doc.filename}</span>
+                <small>{doc.chunk_count ?? 0} parça</small>
+              </div>
+            ))}
+            {!displayDocs.length && (
+              <div className="ledger-line muted">
+                <code>K00</code>
+                <span>İndekse alınmış belge bulunamadı.</span>
+                <small>{contextLoading ? 'yükleniyor' : 'boş'}</small>
+              </div>
+            )}
+          </div>
+
+          <div className="session-ledger">
+            <div className="ledger-title compact">
+              <span>Son fişler</span>
+              <strong>{recentSessions.length || 0}</strong>
+            </div>
             {recentSessions.map((s) => (
-              <div className="recent-session-row" key={s.id}>
+              <div className="session-ledger-row" key={s.id}>
                 <span>{s.preview || 'Boş oturum'}</span>
                 <small>{formatDate(s.created_at)}</small>
               </div>
             ))}
             {!recentSessions.length && (
-              <div className="recent-session-row muted">
+              <div className="session-ledger-row muted">
                 <span>Henüz oturum yok</span>
                 <small>bugün</small>
               </div>
             )}
           </div>
-        </section>
+        </aside>
       </div>
     </div>
   )
@@ -208,6 +218,10 @@ function WorkbenchEmpty({ tenant, sessions = [], context, contextLoading, onSend
 function InlineWorkbenchComposer({ input, setInput, textareaRef, isStreaming, abort, handleSend, handleKey }) {
   return (
     <div className="workbench-composer">
+      <div className="composer-rail">
+        <span>Sorgu</span>
+        <code>TR</code>
+      </div>
       <textarea
         ref={textareaRef}
         value={input}

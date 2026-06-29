@@ -45,10 +45,10 @@ const IconExpand = () => (
 )
 
 const NAV_ITEMS = [
-  { key: 'chat',      icon: <IconChat />,      label: 'Sohbet',   description: 'Kaynaklı yanıt' },
-  { key: 'documents', icon: <IconDocs />,      label: 'Belgeler', description: 'İndeks ve işler' },
-  { key: 'analytics', icon: <IconAnalytics />, label: 'Analitik', description: 'Kullanım metrikleri' },
-  { key: 'admin',     icon: <IconAdmin />,     label: 'Yönetim',  description: 'Tenant ve sistem' },
+  { key: 'chat',      icon: <IconChat />,      label: 'Sorgu Masası',   description: 'Yanıt ve kanıt' },
+  { key: 'documents', icon: <IconDocs />,      label: 'Kaynak İndeksi', description: 'Belge ve işler' },
+  { key: 'analytics', icon: <IconAnalytics />, label: 'Kalite Ölçümü',  description: 'Kullanım ve eval' },
+  { key: 'admin',     icon: <IconAdmin />,     label: 'Yetki Defteri',  description: 'Tenant ve sistem' },
 ]
 
 function NavItem({ item, active, collapsed, onClick }) {
@@ -85,7 +85,7 @@ export function Sidebar({
   return (
     <aside className={`app-sidebar ${collapsed ? 'collapsed' : ''}`}>
       <nav className="sidebar-nav">
-        {!collapsed && <div className="sidebar-section-label">Çalışma alanı</div>}
+        {!collapsed && <div className="sidebar-section-label">Operasyon</div>}
         {navItems.map((item) => (
           <NavItem
             key={item.key}
@@ -99,14 +99,15 @@ export function Sidebar({
         {tab === 'chat' && !collapsed && sessions?.length > 0 && (
           <>
             <div className="divider" style={{ margin: '8px 4px' }} />
-            <div className="sidebar-section-label">Sohbet geçmişi</div>
+            <div className="sidebar-section-label">Sorgu fişleri</div>
             <div className="session-list">
-              {sessions.map((s) => (
+              {sessions.map((s, index) => (
                 <button
                   key={s.id}
                   onClick={() => onSessionSelect?.(s.id)}
                   className={`session-row ${selectedSession === s.id ? 'active' : ''}`}
                 >
+                  <div className="session-index">F{String(index + 1).padStart(2, '0')}</div>
                   <div className="session-title">
                     {s.preview || 'Sohbet'}
                   </div>
