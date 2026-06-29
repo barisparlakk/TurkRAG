@@ -94,12 +94,18 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 | `GET` | `/users` | List tenant users (admin) |
 | `POST` | `/users` | Create tenant user (admin) |
 | `PATCH` | `/users/{id}` | Update user role/status (admin) |
-| `GET` | `/health` | Health check (Qdrant, Postgres, LLM) |
+| `GET` | `/health` | Health check (Qdrant, Postgres, Redis/cache, worker, LLM) |
+| `GET` | `/dashboard/summary` | Tenant dashboard summary for documents, collections, query activity, evaluations, and recent ingestion activity |
 | `POST` | `/documents/upload` | Upload PDF/DOCX/TXT/XLSX/CSV |
 | `GET` | `/documents` | List tenant documents |
 | `DELETE` | `/documents/{id}` | Delete document |
 | `GET` | `/documents/jobs` | List ingestion jobs |
 | `GET` | `/documents/jobs/{id}` | Check ingestion job status |
+| `GET` | `/collections` | List tenant collections with ACL-aware document counts |
+| `POST` | `/collections` | Create a tenant collection (admin) |
+| `PATCH` | `/collections/{id}` | Update collection metadata (admin) |
+| `DELETE` | `/collections/{id}` | Delete a collection without deleting documents (admin) |
+| `POST` | `/collections/{id}/documents/{doc_id}` | Assign a manageable document to a collection |
 | `POST` | `/chat` | Synchronous RAG query |
 | `WS` | `/chat/stream` | Streaming WebSocket RAG |
 | `POST` | `/tenants` | Create tenant (admin) |
@@ -110,6 +116,8 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 | `POST` | `/eval/run` | Queue one background evaluation for the tenant (admin, returns `202`) |
 | `GET` | `/eval/history` | List queued/running/completed/failed evaluations (admin) |
 | `GET` | `/eval/runs/{id}` | Fetch one evaluation run for focused status polling (admin) |
+| `GET` | `/settings/ui` | Read tenant UI preferences |
+| `PUT` | `/settings/ui` | Save safe tenant UI preferences |
 
 Interactive docs at: http://localhost:8000/docs
 

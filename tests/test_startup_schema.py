@@ -6,7 +6,7 @@ import pytest
 
 
 class _Cursor:
-    def __init__(self, version_table=True, revision="0003_acl_backfill", tables=None):
+    def __init__(self, version_table=True, revision="0005_dashboard_ops", tables=None):
         self.version_table = version_table
         self.revision = revision
         self.tables = tables or {
@@ -20,6 +20,8 @@ class _Cursor:
             "eval_runs",
             "ingestion_jobs",
             "document_versions",
+            "collections",
+            "tenant_ui_settings",
         }
         self.query = ""
 
@@ -66,15 +68,16 @@ def test_schema_verification_passes_at_required_revision():
         main_module._ensure_schema_ready()
 
 
-def test_schema_verification_passes_at_legacy_revision_alias():
+def test_schema_verification_fails_at_previous_revision():
     import api.main as main_module
 
     with (
         patch("api.main.AUTO_INIT_SCHEMA", False),
         patch(
             "psycopg2.connect",
-            return_value=_Conn(_Cursor(revision="0003_backfill_document_permissions")),
+            return_value=_Conn(_Cursor(revision="0004_platform_admin_role")),
         ),
+        pytest.raises(RuntimeError, match="revision mismatch"),
     ):
         main_module._ensure_schema_ready()
 

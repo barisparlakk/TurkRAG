@@ -6,7 +6,7 @@ import os
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile, status
 
 from api.auth import get_current_user
 from api.db import get_conn
@@ -50,6 +50,7 @@ def _sanitize_upload_filename(filename: str | None) -> tuple[str, str]:
 async def upload_document(
     request: Request,
     file: UploadFile = File(...),
+    collection_id: str | None = Form(default=None),
     user: dict = Depends(get_current_user),
 ):
     """Upload a document for ingestion. Returns immediately; processing is async."""
@@ -90,6 +91,13 @@ async def upload_document(
         conn = get_conn()
         try:
             with conn, conn.cursor() as cur:
+                if collection_id:
+                    cur.execute(
+                        "SELECT id FROM collections WHERE id=%s AND tenant_id=%s",
+                        (collection_id, tenant_id),
+                    )
+                    if not cur.fetchone():
+                        raise HTTPException(status_code=404, detail="Collection not found")
                 cur.execute(
                     "SELECT id FROM documents WHERE tenant_id=%s AND file_hash=%s AND status='ready'",
                     (tenant_id, file_hash),
@@ -102,8 +110,10 @@ async def upload_document(
 
                 document_id = str(uuid.uuid4())
                 cur.execute(
-                    "INSERT INTO documents (id, tenant_id, filename, file_hash, status) VALUES (%s, %s, %s, %s, 'processing')",
-                    (document_id, tenant_id, safe_filename, file_hash),
+                    """INSERT INTO documents
+                       (id, tenant_id, filename, file_hash, status, collection_id, file_type, size_bytes)
+                       VALUES (%s, %s, %s, %s, 'processing', %s, %s, %s)""",
+                    (document_id, tenant_id, safe_filename, file_hash, collection_id, suffix.lstrip("."), total_bytes),
                 )
                 document_inserted = True
             grant_access(document_id, user["id"], "owner", user["id"], conn)
@@ -155,7 +165,25 @@ def _delete_document_row(document_id: str) -> None:
             conn.close()
 
 
-@router.get("", response_model=list[DocumentListItem])
+def _document_item_from_row(row) -> DocumentListItem:
+    collection_id = str(row[5]) if len(row) > 5 and row[5] else None
+    collection_name = row[6] if len(row) > 6 else None
+    file_type = row[7] if len(row) > 7 else None
+    size_bytes = row[8] if len(row) > 8 else None
+    return DocumentListItem(
+        id=str(row[0]),
+        filename=row[1],
+        chunk_count=row[2],
+        status=row[3],
+        created_at=str(row[4]),
+        collection_id=collection_id,
+        collection_name=collection_name,
+        file_type=file_type,
+        size_bytes=size_bytes,
+    )
+
+
+@router.get("", response_model=list[DocumentListItem], response_model_exclude_none=True)
 async def list_documents(user: dict = Depends(get_current_user)):
     """List all documents for the current tenant."""
     tenant_id = user["tenant_id"]
@@ -164,10 +192,14 @@ async def list_documents(user: dict = Depends(get_current_user)):
         with conn.cursor() as cur:
             if user.get("role") == "admin":
                 cur.execute(
-                    """SELECT id, filename, chunk_count, status, created_at
-                       FROM documents
-                       WHERE tenant_id=%s
-                       ORDER BY created_at DESC""",
+                    """SELECT
+                              d.id, d.filename, d.chunk_count, d.status, d.created_at,
+                              d.collection_id, c.name AS collection_name,
+                              COALESCE(d.file_type, NULL) AS file_type, d.size_bytes
+                       FROM documents d
+                       LEFT JOIN collections c ON c.id = d.collection_id
+                       WHERE d.tenant_id=%s
+                       ORDER BY d.created_at DESC""",
                     (tenant_id,),
                 )
             else:
@@ -175,26 +207,21 @@ async def list_documents(user: dict = Depends(get_current_user)):
                 if not accessible_ids:
                     return []
                 cur.execute(
-                    """SELECT id, filename, chunk_count, status, created_at
-                       FROM documents
-                       WHERE tenant_id=%s AND id = ANY(%s)
-                       ORDER BY created_at DESC""",
+                    """SELECT
+                              d.id, d.filename, d.chunk_count, d.status, d.created_at,
+                              d.collection_id, c.name AS collection_name,
+                              COALESCE(d.file_type, NULL) AS file_type, d.size_bytes
+                       FROM documents d
+                       LEFT JOIN collections c ON c.id = d.collection_id
+                       WHERE d.tenant_id=%s AND d.id = ANY(%s)
+                       ORDER BY d.created_at DESC""",
                     (tenant_id, accessible_ids),
                 )
             rows = cur.fetchall()
     finally:
         conn.close()
 
-    return [
-        DocumentListItem(
-            id=str(r[0]),
-            filename=r[1],
-            chunk_count=r[2],
-            status=r[3],
-            created_at=str(r[4]),
-        )
-        for r in rows
-    ]
+    return [_document_item_from_row(row) for row in rows]
 
 
 @router.delete("/{doc_id}", status_code=status.HTTP_204_NO_CONTENT)

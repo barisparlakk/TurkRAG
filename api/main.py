@@ -22,11 +22,14 @@ from api.middleware import setup_middleware
 from api.routers import (
     analytics,
     chat,
+    collections,
+    dashboard,
     documents,
     evaluation,
     export,
     health,
     permissions,
+    settings,
     sessions,
     tenants,
     users,
@@ -47,10 +50,8 @@ logger = logging.getLogger(__name__)
 POSTGRES_URL = os.getenv("POSTGRES_URL", "postgresql://turkrag:turkrag_secret@localhost/turkrag")
 UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", "/tmp/uploads"))
 BM25_INDEX_DIR = Path(os.getenv("BM25_INDEX_DIR", "indexes"))
-REQUIRED_ALEMBIC_REVISION = "0004_platform_admin_role"
+REQUIRED_ALEMBIC_REVISION = "0005_dashboard_ops"
 COMPATIBLE_ALEMBIC_REVISIONS = {
-    "0003_backfill_document_permissions",
-    "0003_acl_backfill",
     REQUIRED_ALEMBIC_REVISION,
 }
 AUTO_INIT_SCHEMA = os.getenv("AUTO_INIT_SCHEMA", "false").lower() == "true"
@@ -65,6 +66,8 @@ REQUIRED_TABLES = {
     "eval_runs",
     "ingestion_jobs",
     "document_versions",
+    "collections",
+    "tenant_ui_settings",
 }
 
 
@@ -190,14 +193,17 @@ setup_middleware(app)
 
 # Routers
 app.include_router(health.router)
+app.include_router(dashboard.router)
 app.include_router(documents.router)
 app.include_router(chat.router)
+app.include_router(collections.router)
 app.include_router(tenants.router)
 app.include_router(analytics.router)
 app.include_router(sessions.router)
 app.include_router(evaluation.router)
 app.include_router(export.router)
 app.include_router(permissions.router)
+app.include_router(settings.router)
 app.include_router(users.router)
 
 

@@ -255,114 +255,44 @@ function EmptyState({ tenant, sessions, context, contextLoading, onSend, input, 
   const activeJob = jobs.find((job) => ['pending', 'processing'].includes(job.status))
   const lastJob = jobs[0]
   const lastEval = evalRuns[0]
-  const recentSessions = sessions.slice(0, 4)
 
   return (
-    <div className="chat-empty research-empty">
-      <div className="scope-bar">
-        <div>
-          <span>Çalışma alanı</span>
-          <strong>{tenant?.name || tenant?.slug || 'Tenant'}</strong>
-          <small>{tenant?.slug || 'tenant'}</small>
-        </div>
-        <div>
-          <span>Kaynak kapsamı</span>
-          <strong>{contextLoading ? '...' : `${readyDocs.length}/${docs.length}`}</strong>
-          <small>hazır belge</small>
-        </div>
-        <div>
-          <span>İşlem hattı</span>
-          <strong>{activeJob ? statusLabel(activeJob.status) : statusLabel(lastJob?.status)}</strong>
-          <small>{activeJob?.filename || lastJob?.filename || 'kuyruk boş'}</small>
-        </div>
-        <div>
-          <span>Kalite ölçümü</span>
-          <strong>{statusLabel(lastEval?.status)}</strong>
-          <small>{lastEval?.run_label || formatDate(lastEval?.created_at)}</small>
-        </div>
+    <div className="chat-empty ask-empty">
+      <div className="ask-orbit" aria-hidden="true"><span /><i /></div>
+      <div className="ask-empty-copy">
+        <span>Ask Documents</span>
+        <h2>How can I help you today?</h2>
+        <p>Ask anything about your documents and get source-grounded answers with citations.</p>
       </div>
 
-      <div className="research-layout">
-        <section className="research-primary">
-          <div className="research-title">
-            <span>TurkRAG sorgu masası</span>
-            <h2>Kurumsal belgelerde net, kaynaklı yanıt üret.</h2>
-            <p>Önce soruyu yazın; yanıt, alıntı ve belge izi aynı akışta denetlenir.</p>
-          </div>
+      <InlineWorkbenchComposer
+        input={input}
+        setInput={setInput}
+        textareaRef={textareaRef}
+        isStreaming={isStreaming}
+        abort={abort}
+        handleSend={handleSend}
+        handleKey={handleKey}
+      />
 
-          <InlineWorkbenchComposer
-            input={input}
-            setInput={setInput}
-            textareaRef={textareaRef}
-            isStreaming={isStreaming}
-            abort={abort}
-            handleSend={handleSend}
-            handleKey={handleKey}
-          />
+      <div className="ask-controls">
+        <span>{tenant?.slug || 'tenant'}-model</span>
+        <span>Türkçe</span>
+        <span>Hybrid Search</span>
+        <span>{contextLoading ? 'checking' : `${readyDocs.length}/${docs.length} docs ready`}</span>
+        <span>{activeJob ? statusLabel(activeJob.status) : statusLabel(lastJob?.status)}</span>
+        <span>{statusLabel(lastEval?.status)}</span>
+      </div>
 
-          <div className="suggestion-board">
-            <div className="suggestion-board-head">
-              <span>Hazır sorgular</span>
-              <small>gerçek iş senaryoları</small>
-            </div>
-            <div className="suggestion-rows">
-              {EXAMPLE_QUESTIONS.map((q, i) => (
-                <button
-                  key={i}
-                  onClick={() => onSend(q.label)}
-                  className="suggestion-row"
-                >
-                  <code>{q.meta}</code>
-                  <strong>{q.label}</strong>
-                  <span>{q.intent}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <aside className="evidence-scope">
-          <div className="evidence-scope-head">
-            <span>Kanıt kapsamı</span>
-            <strong>{readyDocs.length ? `${readyDocs.length} belge hazır` : 'Kaynak bekleniyor'}</strong>
-          </div>
-
-          <div className="scope-doc-list">
-            {readyDocs.slice(0, 5).map((doc, index) => (
-              <div className="scope-doc" key={doc.id}>
-                <code>K{String(index + 1).padStart(2, '0')}</code>
-                <span>{doc.filename}</span>
-                <small>{doc.chunk_count ?? 0} parça</small>
-              </div>
-            ))}
-            {!readyDocs.length && (
-              <div className="scope-doc muted">
-                <code>K00</code>
-                <span>İndekse alınmış belge yok</span>
-                <small>{contextLoading ? 'yükleniyor' : 'boş'}</small>
-              </div>
-            )}
-          </div>
-
-          <div className="recent-mini">
-            <div className="evidence-scope-head compact">
-              <span>Son oturumlar</span>
-              <strong>{recentSessions.length}</strong>
-            </div>
-            {recentSessions.map((s) => (
-              <div className="recent-mini-row" key={s.id}>
-                <span>{s.preview || 'Boş oturum'}</span>
-                <small>{formatDate(s.created_at)}</small>
-              </div>
-            ))}
-            {!recentSessions.length && (
-              <div className="recent-mini-row muted">
-                <span>Henüz oturum yok</span>
-                <small>bugün</small>
-              </div>
-            )}
-          </div>
-        </aside>
+      <div className="example-questions">
+        <span>Example Questions</span>
+        <div>
+          {EXAMPLE_QUESTIONS.slice(0, 4).map((q) => (
+            <button key={q.label} onClick={() => onSend(q.label)} type="button">
+              {q.label}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   )

@@ -1,12 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import { ChatWindow } from './components/ChatWindow.jsx'
-import { DocumentUpload } from './components/DocumentUpload.jsx'
-import { AnalyticsDashboard } from './components/AnalyticsDashboard.jsx'
-import AdminPanel from './components/AdminPanel.jsx'
 import { Header } from './components/Header.jsx'
 import { Sidebar } from './components/Sidebar.jsx'
 import { SourcesPanel } from './components/SourcesPanel.jsx'
 import { ToastProvider } from './components/Toast.jsx'
+import {
+  AnalyticsPage,
+  CollectionsPage,
+  DashboardPage,
+  DocumentsPage,
+  HistoryPage,
+  JobsPage,
+  SettingsPage,
+  SystemPage,
+} from './components/OperationsPages.jsx'
 import { api, getTokenPayload, getToken, setToken } from './api/client.js'
 
 const AUTH_STORAGE_KEY = 'turkrag_auth'
@@ -24,7 +31,6 @@ function isTokenExpired(payload) {
   return !payload?.exp || payload.exp * 1000 <= Date.now()
 }
 
-/* ── Login ─────────────────────────────────────────────── */
 function LoginPage({ onLogin }) {
   const [tenantSlug, setTenantSlug] = useState('')
   const [email, setEmail] = useState('')
@@ -32,14 +38,13 @@ function LoginPage({ onLogin }) {
   const [loginError, setLoginError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleLogin = async (e) => {
-    e.preventDefault()
+  const handleLogin = async (event) => {
+    event.preventDefault()
     const slug = tenantSlug.trim()
     if (!slug || !email.trim() || !password) {
-      setLoginError('Çalışma alanı, email ve şifre zorunludur.')
+      setLoginError('Workspace, email and password are required.')
       return
     }
-
     setLoading(true)
     setLoginError('')
     try {
@@ -59,122 +64,51 @@ function LoginPage({ onLogin }) {
         },
       })
     } catch (err) {
-      setLoginError(`Giriş başarısız: ${err.message}`)
+      setLoginError(`Login failed: ${err.message}`)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="login-shell">
-      <div className="login-stage fade-up">
-        <section className="login-hero glass">
-          <div className="login-badge">TurkRAG access control</div>
-          <h1>Kurumsal belgeler için güvenli tenant girişi</h1>
-          <p>
-            Kullanıcılar tenant, email ve şifre ile doğrulanır; admin araçları yalnızca
-            yetkili hesaplara açılır.
-          </p>
-
-          <div className="login-highlights">
-            <div className="login-highlight">
-              <span>Üye oturumu</span>
-              <strong>Belge sorgulama, yükleme, sohbet</strong>
-            </div>
-            <div className="login-highlight">
-              <span>Admin oturumu</span>
-              <strong>Tenant listeleme, sistem yönetimi, değerlendirme</strong>
-            </div>
+    <main className="login-shell">
+      <section className="login-card">
+        <div className="login-brand-row">
+          <div className="brand-mark large"><img src="/logo-dark.png" alt="" /></div>
+          <div>
+            <strong>TurkRAG</strong>
+            <span>AI-Powered Document Intelligence</span>
           </div>
-
-          <div className="login-admin-note">
-            <div className="login-admin-note-label">Güvenli oturum</div>
-            <code>tenant scoped</code>
-            <code>role aware</code>
-          </div>
-        </section>
-
-        <section className="login-panel glass">
-          <div className="login-brand">
-            <div className="login-brand-logo">
-              <img src="/logo-light.png" className="logo-light" alt="TurkRAG" />
-              <img src="/logo-dark.png" className="logo-dark" alt="TurkRAG" />
-            </div>
-            <div>
-              <div className="login-brand-kicker">Türkçe Kurumsal Belge Asistanı</div>
-              <h2>Giriş merkezi</h2>
-            </div>
-          </div>
-
-            <form onSubmit={handleLogin} className="login-form">
-              <div className="login-form-copy">
-                <h3>Çalışma alanına giriş yap</h3>
-                <p>Hesabınızın rolüne göre sohbet, belge ve yönetim panelleri açılır.</p>
-              </div>
-
-              <label className="login-label">
-                Çalışma alanı slug
-                <input
-                  type="text"
-                  value={tenantSlug}
-                  onChange={(e) => setTenantSlug(e.target.value)}
-                  placeholder="ornek: acme-sirket"
-                  className="input-field"
-                />
-              </label>
-
-              <div className="login-grid-two">
-                <label className="login-label">
-                  Email
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="admin@acme.com"
-                    className="input-field"
-                  />
-                </label>
-                <label className="login-label">
-                  Şifre
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="input-field"
-                  />
-                </label>
-              </div>
-
-              {loginError && <div className="login-error">{loginError}</div>}
-
-              <button type="submit" disabled={loading} className="btn btn-primary login-submit">
-                {loading ? 'Oturum doğrulanıyor...' : 'Giriş yap'}
-              </button>
-            </form>
-
-          <p className="login-footer-copy">KVKK uyumlu · şirket içi indeksleme · rol bazlı erişim</p>
-        </section>
-      </div>
-    </div>
+        </div>
+        <h1>Secure tenant access</h1>
+        <p>Sign in to query private Turkish enterprise knowledge with citations, ACLs, ingestion monitoring, and analytics.</p>
+        <form onSubmit={handleLogin} className="login-form">
+          <label>Workspace slug<input value={tenantSlug} onChange={(event) => setTenantSlug(event.target.value)} placeholder="demo" /></label>
+          <label>Email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="baris@dev.com" /></label>
+          <label>Password<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="••••••••" /></label>
+          {loginError && <div className="inline-error">{loginError}</div>}
+          <button className="primary-action wide" type="submit" disabled={loading}>{loading ? 'Authenticating...' : 'Sign In'}</button>
+        </form>
+      </section>
+    </main>
   )
 }
 
-/* ── Main app ──────────────────────────────────────────── */
 export default function App() {
   const [tenant, setTenant] = useState(() => loadStoredJSON('turkrag_tenant'))
   const [authSession, setAuthSession] = useState(() => loadStoredJSON(AUTH_STORAGE_KEY))
   const [tenants, setTenants] = useState([])
   const [role, setRole] = useState(() => getTokenPayload()?.role || loadStoredJSON(AUTH_STORAGE_KEY)?.role || '')
-  const [tab, setTab] = useState('chat')
+  const [tab, setTab] = useState('dashboard')
   const [selectedSession, setSelectedSession] = useState(null)
   const [sessionRefresh, setSessionRefresh] = useState(0)
   const [sessions, setSessions] = useState([])
   const [citations, setCitations] = useState([])
   const [attribution, setAttribution] = useState(null)
   const [hasChatMessages, setHasChatMessages] = useState(false)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [theme, setTheme] = useState(() => localStorage.getItem('turkrag_theme') || 'light')
+  const [theme, setTheme] = useState(() => localStorage.getItem('turkrag_theme') || 'dark')
+  const [health, setHealth] = useState(null)
+  const [refreshTick, setRefreshTick] = useState(0)
 
   const clearSessionState = () => {
     setToken('')
@@ -200,13 +134,11 @@ export default function App() {
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(nextAuth))
   }
 
-  /* Apply theme to <html> */
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
     localStorage.setItem('turkrag_theme', theme)
   }, [theme])
 
-  /* Validate restored token. */
   useEffect(() => {
     if (!tenant) return
     const payload = getTokenPayload()
@@ -217,10 +149,9 @@ export default function App() {
     setRole(payload.role || authSession?.role || '')
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  /* Load tenant list for admins; members stay scoped to the current tenant. */
   useEffect(() => {
     if (!tenant) return
-    if (role !== 'admin') {
+    if (role !== 'platform_admin') {
       setTenants([tenant])
       return
     }
@@ -228,128 +159,95 @@ export default function App() {
   }, [tenant, role])
 
   useEffect(() => {
-    if (tab === 'admin' && role !== 'admin') {
-      setTab('chat')
-    }
-  }, [role, tab])
+    if (!tenant) return
+    api.listSessions(50).then(setSessions).catch(() => {})
+  }, [tenant, sessionRefresh, refreshTick])
 
-  /* Load session history */
   useEffect(() => {
     if (!tenant) return
-    api.listSessions(30).then(setSessions).catch(() => {})
-  }, [tenant, sessionRefresh])
+    api.health().then(setHealth).catch(() => setHealth(null))
+  }, [tenant, refreshTick])
 
-  const handleLogout = () => {
-    clearSessionState()
-  }
-
-  const handleTenantSwitch = async (t) => {
+  const handleTenantSwitch = async (nextTenantOption) => {
     if (!authSession) return
     try {
-      const nextRole = authSession.role || 'member'
+      const nextRole = authSession.role || role || 'member'
       const userId = authSession.userId || 'demo-user'
-      const data = nextRole === 'admin'
-        ? await api.switchAdminTenant(t.slug)
-        : await api.getToken(t.id, userId)
+      const data = nextRole === 'platform_admin'
+        ? await api.switchAdminTenant(nextTenantOption.slug)
+        : await api.getToken(nextTenantOption.id, userId)
       setToken(data.access_token)
       setRole(getTokenPayload()?.role || nextRole)
-      const nextTenant = { slug: t.slug, id: t.id, name: t.name }
+      const nextTenant = { slug: nextTenantOption.slug, id: nextTenantOption.id, name: nextTenantOption.name }
       setTenant(nextTenant)
       localStorage.setItem('turkrag_tenant', JSON.stringify(nextTenant))
       setSelectedSession(null)
       setCitations([])
       setAttribution(null)
       setHasChatMessages(false)
-      setSessionRefresh((n) => n + 1)
+      setSessionRefresh((value) => value + 1)
+      setTab('dashboard')
     } catch {}
   }
 
   if (!tenant || !authSession || !role) {
     return (
       <ToastProvider>
-        <LoginPage
-          onLogin={({ tenant: nextTenant, auth: nextAuth }) => {
-            persistSession(nextTenant, nextAuth)
-          }}
-        />
+        <LoginPage onLogin={({ tenant: nextTenant, auth: nextAuth }) => persistSession(nextTenant, nextAuth)} />
       </ToastProvider>
     )
+  }
+
+  const navigate = (nextTab) => {
+    setTab(nextTab)
+    if (nextTab !== 'chat') {
+      setCitations([])
+      setAttribution(null)
+    }
   }
 
   return (
     <ToastProvider>
       <div className="app-shell">
-
-        <Header
-          tenant={tenant}
-          tenants={tenants}
-          role={role}
-          onTenantSwitch={handleTenantSwitch}
-          onLogout={handleLogout}
-          theme={theme}
-          onThemeToggle={() => setTheme((t) => t === 'dark' ? 'light' : 'dark')}
-        />
-
-        <div
-          className="dashboard-body"
-          data-view={tab}
-          data-chat-state={hasChatMessages ? 'active' : 'empty'}
-        >
-          <Sidebar
-            tab={tab}
-            onTabChange={(t) => {
-              setTab(t)
-              if (t !== 'chat') {
-                setCitations([])
-                setAttribution(null)
-              }
-            }}
-            onUploadClick={() => setTab('documents')}
-            collapsed={sidebarCollapsed}
-            onCollapseToggle={() => setSidebarCollapsed((v) => !v)}
-            sessions={sessions}
-            selectedSession={selectedSession}
-            onSessionSelect={(id) => { setSelectedSession(id); setTab('chat') }}
-            showAdmin={role === 'admin'}
+        <Sidebar tab={tab} onTabChange={navigate} tenant={tenant} health={health} />
+        <section className="content-shell">
+          <Header
+            tenant={tenant}
+            tenants={tenants}
+            role={role}
+            onTenantSwitch={handleTenantSwitch}
+            onLogout={clearSessionState}
+            theme={theme}
+            onThemeToggle={() => setTheme((value) => value === 'dark' ? 'light' : 'dark')}
+            onRefresh={() => setRefreshTick((value) => value + 1)}
           />
-
-          <main className="main-stage">
-            <div className="main-view chat-view" style={{ display: tab === 'chat' ? 'flex' : 'none' }}>
-              <ChatWindow
-                tenant={tenant}
-                role={role}
-                sessions={sessions}
-                selectedSession={selectedSession}
-                onSessionChange={setSelectedSession}
-                onNewSession={() => setSessionRefresh((n) => n + 1)}
-                onCitationsChange={(cits, attr) => { setCitations(cits); setAttribution(attr || null) }}
-                onMessageStateChange={setHasChatMessages}
-              />
-            </div>
-
-            <div className="main-view scroll-view" style={{ display: tab === 'documents' ? 'block' : 'none' }}>
-              <div className="view-pane">
-                <DocumentUpload />
+          <main className="main-stage" data-view={tab} data-chat-state={hasChatMessages ? 'active' : 'empty'}>
+            {tab === 'dashboard' && <DashboardPage tenant={tenant} onNavigate={navigate} />}
+            {tab === 'chat' && (
+              <div className="ask-documents-view">
+                <ChatWindow
+                  tenant={tenant}
+                  sessions={sessions}
+                  selectedSession={selectedSession}
+                  onSessionChange={setSelectedSession}
+                  onNewSession={() => setSessionRefresh((value) => value + 1)}
+                  onCitationsChange={(cits, attr) => { setCitations(cits); setAttribution(attr || null) }}
+                  onMessageStateChange={setHasChatMessages}
+                />
+                {(citations.length > 0 || attribution?.length > 0) && (
+                  <SourcesPanel citations={citations} attribution={attribution} />
+                )}
               </div>
-            </div>
-
-            <div className="main-view scroll-view" style={{ display: tab === 'analytics' ? 'block' : 'none' }}>
-              <div className="view-pane">
-                <AnalyticsDashboard />
-              </div>
-            </div>
-
-            <div className="main-view scroll-view admin-view" style={{ display: tab === 'admin' && role === 'admin' ? 'block' : 'none' }}>
-              <div className="view-pane">
-                <AdminPanel />
-              </div>
-            </div>
-
-            {tab === 'chat' && (citations.length > 0 || attribution?.length > 0) && (
-              <SourcesPanel citations={citations} attribution={attribution} />
             )}
+            {tab === 'documents' && <DocumentsPage />}
+            {tab === 'collections' && <CollectionsPage />}
+            {tab === 'history' && <HistoryPage />}
+            {tab === 'analytics' && <AnalyticsPage />}
+            {tab === 'jobs' && <JobsPage />}
+            {tab === 'settings' && <SettingsPage theme={theme} onThemeChange={setTheme} />}
+            {tab === 'system' && <SystemPage />}
           </main>
-        </div>
+        </section>
       </div>
     </ToastProvider>
   )

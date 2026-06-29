@@ -44,6 +44,47 @@ class DocumentListItem(BaseModel):
     chunk_count: int | None
     status: str
     created_at: str
+    collection_id: str | None = None
+    collection_name: str | None = None
+    file_type: str | None = None
+    size_bytes: int | None = None
+
+
+class CollectionCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=80)
+    description: str | None = Field(default=None, max_length=240)
+    color: str | None = Field(default=None, max_length=24)
+
+
+class CollectionUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=80)
+    description: str | None = Field(default=None, max_length=240)
+    color: str | None = Field(default=None, max_length=24)
+
+
+class CollectionResponse(BaseModel):
+    id: str
+    tenant_id: str
+    name: str
+    description: str | None = None
+    color: str
+    document_count: int = 0
+    ready_count: int = 0
+    created_at: str
+    updated_at: str | None = None
+
+
+class UiSettings(BaseModel):
+    default_model: str = Field(default="turkrag-model", max_length=80)
+    default_language: str = Field(default="tr", pattern="^(tr|en|auto)$")
+    hybrid_search: bool = True
+    results_per_page: int = Field(default=10, ge=5, le=50)
+    notifications_enabled: bool = True
+    theme: str = Field(default="dark", pattern="^(dark|light|system)$")
+
+
+class UiSettingsResponse(UiSettings):
+    updated_at: str | None = None
 
 
 class TenantCreate(BaseModel):
@@ -124,5 +165,8 @@ class HealthResponse(BaseModel):
     qdrant: str
     postgres: str
     llm_available: bool
+    redis: str = "not_configured"
+    worker: str = "unknown"
+    uptime_seconds: int | None = None
     details: dict = Field(default_factory=dict)
     version: str = "1.0.0"

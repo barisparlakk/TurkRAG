@@ -72,12 +72,24 @@ export const api = {
 
   // Documents
   listDocuments: () => request('GET', '/documents'),
-  uploadDocument: (file) => {
+  uploadDocument: (file, collectionId = '') => {
     const form = new FormData()
     form.append('file', file)
+    if (collectionId) form.append('collection_id', collectionId)
     return request('POST', '/documents/upload', form, true)
   },
   deleteDocument: (docId) => request('DELETE', `/documents/${docId}`),
+
+  // Dashboard
+  getDashboardSummary: () => request('GET', '/dashboard/summary'),
+
+  // Collections
+  listCollections: () => request('GET', '/collections'),
+  createCollection: (body) => request('POST', '/collections', body),
+  updateCollection: (collectionId, body) => request('PATCH', `/collections/${collectionId}`, body),
+  deleteCollection: (collectionId) => request('DELETE', `/collections/${collectionId}`),
+  assignDocumentToCollection: (collectionId, docId) =>
+    request('POST', `/collections/${collectionId}/documents/${docId}`),
 
   // Chat (sync)
   chat: (query, topK = 5) => request('POST', '/chat', { query, top_k: topK }),
@@ -106,6 +118,10 @@ export const api = {
 
   // Health
   health: () => request('GET', '/health'),
+
+  // Settings
+  getUiSettings: () => request('GET', '/settings/ui'),
+  updateUiSettings: (settings) => request('PUT', '/settings/ui', settings),
 
   // Export
   exportSessionTxt: (sessionId) => `${API_BASE}/export/sessions/${sessionId}/txt`,

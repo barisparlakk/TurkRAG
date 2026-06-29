@@ -3,6 +3,7 @@
 import asyncio
 import logging
 import os
+import time
 
 from fastapi import APIRouter
 
@@ -10,6 +11,7 @@ from api.schemas import HealthResponse
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["health"])
+STARTED_AT = time.monotonic()
 
 
 def _check_qdrant() -> str:
@@ -48,18 +50,47 @@ def _check_postgres() -> str:
         return "error"
 
 
+def _check_redis() -> str:
+    redis_url = os.getenv("REDIS_URL")
+    if not redis_url:
+        return "not_configured"
+    try:
+        import redis
+
+        client = redis.Redis.from_url(redis_url, socket_connect_timeout=2, socket_timeout=2)
+        client.ping()
+        client.close()
+        return "ok"
+    except Exception as exc:
+        logger.warning("Redis health check failed: %s", exc)
+        return "error"
+
+
+def _worker_status() -> str:
+    try:
+        from ingestion import worker
+
+        thread = getattr(worker, "_worker_thread", None)
+        return "running" if thread and thread.is_alive() else "stopped"
+    except Exception as exc:
+        logger.warning("Worker health check failed: %s", exc)
+        return "unknown"
+
+
 @router.get("/health", response_model=HealthResponse)
 async def health_check():
     """Return health status of all dependencies."""
-    qdrant_status, postgres_status = await asyncio.gather(
+    qdrant_status, postgres_status, redis_status = await asyncio.gather(
         asyncio.to_thread(_check_qdrant),
         asyncio.to_thread(_check_postgres),
+        asyncio.to_thread(_check_redis),
     )
 
     # Check LLM
     from generation.llm import is_available
     llm_ok = is_available()
     overall = "ok" if qdrant_status == "ok" and postgres_status == "ok" else "degraded"
+    worker_status = _worker_status()
     details = {}
     if os.getenv("HEALTH_INCLUDE_DETAILS", "false").lower() == "true":
         llm_path = os.getenv("LLM_MODEL_PATH", "models/qwen3-8b-instruct-q4_k_m.gguf")
@@ -74,5 +105,8 @@ async def health_check():
         qdrant=qdrant_status,
         postgres=postgres_status,
         llm_available=llm_ok,
+        redis=redis_status,
+        worker=worker_status,
+        uptime_seconds=int(time.monotonic() - STARTED_AT),
         details=details,
     )
