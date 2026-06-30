@@ -29,8 +29,8 @@ from api.routers import (
     export,
     health,
     permissions,
-    settings,
     sessions,
+    settings,
     tenants,
     users,
 )

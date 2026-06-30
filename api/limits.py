@@ -34,7 +34,19 @@ limiter = Limiter(key_func=rate_limit_key, default_limits=[RATE_LIMIT])
 _ws_hits: dict[str, deque[float]] = defaultdict(deque)
 
 
-def websocket_rate_limited(websocket: WebSocket, key: str, limit: int | None = None, window_seconds: int = 60) -> bool:
+def websocket_rate_key(user: dict) -> str:
+    """Build a stable WebSocket rate-limit key from validated user claims."""
+    tenant_id = user.get("tenant_id") or "unknown-tenant"
+    user_id = user.get("id") or "anonymous"
+    return f"tenant:{tenant_id}:user:{user_id}"
+
+
+def websocket_rate_limited(
+    websocket: WebSocket,
+    key: str,
+    limit: int | None = None,
+    window_seconds: int = 60,
+) -> bool:
     """Return True when a WebSocket caller has exceeded the in-memory rate limit."""
     limit = limit or int(os.getenv("WS_RATE_LIMIT_PER_MINUTE", "30"))
     client_host = websocket.client.host if websocket.client else "unknown"

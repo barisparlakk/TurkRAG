@@ -10,7 +10,7 @@ from pydantic import ValidationError
 
 from api.auth import get_current_user
 from api.db import get_conn
-from api.limits import CHAT_RATE_LIMIT, limiter, websocket_rate_limited
+from api.limits import CHAT_RATE_LIMIT, limiter, websocket_rate_key, websocket_rate_limited
 from api.rbac import get_accessible_document_ids
 from api.schemas import ChatStreamRequest, CitationSource, QueryRequest, QueryResponse
 
@@ -242,10 +242,6 @@ async def chat_stream(websocket: WebSocket):
 
     from api.auth import decode_token, get_current_user
     token = payload.token
-    if websocket_rate_limited(websocket, token):
-        await websocket.send_text(json.dumps({"type": "error", "message": "Rate limit exceeded"}))
-        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
-        return
 
     try:
         claims = decode_token(token)
@@ -255,6 +251,11 @@ async def chat_stream(websocket: WebSocket):
     except Exception:
         await websocket.send_text(json.dumps({"type": "error", "message": "Authentication failed"}))
         await websocket.close()
+        return
+
+    if websocket_rate_limited(websocket, websocket_rate_key(user)):
+        await websocket.send_text(json.dumps({"type": "error", "message": "Rate limit exceeded"}))
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
 
     query = payload.query.strip()

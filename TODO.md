@@ -1,6 +1,6 @@
 # TurkRAG TODO
 
-Last reviewed: 2026-06-29
+Last reviewed: 2026-06-30
 
 ## Requirement analysis
 
@@ -50,6 +50,7 @@ Last reviewed: 2026-06-29
 - [x] `generation/streamer.py`, `generation/attribution.py`, `tests/test_streamer.py`, and `tests/test_attribution.py`: make post-answer attribution/follow-up worker failures exception-safe so streaming responses cannot hang after the `done` frame, and keep low-confidence fallback source metadata consistent.
 - [x] `api/routers/documents.py` and `tests/test_documents.py`: make ingestion job status/history enforce document ACLs for tenant members while preserving tenant-admin visibility.
 - [x] `api/routers/documents.py` and `tests/test_documents.py`: reject upload requests with path-only or extension-only filenames before writing temporary files or opening DB connections.
+- [x] `api/limits.py`, `api/routers/chat.py`, and `tests/test_limits.py`: key WebSocket chat rate limits by validated tenant/user identity instead of raw JWT strings while preserving per-client isolation.
 
 ## Deferred work
 
