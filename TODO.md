@@ -1,6 +1,6 @@
 # TurkRAG TODO
 
-Last reviewed: 2026-06-30
+Last reviewed: 2026-07-01
 
 ## Requirement analysis
 
@@ -51,6 +51,7 @@ Last reviewed: 2026-06-30
 - [x] `api/routers/documents.py` and `tests/test_documents.py`: make ingestion job status/history enforce document ACLs for tenant members while preserving tenant-admin visibility.
 - [x] `api/routers/documents.py` and `tests/test_documents.py`: reject upload requests with path-only or extension-only filenames before writing temporary files or opening DB connections.
 - [x] `api/limits.py`, `api/routers/chat.py`, and `tests/test_limits.py`: key WebSocket chat rate limits by validated tenant/user identity instead of raw JWT strings while preserving per-client isolation.
+- [x] `api/limits.py` and `tests/test_limits.py`: key authenticated HTTP rate limits by tenant/user claims instead of tenant-only buckets, while preserving IP fallback for invalid or unauthenticated requests.
 
 ## Deferred work
 

@@ -10,14 +10,19 @@ from slowapi.util import get_remote_address
 
 
 def rate_limit_key(request: Request) -> str:
-    """Key by tenant_id from JWT when possible, otherwise by client IP."""
+    """Key authenticated requests by tenant/user, otherwise by client IP."""
     auth = request.headers.get("Authorization", "")
     if auth.startswith("Bearer "):
         try:
             from api.auth import decode_token
 
             claims = decode_token(auth[7:])
-            return f"tenant:{claims['tenant_id']}"
+            tenant_id = claims.get("tenant_id")
+            user_id = claims.get("user_id")
+            if tenant_id and user_id:
+                return f"tenant:{tenant_id}:user:{user_id}"
+            if tenant_id:
+                return f"tenant:{tenant_id}:user:anonymous"
         except Exception:
             pass
     return get_remote_address(request)
