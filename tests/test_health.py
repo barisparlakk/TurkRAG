@@ -10,13 +10,13 @@ def test_qdrant_check_closes_client():
     with patch("qdrant_client.QdrantClient", return_value=client):
         assert _check_qdrant() == "ok"
 
-    client.get_collections.assert_called_once_with()
+    client.info.assert_called_once_with()
     client.close.assert_called_once_with()
 
 
 def test_qdrant_check_reports_failure_and_closes_client():
     client = MagicMock()
-    client.get_collections.side_effect = RuntimeError("qdrant unavailable")
+    client.info.side_effect = RuntimeError("qdrant unavailable")
 
     with patch("qdrant_client.QdrantClient", return_value=client):
         status = _check_qdrant()

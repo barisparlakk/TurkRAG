@@ -21,7 +21,7 @@ def _check_qdrant() -> str:
 
         qdrant_url = os.getenv("QDRANT_URL", "http://localhost:6333")
         client = QdrantClient(url=qdrant_url, timeout=3)
-        client.get_collections()
+        client.info()
         return "ok"
     except Exception as exc:
         logger.warning("Qdrant health check failed: %s", exc)
