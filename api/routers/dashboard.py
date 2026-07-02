@@ -20,15 +20,27 @@ async def dashboard_summary(user: dict = Depends(get_current_user)):
     conn = get_conn()
     try:
         with conn.cursor() as cur:
+            is_admin = user.get("role") == "admin"
+            accessible_ids = None
             doc_filter = ""
             params = [tenant_id]
+            doc_filter_for_alias = ""
+            collection_params = [tenant_id]
+            job_filter = ""
+            job_params = [tenant_id]
             if user.get("role") != "admin":
                 accessible_ids = get_accessible_document_ids(user["id"], tenant_id, conn)
                 if not accessible_ids:
                     doc_filter = "AND false"
+                    doc_filter_for_alias = "AND false"
+                    job_filter = "AND false"
                 else:
                     doc_filter = "AND id = ANY(%s)"
                     params.append(accessible_ids)
+                    doc_filter_for_alias = "AND d.id = ANY(%s)"
+                    collection_params = [accessible_ids, tenant_id]
+                    job_filter = "AND d.id = ANY(%s)"
+                    job_params.append(accessible_ids)
 
             cur.execute(
                 f"""
@@ -77,38 +89,56 @@ async def dashboard_summary(user: dict = Depends(get_current_user)):
             eval_row = cur.fetchone()
 
             cur.execute(
-                """SELECT id, filename, status, created_at
+                f"""SELECT id, filename, status, created_at
                    FROM documents
-                   WHERE tenant_id=%s
+                   WHERE tenant_id=%s {doc_filter}
                    ORDER BY created_at DESC
                    LIMIT 4""",
-                (tenant_id,),
+                tuple(params),
             )
             recent_docs = cur.fetchall()
 
             cur.execute(
-                """SELECT id, filename, status, attempts, max_attempts, created_at,
-                          started_at, completed_at, last_heartbeat_at
-                   FROM ingestion_jobs
-                   WHERE tenant_id=%s
-                   ORDER BY created_at DESC
+                f"""SELECT j.id, j.filename, j.status, j.attempts, j.max_attempts, j.created_at,
+                          j.started_at, j.completed_at, j.last_heartbeat_at
+                   FROM ingestion_jobs j
+                   LEFT JOIN documents d ON d.id = j.document_id AND d.tenant_id = j.tenant_id
+                   WHERE j.tenant_id=%s {job_filter}
+                   ORDER BY j.created_at DESC
                    LIMIT 4""",
-                (tenant_id,),
+                tuple(job_params),
             )
             recent_jobs = cur.fetchall()
 
-            cur.execute(
-                """SELECT c.id, c.name, c.color,
-                          COUNT(d.id) AS document_count,
-                          COUNT(d.id) FILTER (WHERE d.status='ready') AS ready_count
-                   FROM collections c
-                   LEFT JOIN documents d ON d.collection_id=c.id AND d.tenant_id=c.tenant_id
-                   WHERE c.tenant_id=%s
-                   GROUP BY c.id
-                   ORDER BY document_count DESC, c.created_at DESC
-                   LIMIT 4""",
-                (tenant_id,),
-            )
+            if is_admin:
+                cur.execute(
+                    """SELECT c.id, c.name, c.color,
+                              COUNT(d.id) AS document_count,
+                              COUNT(d.id) FILTER (WHERE d.status='ready') AS ready_count
+                       FROM collections c
+                       LEFT JOIN documents d ON d.collection_id=c.id AND d.tenant_id=c.tenant_id
+                       WHERE c.tenant_id=%s
+                       GROUP BY c.id
+                       ORDER BY document_count DESC, c.created_at DESC
+                       LIMIT 4""",
+                    (tenant_id,),
+                )
+            else:
+                cur.execute(
+                    f"""SELECT c.id, c.name, c.color,
+                              COUNT(d.id) AS document_count,
+                              COUNT(d.id) FILTER (WHERE d.status='ready') AS ready_count
+                       FROM collections c
+                       LEFT JOIN documents d
+                         ON d.collection_id=c.id
+                        AND d.tenant_id=c.tenant_id
+                        {doc_filter_for_alias}
+                       WHERE c.tenant_id=%s
+                       GROUP BY c.id
+                       ORDER BY document_count DESC, c.created_at DESC
+                       LIMIT 4""",
+                    tuple(collection_params),
+                )
             collections = cur.fetchall()
     finally:
         conn.close()

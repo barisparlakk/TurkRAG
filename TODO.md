@@ -53,6 +53,7 @@ Last reviewed: 2026-07-01
 - [x] `api/limits.py`, `api/routers/chat.py`, and `tests/test_limits.py`: key WebSocket chat rate limits by validated tenant/user identity instead of raw JWT strings while preserving per-client isolation.
 - [x] `api/limits.py` and `tests/test_limits.py`: key authenticated HTTP rate limits by tenant/user claims instead of tenant-only buckets, while preserving IP fallback for invalid or unauthenticated requests.
 - [x] `api/routers/health.py` and `tests/test_health.py`: use Qdrant `info()` for the health probe instead of listing collections, avoiding unnecessary metadata scans and client deprecation drift.
+- [x] `api/routers/dashboard.py` and `tests/test_dashboard.py`: apply document ACL filtering to dashboard recent activity, ingestion jobs, and collection document counts so member summaries cannot leak tenant-wide document metadata.
 
 ## Deferred work
 
