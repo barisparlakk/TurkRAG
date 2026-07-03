@@ -543,8 +543,8 @@ export function ChatWindow({
     setMessages((prev) => prev.map((m) =>
       m.id === streamMsgIdRef.current ? { ...m, attribution } : m
     ))
-    onCitationsChange?.(messages.find((m) => m.id === streamMsgIdRef.current)?.citations || citations, attribution)
-  }, [attribution])
+    onCitationsChange?.(citations, attribution)
+  }, [attribution, citations])
 
   // Attach message_id
   useEffect(() => {
