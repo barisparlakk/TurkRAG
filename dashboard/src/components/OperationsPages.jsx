@@ -89,6 +89,16 @@ function EmptyState({ title, detail }) {
   )
 }
 
+function RetryNotice({ message, onRetry }) {
+  if (!message) return null
+  return (
+    <div className="inline-error recoverable">
+      <span>{message}</span>
+      {onRetry && <button type="button" onClick={onRetry}>Retry</button>}
+    </div>
+  )
+}
+
 function MiniLineChart({ points = [] }) {
   const values = points.length ? points : [18, 22, 19, 30, 26, 38, 32, 45, 42, 58, 51, 64]
   const max = Math.max(...values, 1)
@@ -267,13 +277,15 @@ export function DashboardPage({ tenant, onNavigate }) {
   )
 }
 
-export function DocumentsPage() {
+export function DocumentsPage({ onNavigate }) {
   const fileInput = useRef(null)
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState('all')
   const [collectionId, setCollectionId] = useState('')
   const [uploading, setUploading] = useState(false)
   const [message, setMessage] = useState('')
+  const [selectedDoc, setSelectedDoc] = useState(null)
+  const [deletingId, setDeletingId] = useState('')
   const { data, loading, error, reload } = useAsyncData(async () => {
     const [documents, collections] = await Promise.all([api.listDocuments(), api.listCollections().catch(() => [])])
     return { documents: documents || [], collections: collections || [] }
@@ -298,6 +310,22 @@ export function DocumentsPage() {
       setMessage(err.message)
     } finally {
       setUploading(false)
+    }
+  }
+
+  const removeDocument = async (doc) => {
+    if (!window.confirm(`Delete "${doc.filename}" and remove it from retrieval indexes?`)) return
+    setDeletingId(doc.id)
+    setMessage('')
+    try {
+      await api.deleteDocument(doc.id)
+      setSelectedDoc(null)
+      setMessage('Document deleted.')
+      await reload()
+    } catch (err) {
+      setMessage(err.message)
+    } finally {
+      setDeletingId('')
     }
   }
 
@@ -328,11 +356,11 @@ export function DocumentsPage() {
           <button type="button" onClick={reload}>Refresh</button>
         </div>
         {message && <div className="inline-note">{message}</div>}
-        {error && <div className="inline-error">{error}</div>}
+        <RetryNotice message={error} onRetry={reload} />
         {loading ? <EmptyState title="Loading documents" /> : filtered.length ? (
           <div className="data-table document-table">
             <div className="table-head">
-              <span>Document</span><span>Collection</span><span>Type</span><span>Chunks</span><span>Uploaded</span><span>Status</span>
+              <span>Document</span><span>Collection</span><span>Type</span><span>Chunks</span><span>Uploaded</span><span>Status</span><span>Actions</span>
             </div>
             {filtered.map((doc) => (
               <div className="table-row" key={doc.id}>
@@ -342,11 +370,43 @@ export function DocumentsPage() {
                 <span>{doc.chunk_count ?? '-'}</span>
                 <span>{formatDate(doc.created_at)}</span>
                 <StatusBadge status={doc.status} />
+                <span className="row-actions">
+                  <button type="button" onClick={() => setSelectedDoc(doc)}>Details</button>
+                  <button type="button" onClick={() => onNavigate?.('jobs')}>Jobs</button>
+                  <button
+                    type="button"
+                    className="danger"
+                    disabled={deletingId === doc.id}
+                    onClick={() => removeDocument(doc)}
+                  >
+                    {deletingId === doc.id ? 'Deleting' : 'Delete'}
+                  </button>
+                </span>
               </div>
             ))}
           </div>
         ) : <EmptyState title="No matching documents" detail="Upload or adjust filters to see source records." />}
       </GlassCard>
+
+      {selectedDoc && (
+        <GlassCard className="document-detail-panel">
+          <div className="card-head">
+            <div>
+              <span>Document Detail</span>
+              <strong>{selectedDoc.filename}</strong>
+            </div>
+            <button type="button" onClick={() => setSelectedDoc(null)}>Close</button>
+          </div>
+          <div className="detail-grid">
+            <span>Status <strong>{statusLabel(selectedDoc.status)}</strong></span>
+            <span>Collection <strong>{selectedDoc.collection_name || 'Unassigned'}</strong></span>
+            <span>Type <strong>{fileType(selectedDoc.filename, selectedDoc.file_type)}</strong></span>
+            <span>Chunks <strong>{selectedDoc.chunk_count ?? '-'}</strong></span>
+            <span>Uploaded <strong>{formatDate(selectedDoc.created_at)}</strong></span>
+            <span>Size <strong>{selectedDoc.size_bytes ? `${Math.round(selectedDoc.size_bytes / 1024)} KB` : '-'}</strong></span>
+          </div>
+        </GlassCard>
+      )}
     </div>
   )
 }
@@ -355,6 +415,9 @@ export function CollectionsPage() {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [message, setMessage] = useState('')
+  const [editingId, setEditingId] = useState('')
+  const [draft, setDraft] = useState({ name: '', description: '' })
+  const [busyId, setBusyId] = useState('')
   const { data, loading, error, reload } = useAsyncData(async () => api.listCollections(), [])
   const collections = data || []
 
@@ -370,6 +433,46 @@ export function CollectionsPage() {
       await reload()
     } catch (err) {
       setMessage(err.message)
+    }
+  }
+
+  const startEdit = (collection) => {
+    setEditingId(collection.id)
+    setDraft({ name: collection.name, description: collection.description || '' })
+    setMessage('')
+  }
+
+  const saveEdit = async (collection) => {
+    if (!draft.name.trim()) return
+    setBusyId(collection.id)
+    setMessage('')
+    try {
+      await api.updateCollection(collection.id, {
+        name: draft.name.trim(),
+        description: draft.description.trim() || null,
+      })
+      setEditingId('')
+      setMessage('Collection updated.')
+      await reload()
+    } catch (err) {
+      setMessage(err.message)
+    } finally {
+      setBusyId('')
+    }
+  }
+
+  const removeCollection = async (collection) => {
+    if (!window.confirm(`Delete collection "${collection.name}"? Documents will remain in the library.`)) return
+    setBusyId(collection.id)
+    setMessage('')
+    try {
+      await api.deleteCollection(collection.id)
+      setMessage('Collection deleted. Documents were not removed.')
+      await reload()
+    } catch (err) {
+      setMessage(err.message)
+    } finally {
+      setBusyId('')
     }
   }
 
@@ -393,15 +496,39 @@ export function CollectionsPage() {
         </GlassCard>
 
         <div className="collection-grid">
-          {error && <div className="inline-error">{error}</div>}
+          <RetryNotice message={error} onRetry={reload} />
           {loading ? <EmptyState title="Loading collections" /> : collections.length ? collections.map((collection) => {
             const progress = collection.document_count ? Math.round((collection.ready_count / collection.document_count) * 100) : 0
+            const editing = editingId === collection.id
             return (
               <GlassCard className="collection-card" key={collection.id}>
                 <div className="collection-icon" style={{ background: collection.color }}>▣</div>
-                <div className="card-menu">•••</div>
-                <h3>{collection.name}</h3>
-                <p>{collection.description || 'Tenant-scoped document collection'}</p>
+                <div className="collection-actions">
+                  {editing ? (
+                    <>
+                      <button type="button" onClick={() => saveEdit(collection)} disabled={busyId === collection.id}>Save</button>
+                      <button type="button" onClick={() => setEditingId('')}>Cancel</button>
+                    </>
+                  ) : (
+                    <>
+                      <button type="button" onClick={() => startEdit(collection)}>Edit</button>
+                      <button type="button" className="danger" onClick={() => removeCollection(collection)} disabled={busyId === collection.id}>
+                        {busyId === collection.id ? '...' : 'Delete'}
+                      </button>
+                    </>
+                  )}
+                </div>
+                {editing ? (
+                  <div className="collection-edit-fields">
+                    <input value={draft.name} onChange={(event) => setDraft((value) => ({ ...value, name: event.target.value }))} />
+                    <textarea value={draft.description} onChange={(event) => setDraft((value) => ({ ...value, description: event.target.value }))} rows={3} />
+                  </div>
+                ) : (
+                  <>
+                    <h3>{collection.name}</h3>
+                    <p>{collection.description || 'Tenant-scoped document collection'}</p>
+                  </>
+                )}
                 <div className="collection-meter"><span style={{ width: `${progress}%`, background: collection.color }} /></div>
                 <div className="collection-meta">
                   <span>{collection.document_count} documents</span>

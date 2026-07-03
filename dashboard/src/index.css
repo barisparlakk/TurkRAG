@@ -310,6 +310,7 @@ a {
 }
 
 .global-search {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 9px;
@@ -340,6 +341,53 @@ a {
 .global-search kbd {
   color: var(--faint);
   font-size: 10px;
+}
+
+.command-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 45;
+  display: grid;
+  width: min(420px, calc(100vw - 28px));
+  max-height: 380px;
+  overflow: auto;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(8, 19, 34, 0.97);
+  box-shadow: var(--shadow);
+}
+
+[data-theme="light"] .command-menu {
+  background: rgba(255, 255, 255, 0.97);
+}
+
+.command-menu button,
+.notification-item {
+  display: grid !important;
+  align-items: start !important;
+  gap: 2px !important;
+  min-height: 48px !important;
+  padding: 8px 10px !important;
+  border: 0 !important;
+  border-radius: 9px !important;
+  background: transparent !important;
+  color: var(--text) !important;
+  cursor: pointer;
+  text-align: left !important;
+}
+
+.command-menu button:hover,
+.notification-item:hover {
+  background: rgba(79, 140, 255, 0.15) !important;
+}
+
+.command-menu button span,
+.notification-item span,
+.topbar-empty {
+  color: var(--muted);
+  font-size: 11px;
 }
 
 .topbar-actions {
@@ -511,6 +559,23 @@ a {
 
 .topbar-menu button.danger {
   color: var(--red);
+}
+
+.notification-menu {
+  right: 138px;
+  min-width: 300px;
+}
+
+.notification-item.tone-warning strong {
+  color: var(--orange);
+}
+
+.notification-item.tone-muted strong {
+  color: var(--muted);
+}
+
+.topbar-empty {
+  padding: 12px 10px;
 }
 
 .menu-meta {
@@ -962,7 +1027,7 @@ textarea {
 
 .document-table .table-head,
 .document-table .table-row {
-  grid-template-columns: minmax(220px, 1.4fr) minmax(130px, 0.8fr) 80px 80px 140px 110px;
+  grid-template-columns: minmax(220px, 1.4fr) minmax(130px, 0.8fr) 80px 80px 140px 110px 190px;
 }
 
 .jobs-table .table-head,
@@ -1006,6 +1071,75 @@ textarea {
   font-weight: 800;
 }
 
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.row-actions button,
+.collection-actions button,
+.inline-error.recoverable button,
+.document-detail-panel .card-head button {
+  min-height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: rgba(17, 36, 62, 0.72);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.row-actions button:hover,
+.collection-actions button:hover,
+.inline-error.recoverable button:hover,
+.document-detail-panel .card-head button:hover {
+  border-color: var(--line-strong);
+  background: rgba(79, 140, 255, 0.16);
+}
+
+.row-actions button.danger,
+.collection-actions button.danger {
+  color: var(--red);
+}
+
+.row-actions button:disabled,
+.collection-actions button:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+.document-detail-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.detail-grid span {
+  display: grid;
+  gap: 4px;
+  min-height: 62px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.detail-grid strong {
+  overflow: hidden;
+  color: var(--text);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .collections-layout,
 .history-layout {
   display: grid;
@@ -1039,6 +1173,25 @@ textarea {
   top: 16px;
   right: 16px;
   color: var(--faint);
+}
+
+.collection-actions {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  gap: 6px;
+}
+
+.collection-edit-fields {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.collection-edit-fields input,
+.collection-edit-fields textarea {
+  width: 100%;
 }
 
 .collection-card h3 {
@@ -1354,6 +1507,17 @@ textarea {
   border: 1px solid rgba(251, 113, 133, 0.28);
   background: rgba(251, 113, 133, 0.1);
   color: var(--red);
+}
+
+.inline-error.recoverable {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.inline-error.recoverable span {
+  min-width: 0;
 }
 
 .inline-note {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 
 const IconSearch = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -39,36 +39,146 @@ export function Header({
   onLogout,
   theme,
   onThemeToggle,
-  onSearch,
   onRefresh,
+  commands = [],
+  notifications = [],
+  onCommand,
+  onNotificationSelect,
 }) {
   const [userOpen, setUserOpen] = useState(false)
   const [tenantOpen, setTenantOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [notificationOpen, setNotificationOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const searchRef = useRef(null)
   const roleLabel = role === 'platform_admin' ? 'Platform' : role === 'admin' ? 'Admin' : 'Member'
+  const filteredCommands = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase()
+    if (!term) return commands
+    return commands.filter((command) =>
+      `${command.label} ${command.detail}`.toLowerCase().includes(term)
+    )
+  }, [commands, searchTerm])
+
+  useEffect(() => {
+    const onKeyDown = (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        setSearchOpen(true)
+        searchRef.current?.focus()
+      }
+      if (event.key === 'Escape') {
+        setSearchOpen(false)
+        setNotificationOpen(false)
+        setTenantOpen(false)
+        setUserOpen(false)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
+
+  const closeMenus = () => {
+    setSearchOpen(false)
+    setNotificationOpen(false)
+    setTenantOpen(false)
+    setUserOpen(false)
+  }
+
+  const runCommand = (command) => {
+    onCommand?.(command)
+    setSearchTerm('')
+    closeMenus()
+  }
+
+  const selectNotification = (notification) => {
+    onNotificationSelect?.(notification)
+    closeMenus()
+  }
 
   return (
     <header className="app-topbar">
       <div className="global-search">
         <IconSearch />
         <input
+          ref={searchRef}
           type="search"
-          placeholder="Search anything..."
-          onChange={(event) => onSearch?.(event.target.value)}
+          value={searchTerm}
+          placeholder="Search pages and actions..."
+          onChange={(event) => {
+            setSearchTerm(event.target.value)
+            setSearchOpen(true)
+          }}
+          onFocus={() => setSearchOpen(true)}
           aria-label="Search dashboard"
         />
         <kbd>⌘ K</kbd>
+        {searchOpen && (
+          <div className="command-menu" role="listbox" aria-label="Command search results">
+            <div className="menu-meta">
+              <strong>Go to</strong>
+              <span>{filteredCommands.length} action{filteredCommands.length === 1 ? '' : 's'}</span>
+            </div>
+            {filteredCommands.length ? filteredCommands.map((command) => (
+              <button
+                key={command.id}
+                type="button"
+                role="option"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => runCommand(command)}
+              >
+                <strong>{command.label}</strong>
+                <span>{command.detail}</span>
+              </button>
+            )) : (
+              <div className="topbar-empty">No matching action</div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="topbar-actions">
-        <button className="topbar-icon" type="button" onClick={onRefresh} title="Refresh data">
+        <button className="topbar-icon" type="button" onClick={onRefresh} title="Refresh data" aria-label="Refresh data">
           <IconRefresh />
         </button>
-        <button className="topbar-icon" type="button" onClick={onThemeToggle} title={theme === 'dark' ? 'Light mode' : 'Dark mode'}>
+        <button className="topbar-icon" type="button" onClick={onThemeToggle} title={theme === 'dark' ? 'Light mode' : 'Dark mode'} aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
           {theme === 'dark' ? <IconSun /> : <IconMoon />}
         </button>
-        <button className="topbar-icon has-dot" type="button" title="Notifications">
+        <button
+          className={`topbar-icon ${notifications.length ? 'has-dot' : ''}`}
+          type="button"
+          title="Notifications"
+          aria-label="Open notifications"
+          onClick={() => {
+            setNotificationOpen((value) => !value)
+            setSearchOpen(false)
+            setTenantOpen(false)
+            setUserOpen(false)
+          }}
+        >
           <IconBell />
         </button>
+        {notificationOpen && (
+          <div className="topbar-menu notification-menu">
+            <div className="menu-meta">
+              <strong>Notifications</strong>
+              <span>{notifications.length ? 'Workspace signals' : 'No updates'}</span>
+            </div>
+            {notifications.length ? notifications.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                className={`notification-item tone-${item.tone || 'info'}`}
+                onClick={() => selectNotification(item)}
+              >
+                <strong>{item.title}</strong>
+                <span>{item.detail}</span>
+              </button>
+            )) : (
+              <div className="topbar-empty">No notifications</div>
+            )}
+          </div>
+        )}
 
         <div className="tenant-control">
           <button className="tenant-chip" type="button" onClick={() => setTenantOpen((value) => !value)}>
@@ -116,15 +226,12 @@ export function Header({
         </div>
       </div>
 
-      {(tenantOpen || userOpen) && (
+      {(tenantOpen || userOpen || searchOpen || notificationOpen) && (
         <button
           className="menu-scrim"
           type="button"
           aria-label="Close menu"
-          onClick={() => {
-            setTenantOpen(false)
-            setUserOpen(false)
-          }}
+          onClick={closeMenus}
         />
       )}
     </header>

@@ -17,6 +17,17 @@ import {
 import { api, getTokenPayload, getToken, setToken } from './api/client.js'
 
 const AUTH_STORAGE_KEY = 'turkrag_auth'
+const COMMANDS = [
+  { id: 'dashboard', label: 'Dashboard', detail: 'Workspace summary and health', tab: 'dashboard' },
+  { id: 'chat', label: 'Ask Documents', detail: 'Query tenant-scoped documents', tab: 'chat' },
+  { id: 'documents', label: 'Documents', detail: 'Upload, filter, and manage sources', tab: 'documents' },
+  { id: 'collections', label: 'Collections', detail: 'Organize knowledge spaces', tab: 'collections' },
+  { id: 'history', label: 'History', detail: 'Review past cited answers', tab: 'history' },
+  { id: 'analytics', label: 'Analytics', detail: 'Usage, latency, and citation metrics', tab: 'analytics' },
+  { id: 'jobs', label: 'Ingestion Jobs', detail: 'Monitor parsing and indexing work', tab: 'jobs' },
+  { id: 'settings', label: 'Settings', detail: 'Dashboard preferences', tab: 'settings' },
+  { id: 'system', label: 'System Status', detail: 'Service health and links', tab: 'system' },
+]
 
 function loadStoredJSON(key) {
   try {
@@ -206,6 +217,33 @@ export default function App() {
     }
   }
 
+  const notifications = [
+    health?.status && health.status !== 'ok'
+      ? {
+          id: 'health',
+          tone: 'warning',
+          title: 'Dependency check needs attention',
+          detail: `System is ${health.status}. Open System Status for details.`,
+          tab: 'system',
+        }
+      : null,
+    sessions.length
+      ? {
+          id: 'sessions',
+          tone: 'info',
+          title: `${sessions.length} recent sessions loaded`,
+          detail: 'Conversation history is available for review.',
+          tab: 'history',
+        }
+      : {
+          id: 'no-sessions',
+          tone: 'muted',
+          title: 'No recent conversations',
+          detail: 'Start a document question from Ask Documents.',
+          tab: 'chat',
+        },
+  ].filter(Boolean)
+
   return (
     <ToastProvider>
       <div className="app-shell">
@@ -220,6 +258,10 @@ export default function App() {
             theme={theme}
             onThemeToggle={() => setTheme((value) => value === 'dark' ? 'light' : 'dark')}
             onRefresh={() => setRefreshTick((value) => value + 1)}
+            commands={COMMANDS}
+            notifications={notifications}
+            onCommand={(command) => navigate(command.tab)}
+            onNotificationSelect={(notification) => navigate(notification.tab)}
           />
           <main className="main-stage" data-view={tab} data-chat-state={hasChatMessages ? 'active' : 'empty'}>
             {tab === 'dashboard' && <DashboardPage tenant={tenant} onNavigate={navigate} />}
@@ -239,7 +281,7 @@ export default function App() {
                 )}
               </div>
             )}
-            {tab === 'documents' && <DocumentsPage />}
+            {tab === 'documents' && <DocumentsPage onNavigate={navigate} />}
             {tab === 'collections' && <CollectionsPage />}
             {tab === 'history' && <HistoryPage />}
             {tab === 'analytics' && <AnalyticsPage />}
