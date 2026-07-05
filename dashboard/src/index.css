@@ -1496,6 +1496,62 @@ textarea {
   border-color: var(--line-strong);
 }
 
+.upload-zone.disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.upload-zone.disabled button {
+  cursor: wait;
+}
+
+.upload-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(53, 208, 186, 0.24);
+  border-radius: 10px;
+  background: rgba(53, 208, 186, 0.09);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.upload-summary.has-skips {
+  border-color: rgba(249, 115, 22, 0.26);
+  background: rgba(249, 115, 22, 0.08);
+}
+
+.upload-summary strong {
+  display: block;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.upload-summary span {
+  color: var(--muted);
+}
+
+.upload-summary details {
+  min-width: 180px;
+  color: var(--orange);
+}
+
+.upload-summary summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.upload-summary ul {
+  display: grid;
+  gap: 4px;
+  max-width: 360px;
+  margin: 8px 0 0;
+  padding-left: 16px;
+  color: var(--muted);
+}
+
 .inline-error,
 .inline-note {
   padding: 10px 12px;

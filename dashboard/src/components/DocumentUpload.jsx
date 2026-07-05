@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { api } from '../api/client.js'
 
+const ALLOWED_EXTENSIONS = new Set(['pdf', 'docx', 'txt', 'xlsx', 'xls', 'csv'])
+
 const IconUpload = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="16 16 12 12 8 16"/>
@@ -55,12 +57,41 @@ function FileTypeTag({ filename }) {
   )
 }
 
+function formatBytes(bytes = 0) {
+  if (!bytes) return '0 B'
+  const units = ['B', 'KB', 'MB', 'GB']
+  const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1)
+  const value = bytes / 1024 ** index
+  return `${value.toFixed(value >= 10 || index === 0 ? 0 : 1)} ${units[index]}`
+}
+
+function validateUploadFiles(fileList) {
+  const accepted = []
+  const rejected = []
+
+  Array.from(fileList || []).forEach((file) => {
+    const ext = file.name?.split('.').pop()?.toLowerCase() || ''
+    if (!ALLOWED_EXTENSIONS.has(ext)) {
+      rejected.push({ name: file.name || 'isimsiz dosya', reason: 'desteklenmeyen tür' })
+      return
+    }
+    if (file.size === 0) {
+      rejected.push({ name: file.name || 'isimsiz dosya', reason: 'boş dosya' })
+      return
+    }
+    accepted.push(file)
+  })
+
+  return { accepted, rejected }
+}
+
 export function DocumentUpload() {
   const [documents, setDocuments] = useState([])
   const [jobs, setJobs] = useState([])
   const [dragging, setDragging] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const [uploadSummary, setUploadSummary] = useState(null)
   const [error, setError] = useState(null)
   const [lastJob, setLastJob] = useState(null)
   const fileInputRef = useRef()
@@ -85,14 +116,31 @@ export function DocumentUpload() {
 
   const handleFiles = async (files) => {
     if (!files?.length) return
-    setError(null); setUploading(true); setUploadProgress(0)
-    for (let i = 0; i < files.length; i++) {
+    if (uploading) return
+    const { accepted, rejected } = validateUploadFiles(files)
+    const acceptedBytes = accepted.reduce((sum, file) => sum + file.size, 0)
+    setError(null)
+    setLastJob(null)
+    setUploadSummary({
+      accepted: accepted.length,
+      rejected,
+      bytes: acceptedBytes,
+      completed: 0,
+    })
+    if (fileInputRef.current) fileInputRef.current.value = ''
+    if (!accepted.length) return
+
+    setUploading(true); setUploadProgress(0)
+    for (let i = 0; i < accepted.length; i++) {
       try {
-        setUploadProgress(Math.round(((i + 0.5) / files.length) * 100))
-        const result = await api.uploadDocument(files[i])
+        setUploadProgress(Math.round(((i + 0.5) / accepted.length) * 100))
+        const result = await api.uploadDocument(accepted[i])
         if (result?.job_id) setLastJob(result)
-        setUploadProgress(Math.round(((i + 1) / files.length) * 100))
-      } catch (e) { setError(`Yükleme hatası: ${e.message}`) }
+        setUploadProgress(Math.round(((i + 1) / accepted.length) * 100))
+        setUploadSummary((prev) => prev ? { ...prev, completed: prev.completed + 1 } : prev)
+      } catch (e) {
+        setError(`Yükleme hatası (${accepted[i].name}): ${e.message}`)
+      }
     }
     setUploading(false); setUploadProgress(0)
     await loadDocuments()
@@ -118,24 +166,26 @@ export function DocumentUpload() {
 
       <div className="ingestion-board">
         <div
-          className={`upload-zone ${dragging ? 'dragging' : ''}`}
-          onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
+          className={`upload-zone ${dragging ? 'dragging' : ''} ${uploading ? 'disabled' : ''}`}
+          onDragOver={(e) => { e.preventDefault(); if (!uploading) setDragging(true) }}
           onDragLeave={() => setDragging(false)}
           onDrop={(e) => { e.preventDefault(); setDragging(false); handleFiles(e.dataTransfer.files) }}
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => { if (!uploading) fileInputRef.current?.click() }}
         >
           <div className="upload-icon">
             <IconUpload />
           </div>
           <div className="upload-copy">
             <div className="upload-title">
-              {dragging ? 'İndeks kuyruğuna bırak' : 'Yeni kaynak ekle'}
+              {uploading ? 'Yükleme devam ediyor' : dragging ? 'İndeks kuyruğuna bırak' : 'Yeni kaynak ekle'}
             </div>
             <div className="upload-meta">
-              PDF, DOCX, TXT, XLSX, XLS, CSV
+              PDF, DOCX, TXT, XLSX, XLS, CSV · boş dosyalar atlanır
             </div>
           </div>
-          <button className="btn btn-primary" type="button">Dosya seç</button>
+          <button className="btn btn-primary" type="button" disabled={uploading}>
+            {uploading ? 'Yükleniyor' : 'Dosya seç'}
+          </button>
           <input
             ref={fileInputRef}
             type="file"
@@ -172,6 +222,35 @@ export function DocumentUpload() {
               borderRadius: 2, transition: 'width 0.3s ease',
             }} />
           </div>
+        </div>
+      )}
+
+      {uploadSummary && (
+        <div className={`upload-summary ${uploadSummary.rejected.length ? 'has-skips' : ''}`}>
+          <div>
+            <strong>
+              {uploading
+                ? `${uploadSummary.completed}/${uploadSummary.accepted} dosya kuyruğa alındı`
+                : uploadSummary.accepted
+                  ? `${uploadSummary.accepted} dosya hazırlandı`
+                  : 'Yüklenecek geçerli dosya yok'}
+            </strong>
+            <span>
+              {uploadSummary.accepted
+                ? `${formatBytes(uploadSummary.bytes)} doğrulandı`
+                : 'Desteklenen türlerde ve boş olmayan dosyalar seçin'}
+            </span>
+          </div>
+          {uploadSummary.rejected.length > 0 && (
+            <details>
+              <summary>{uploadSummary.rejected.length} dosya atlandı</summary>
+              <ul>
+                {uploadSummary.rejected.map((item) => (
+                  <li key={`${item.name}-${item.reason}`}>{item.name}: {item.reason}</li>
+                ))}
+              </ul>
+            </details>
+          )}
         </div>
       )}
 
