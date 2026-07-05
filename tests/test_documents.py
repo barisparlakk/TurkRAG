@@ -194,6 +194,25 @@ def test_upload_rejects_over_limit_and_cleans_temp_file(client, tmp_path):
     assert list(tmp_path.iterdir()) == []
 
 
+def test_empty_upload_rejected_before_db_work(client, tmp_path):
+    token = _token(client)
+
+    with (
+        patch("api.routers.documents.UPLOAD_DIR", tmp_path),
+        patch("api.routers.documents.get_conn") as get_conn,
+    ):
+        resp = client.post(
+            "/documents/upload",
+            files={"file": ("empty.txt", BytesIO(b""), "text/plain")},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+    assert resp.status_code == 422
+    assert resp.json()["detail"] == "Uploaded file must not be empty"
+    get_conn.assert_not_called()
+    assert list(tmp_path.iterdir()) == []
+
+
 def test_duplicate_upload_returns_409_and_does_not_enqueue(client, tmp_path):
     token = _token(client)
 

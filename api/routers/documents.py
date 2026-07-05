@@ -80,6 +80,9 @@ async def upload_document(
         temp_path.unlink(missing_ok=True)
         logger.exception("Failed to stream upload: %s", safe_filename)
         raise
+    if total_bytes == 0:
+        temp_path.unlink(missing_ok=True)
+        raise HTTPException(status_code=422, detail="Uploaded file must not be empty")
 
     file_hash = hasher.hexdigest()
     document_id = None

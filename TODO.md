@@ -1,6 +1,6 @@
 # TurkRAG TODO
 
-Last reviewed: 2026-07-03
+Last reviewed: 2026-07-05
 
 ## Requirement analysis
 
@@ -55,6 +55,7 @@ Last reviewed: 2026-07-03
 - [x] `api/routers/health.py` and `tests/test_health.py`: use Qdrant `info()` for the health probe instead of listing collections, avoiding unnecessary metadata scans and client deprecation drift.
 - [x] `api/routers/dashboard.py` and `tests/test_dashboard.py`: apply document ACL filtering to dashboard recent activity, ingestion jobs, and collection document counts so member summaries cannot leak tenant-wide document metadata.
 - [x] `dashboard/src/components/ChatWindow.jsx`: keep the evidence panel's citations intact when the post-answer sentence attribution frame arrives after the `done` frame.
+- [x] `api/routers/documents.py` and `tests/test_documents.py`: reject zero-byte uploads before database work so empty files cannot create processing documents or queued ingestion jobs.
 
 ## Deferred work
 
