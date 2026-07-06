@@ -1,6 +1,6 @@
 # TurkRAG TODO
 
-Last reviewed: 2026-07-05
+Last reviewed: 2026-07-06
 
 ## Requirement analysis
 
@@ -56,6 +56,7 @@ Last reviewed: 2026-07-05
 - [x] `api/routers/dashboard.py` and `tests/test_dashboard.py`: apply document ACL filtering to dashboard recent activity, ingestion jobs, and collection document counts so member summaries cannot leak tenant-wide document metadata.
 - [x] `dashboard/src/components/ChatWindow.jsx`: keep the evidence panel's citations intact when the post-answer sentence attribution frame arrives after the `done` frame.
 - [x] `api/routers/documents.py` and `tests/test_documents.py`: reject zero-byte uploads before database work so empty files cannot create processing documents or queued ingestion jobs.
+- [x] `scripts/plot_results.py` and `tests/test_eval_artifacts.py`: use aggregate CSV `total_latency_ms` values as a latency plot fallback when per-mode JSON sidecars are absent or lack per-query latency from older experiment artifacts.
 
 ## Deferred work
 

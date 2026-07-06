@@ -192,7 +192,7 @@ def collect_recall_data(results: list[dict]) -> list[dict]:
 
 
 def collect_latency_series(results: list[dict]) -> dict[str, list[float]]:
-    """Extract per-query total latency series keyed by retrieval mode."""
+    """Extract total latency series keyed by retrieval mode."""
     series: dict[str, list[float]] = {}
     for result in results:
         mode = result.get("retrieval_mode")
@@ -204,6 +204,10 @@ def collect_latency_series(results: list[dict]) -> dict[str, list[float]]:
             for entry in per_query
             if _to_float(entry.get("total_latency_ms")) is not None
         ]
+        if not latencies:
+            aggregate_latency = _to_float(result.get("total_latency_ms"))
+            if aggregate_latency is not None:
+                latencies = [aggregate_latency]
         if latencies:
             series[mode] = latencies
     return series
@@ -293,7 +297,8 @@ def main():
 
     plot_metrics_comparison(results, output_dir)
     plot_radar(results, output_dir)
-    plot_latency_distribution(load_latency_results(input_path), output_dir)
+    latency_results = load_latency_results(input_path) or results
+    plot_latency_distribution(latency_results, output_dir)
 
     recall_data = collect_recall_data(results)
     if args.recall_input:

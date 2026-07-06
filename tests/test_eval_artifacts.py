@@ -182,6 +182,21 @@ def test_plot_results_loads_matching_mode_json_for_latency(tmp_path):
     assert latency_series == {"dense": [9.0], "hybrid": [12.5, 18.0]}
 
 
+def test_collect_latency_series_uses_csv_aggregate_when_per_query_missing():
+    latency_series = collect_latency_series([
+        {"retrieval_mode": "sparse", "total_latency_ms": "31.5"},
+        {"retrieval_mode": "dense", "total_latency_ms": 22.0, "per_query": []},
+        {"retrieval_mode": "hybrid", "per_query": [{"total_latency_ms": 12.0}]},
+        {"retrieval_mode": "broken", "total_latency_ms": ""},
+    ])
+
+    assert latency_series == {
+        "dense": [22.0],
+        "hybrid": [12.0],
+        "sparse": [31.5],
+    }
+
+
 def test_collect_recall_data_accepts_unified_flat_metrics():
     data = collect_recall_data([
         {"retrieval_mode": "hybrid", "recall@1": "0.4", "recall@3": "0.8", "recall@5": "1.0"},
