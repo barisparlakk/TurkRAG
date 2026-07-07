@@ -1,6 +1,6 @@
 # TurkRAG TODO
 
-Last reviewed: 2026-07-06
+Last reviewed: 2026-07-07
 
 ## Requirement analysis
 
@@ -57,6 +57,7 @@ Last reviewed: 2026-07-06
 - [x] `dashboard/src/components/ChatWindow.jsx`: keep the evidence panel's citations intact when the post-answer sentence attribution frame arrives after the `done` frame.
 - [x] `api/routers/documents.py` and `tests/test_documents.py`: reject zero-byte uploads before database work so empty files cannot create processing documents or queued ingestion jobs.
 - [x] `scripts/plot_results.py` and `tests/test_eval_artifacts.py`: use aggregate CSV `total_latency_ms` values as a latency plot fallback when per-mode JSON sidecars are absent or lack per-query latency from older experiment artifacts.
+- [x] 2026-07-07 source review: no additional safe local implementation gap found; remaining work requires deployment-specific CORS origins or live indexed tenant baselines.
 
 ## Deferred work
 
