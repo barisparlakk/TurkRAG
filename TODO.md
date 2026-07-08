@@ -1,6 +1,6 @@
 # TurkRAG TODO
 
-Last reviewed: 2026-07-07
+Last reviewed: 2026-07-08
 
 ## Requirement analysis
 
@@ -58,6 +58,8 @@ Last reviewed: 2026-07-07
 - [x] `api/routers/documents.py` and `tests/test_documents.py`: reject zero-byte uploads before database work so empty files cannot create processing documents or queued ingestion jobs.
 - [x] `scripts/plot_results.py` and `tests/test_eval_artifacts.py`: use aggregate CSV `total_latency_ms` values as a latency plot fallback when per-mode JSON sidecars are absent or lack per-query latency from older experiment artifacts.
 - [x] 2026-07-07 source review: no additional safe local implementation gap found; remaining work requires deployment-specific CORS origins or live indexed tenant baselines.
+- [x] `README.md`, `.env.example`, and `tests/test_env_example.py`: keep the sample environment file aligned with the documented runtime configuration surface so fresh installs can discover the current DB pool, rate-limit, parser, retrieval, cache, health, and evaluation knobs.
+- [x] `.env.example`, `README.md`, and `tests/test_env_example.py`: document and guard `INGESTION_HEARTBEAT_INTERVAL_SECONDS` so stale-job recovery tuning is visible with the rest of the ingestion knobs.
 
 ## Deferred work
 
