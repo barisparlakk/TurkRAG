@@ -235,6 +235,7 @@ function InlineWorkbenchComposer({ input, setInput, textareaRef, isStreaming, ab
         rows={2}
         disabled={isStreaming}
       />
+      <span className="composer-hint">Enter gönderir · Shift+Enter yeni satır</span>
       <button
         onClick={isStreaming ? abort : () => handleSend()}
         disabled={!isStreaming && !input.trim()}
@@ -260,9 +261,9 @@ function EmptyState({ tenant, sessions, context, contextLoading, onSend, input, 
     <div className="chat-empty ask-empty">
       <div className="ask-orbit" aria-hidden="true"><span /><i /></div>
       <div className="ask-empty-copy">
-        <span>Ask Documents</span>
-        <h2>How can I help you today?</h2>
-        <p>Ask anything about your documents and get source-grounded answers with citations.</p>
+        <span>Belgelere Sor</span>
+        <h2>Belgeleriniz hakkında ne öğrenmek istersiniz?</h2>
+        <p>Belgelerinizden kaynak gösteren, doğrulanabilir yanıtlar alın.</p>
       </div>
 
       <InlineWorkbenchComposer
@@ -738,6 +739,7 @@ export function ChatWindow({
               maxHeight: 120, overflowY: 'auto',
             }}
           />
+          <span className="composer-hint">Enter gönderir · Shift+Enter yeni satır</span>
           <button
             onClick={isStreaming ? abort : () => handleSend()}
             disabled={!isStreaming && !input.trim()}

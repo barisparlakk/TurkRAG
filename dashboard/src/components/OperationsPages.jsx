@@ -27,20 +27,20 @@ function fileType(filename, fallback) {
 
 function statusLabel(status) {
   const labels = {
-    ready: 'Processed',
-    completed: 'Completed',
-    processing: 'Processing',
-    pending: 'Pending',
-    failed: 'Failed',
-    error: 'Failed',
-    queued: 'Queued',
-    running: 'Running',
-    ok: 'Healthy',
-    degraded: 'Degraded',
-    stopped: 'Stopped',
-    not_configured: 'Not Configured',
+    ready: 'Hazır',
+    completed: 'Tamamlandı',
+    processing: 'İşleniyor',
+    pending: 'Bekliyor',
+    failed: 'Hata',
+    error: 'Hata',
+    queued: 'Sırada',
+    running: 'Çalışıyor',
+    ok: 'Sağlıklı',
+    degraded: 'Kısıtlı',
+    stopped: 'Durduruldu',
+    not_configured: 'Yapılandırılmadı',
   }
-  return labels[status] || status || 'Unknown'
+  return labels[status] || status || 'Bilinmiyor'
 }
 
 function StatusBadge({ status }) {
@@ -94,7 +94,22 @@ function RetryNotice({ message, onRetry }) {
   return (
     <div className="inline-error recoverable">
       <span>{message}</span>
-      {onRetry && <button type="button" onClick={onRetry}>Retry</button>}
+      {onRetry && <button type="button" onClick={onRetry}>Yeniden dene</button>}
+    </div>
+  )
+}
+
+function ConfirmDialog({ title, detail, confirmLabel, busy, onCancel, onConfirm }) {
+  return (
+    <div className="confirm-backdrop" role="presentation">
+      <section className="confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-detail">
+        <h2 id="confirm-title">{title}</h2>
+        <p id="confirm-detail">{detail}</p>
+        <div className="confirm-actions">
+          <button type="button" onClick={onCancel} disabled={busy}>Vazgeç</button>
+          <button type="button" className="danger" onClick={onConfirm} disabled={busy}>{busy ? 'Siliniyor…' : confirmLabel}</button>
+        </div>
+      </section>
     </div>
   )
 }
@@ -286,6 +301,7 @@ export function DocumentsPage({ onNavigate }) {
   const [message, setMessage] = useState('')
   const [selectedDoc, setSelectedDoc] = useState(null)
   const [deletingId, setDeletingId] = useState('')
+  const [deleteCandidate, setDeleteCandidate] = useState(null)
   const { data, loading, error, reload } = useAsyncData(async () => {
     const [documents, collections] = await Promise.all([api.listDocuments(), api.listCollections().catch(() => [])])
     return { documents: documents || [], collections: collections || [] }
@@ -314,7 +330,6 @@ export function DocumentsPage({ onNavigate }) {
   }
 
   const removeDocument = async (doc) => {
-    if (!window.confirm(`Delete "${doc.filename}" and remove it from retrieval indexes?`)) return
     setDeletingId(doc.id)
     setMessage('')
     try {
@@ -326,66 +341,67 @@ export function DocumentsPage({ onNavigate }) {
       setMessage(err.message)
     } finally {
       setDeletingId('')
+      setDeleteCandidate(null)
     }
   }
 
   return (
     <div className="page-stack">
       <PageHeader
-        eyebrow="Document Library"
-        title="Documents"
-        description="Browse, upload, filter, and monitor tenant-scoped source material."
-        action={<button className="primary-action" type="button" onClick={() => fileInput.current?.click()}>{uploading ? 'Uploading...' : '+ Upload Document'}</button>}
+        eyebrow="Belge Kitaplığı"
+        title="Belgeler"
+        description="Çalışma alanındaki kaynakları yükleyin, filtreleyin ve izleyin."
+        action={<button className="primary-action" type="button" onClick={() => fileInput.current?.click()}>{uploading ? 'Yükleniyor…' : '+ Belge Yükle'}</button>}
       />
       <input ref={fileInput} type="file" multiple hidden accept=".pdf,.docx,.txt,.xlsx,.xls,.csv" onChange={(event) => upload(event.target.files)} />
 
       <GlassCard>
         <div className="library-toolbar">
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search documents..." />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Belgelerde ara..." />
           <select value={status} onChange={(event) => setStatus(event.target.value)}>
-            <option value="all">All status</option>
-            <option value="ready">Processed</option>
-            <option value="processing">Processing</option>
-            <option value="failed">Failed</option>
-            <option value="error">Error</option>
+            <option value="all">Tüm durumlar</option>
+            <option value="ready">Hazır</option>
+            <option value="processing">İşleniyor</option>
+            <option value="failed">Hata</option>
+            <option value="error">Hata</option>
           </select>
           <select value={collectionId} onChange={(event) => setCollectionId(event.target.value)}>
-            <option value="">No upload collection</option>
+            <option value="">Koleksiyon seçilmedi</option>
             {collections.map((collection) => <option key={collection.id} value={collection.id}>{collection.name}</option>)}
           </select>
-          <button type="button" onClick={reload}>Refresh</button>
+          <button type="button" onClick={reload}>Yenile</button>
         </div>
         {message && <div className="inline-note">{message}</div>}
         <RetryNotice message={error} onRetry={reload} />
-        {loading ? <EmptyState title="Loading documents" /> : filtered.length ? (
+          {loading ? <EmptyState title="Belgeler yükleniyor" /> : filtered.length ? (
           <div className="data-table document-table">
             <div className="table-head">
-              <span>Document</span><span>Collection</span><span>Type</span><span>Chunks</span><span>Uploaded</span><span>Status</span><span>Actions</span>
+              <span>Belge</span><span>Koleksiyon</span><span>Tür</span><span>Parça</span><span>Yüklenme</span><span>Durum</span><span>İşlemler</span>
             </div>
             {filtered.map((doc) => (
               <div className="table-row" key={doc.id}>
                 <strong>{doc.filename}</strong>
-                <span>{doc.collection_name || 'Unassigned'}</span>
+                <span>{doc.collection_name || 'Atanmadı'}</span>
                 <span className="file-pill">{fileType(doc.filename, doc.file_type)}</span>
                 <span>{doc.chunk_count ?? '-'}</span>
                 <span>{formatDate(doc.created_at)}</span>
                 <StatusBadge status={doc.status} />
                 <span className="row-actions">
-                  <button type="button" onClick={() => setSelectedDoc(doc)}>Details</button>
-                  <button type="button" onClick={() => onNavigate?.('jobs')}>Jobs</button>
+                  <button type="button" onClick={() => setSelectedDoc(doc)}>Detay</button>
+                  <button type="button" onClick={() => onNavigate?.('jobs')}>İşler</button>
                   <button
                     type="button"
                     className="danger"
                     disabled={deletingId === doc.id}
-                    onClick={() => removeDocument(doc)}
+                    onClick={() => setDeleteCandidate(doc)}
                   >
-                    {deletingId === doc.id ? 'Deleting' : 'Delete'}
+                    {deletingId === doc.id ? 'Siliniyor' : 'Sil'}
                   </button>
                 </span>
               </div>
             ))}
           </div>
-        ) : <EmptyState title="No matching documents" detail="Upload or adjust filters to see source records." />}
+        ) : <EmptyState title="Eşleşen belge yok" detail="Kaynak kayıtlarını görmek için belge yükleyin veya filtreleri değiştirin." />}
       </GlassCard>
 
       {selectedDoc && (
@@ -407,6 +423,16 @@ export function DocumentsPage({ onNavigate }) {
           </div>
         </GlassCard>
       )}
+      {deleteCandidate && (
+        <ConfirmDialog
+          title="Belge silinsin mi?"
+          detail={`“${deleteCandidate.filename}” belge kitaplığından ve arama indekslerinden kaldırılacak.`}
+          confirmLabel="Belgeyi sil"
+          busy={deletingId === deleteCandidate.id}
+          onCancel={() => setDeleteCandidate(null)}
+          onConfirm={() => removeDocument(deleteCandidate)}
+        />
+      )}
     </div>
   )
 }
@@ -418,6 +444,7 @@ export function CollectionsPage() {
   const [editingId, setEditingId] = useState('')
   const [draft, setDraft] = useState({ name: '', description: '' })
   const [busyId, setBusyId] = useState('')
+  const [deleteCandidate, setDeleteCandidate] = useState(null)
   const { data, loading, error, reload } = useAsyncData(async () => api.listCollections(), [])
   const collections = data || []
 
@@ -462,7 +489,6 @@ export function CollectionsPage() {
   }
 
   const removeCollection = async (collection) => {
-    if (!window.confirm(`Delete collection "${collection.name}"? Documents will remain in the library.`)) return
     setBusyId(collection.id)
     setMessage('')
     try {
@@ -473,6 +499,7 @@ export function CollectionsPage() {
       setMessage(err.message)
     } finally {
       setBusyId('')
+      setDeleteCandidate(null)
     }
   }
 
@@ -512,7 +539,7 @@ export function CollectionsPage() {
                   ) : (
                     <>
                       <button type="button" onClick={() => startEdit(collection)}>Edit</button>
-                      <button type="button" className="danger" onClick={() => removeCollection(collection)} disabled={busyId === collection.id}>
+                      <button type="button" className="danger" onClick={() => setDeleteCandidate(collection)} disabled={busyId === collection.id}>
                         {busyId === collection.id ? '...' : 'Delete'}
                       </button>
                     </>
@@ -539,6 +566,16 @@ export function CollectionsPage() {
           }) : <EmptyState title="No collections" detail="Create a collection to group documents." />}
         </div>
       </div>
+      {deleteCandidate && (
+        <ConfirmDialog
+          title="Koleksiyon silinsin mi?"
+          detail={`“${deleteCandidate.name}” silinecek. İçindeki belgeler belge kitaplığında kalır.`}
+          confirmLabel="Koleksiyonu sil"
+          busy={busyId === deleteCandidate.id}
+          onCancel={() => setDeleteCandidate(null)}
+          onConfirm={() => removeCollection(deleteCandidate)}
+        />
+      )}
     </div>
   )
 }

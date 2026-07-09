@@ -18,15 +18,15 @@ import { api, getTokenPayload, getToken, setToken } from './api/client.js'
 
 const AUTH_STORAGE_KEY = 'turkrag_auth'
 const COMMANDS = [
-  { id: 'dashboard', label: 'Dashboard', detail: 'Workspace summary and health', tab: 'dashboard' },
-  { id: 'chat', label: 'Ask Documents', detail: 'Query tenant-scoped documents', tab: 'chat' },
-  { id: 'documents', label: 'Documents', detail: 'Upload, filter, and manage sources', tab: 'documents' },
-  { id: 'collections', label: 'Collections', detail: 'Organize knowledge spaces', tab: 'collections' },
-  { id: 'history', label: 'History', detail: 'Review past cited answers', tab: 'history' },
-  { id: 'analytics', label: 'Analytics', detail: 'Usage, latency, and citation metrics', tab: 'analytics' },
-  { id: 'jobs', label: 'Ingestion Jobs', detail: 'Monitor parsing and indexing work', tab: 'jobs' },
-  { id: 'settings', label: 'Settings', detail: 'Dashboard preferences', tab: 'settings' },
-  { id: 'system', label: 'System Status', detail: 'Service health and links', tab: 'system' },
+  { id: 'dashboard', label: 'Pano', detail: 'Çalışma alanı özeti ve sağlık durumu', tab: 'dashboard' },
+  { id: 'chat', label: 'Belgelere Sor', detail: 'Çalışma alanındaki belgeleri sorgula', tab: 'chat' },
+  { id: 'documents', label: 'Belgeler', detail: 'Kaynakları yükle, filtrele ve yönet', tab: 'documents' },
+  { id: 'collections', label: 'Koleksiyonlar', detail: 'Bilgi alanlarını düzenle', tab: 'collections' },
+  { id: 'history', label: 'Geçmiş', detail: 'Kaynaklı yanıtları incele', tab: 'history' },
+  { id: 'analytics', label: 'Analitik', detail: 'Kullanım, gecikme ve atıf metrikleri', tab: 'analytics' },
+  { id: 'jobs', label: 'İçe Aktarım İşleri', detail: 'Ayrıştırma ve indeksleme süreçlerini izle', tab: 'jobs' },
+  { id: 'settings', label: 'Ayarlar', detail: 'Pano tercihleri', tab: 'settings' },
+  { id: 'system', label: 'Sistem Durumu', detail: 'Servis sağlığı ve bağlantılar', tab: 'system' },
 ]
 
 function loadStoredJSON(key) {
@@ -53,7 +53,7 @@ function LoginPage({ onLogin }) {
     event.preventDefault()
     const slug = tenantSlug.trim()
     if (!slug || !email.trim() || !password) {
-      setLoginError('Workspace, email and password are required.')
+      setLoginError('Çalışma alanı, e-posta ve parola zorunludur.')
       return
     }
     setLoading(true)
@@ -75,7 +75,7 @@ function LoginPage({ onLogin }) {
         },
       })
     } catch (err) {
-      setLoginError(`Login failed: ${err.message}`)
+      setLoginError(`Giriş başarısız: ${err.message}`)
     } finally {
       setLoading(false)
     }
@@ -88,17 +88,17 @@ function LoginPage({ onLogin }) {
           <div className="brand-mark large"><img src="/logo-dark.png" alt="" /></div>
           <div>
             <strong>TurkRAG</strong>
-            <span>AI-Powered Document Intelligence</span>
+            <span>Yapay zekâ destekli belge zekâsı</span>
           </div>
         </div>
-        <h1>Secure tenant access</h1>
-        <p>Sign in to query private Turkish enterprise knowledge with citations, ACLs, ingestion monitoring, and analytics.</p>
+        <h1>Güvenli çalışma alanı erişimi</h1>
+        <p>Özel kurumsal belgelerinizi kaynaklarıyla sorgulamak için giriş yapın.</p>
         <form onSubmit={handleLogin} className="login-form">
-          <label>Workspace slug<input value={tenantSlug} onChange={(event) => setTenantSlug(event.target.value)} placeholder="demo" /></label>
-          <label>Email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="baris@dev.com" /></label>
-          <label>Password<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="••••••••" /></label>
+          <label>Çalışma alanı kısa adı<input value={tenantSlug} onChange={(event) => setTenantSlug(event.target.value)} placeholder="demo" /></label>
+          <label>E-posta<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="baris@dev.com" /></label>
+          <label>Parola<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="••••••••" /></label>
           {loginError && <div className="inline-error">{loginError}</div>}
-          <button className="primary-action wide" type="submit" disabled={loading}>{loading ? 'Authenticating...' : 'Sign In'}</button>
+          <button className="primary-action wide" type="submit" disabled={loading}>{loading ? 'Doğrulanıyor…' : 'Giriş yap'}</button>
         </form>
       </section>
     </main>
@@ -227,21 +227,6 @@ export default function App() {
           tab: 'system',
         }
       : null,
-    sessions.length
-      ? {
-          id: 'sessions',
-          tone: 'info',
-          title: `${sessions.length} recent sessions loaded`,
-          detail: 'Conversation history is available for review.',
-          tab: 'history',
-        }
-      : {
-          id: 'no-sessions',
-          tone: 'muted',
-          title: 'No recent conversations',
-          detail: 'Start a document question from Ask Documents.',
-          tab: 'chat',
-        },
   ].filter(Boolean)
 
   return (

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 function Icon({ name }) {
   const common = {
@@ -26,18 +26,24 @@ function Icon({ name }) {
 }
 
 const MAIN_NAV = [
-  { key: 'dashboard', icon: 'dashboard', label: 'Dashboard' },
-  { key: 'chat', icon: 'ask', label: 'Ask Documents' },
-  { key: 'documents', icon: 'documents', label: 'Documents' },
-  { key: 'collections', icon: 'collections', label: 'Collections' },
-  { key: 'history', icon: 'history', label: 'History' },
-  { key: 'analytics', icon: 'analytics', label: 'Analytics' },
+  { key: 'dashboard', icon: 'dashboard', label: 'Pano' },
+  { key: 'chat', icon: 'ask', label: 'Belgelere Sor' },
+  { key: 'documents', icon: 'documents', label: 'Belgeler' },
+  { key: 'collections', icon: 'collections', label: 'Koleksiyonlar' },
+  { key: 'history', icon: 'history', label: 'Geçmiş' },
+  { key: 'analytics', icon: 'analytics', label: 'Analitik' },
 ]
 
 const SYSTEM_NAV = [
-  { key: 'jobs', icon: 'jobs', label: 'Ingestion Jobs' },
-  { key: 'settings', icon: 'settings', label: 'Settings' },
-  { key: 'system', icon: 'system', label: 'System Status' },
+  { key: 'jobs', icon: 'jobs', label: 'İçe Aktarım' },
+  { key: 'settings', icon: 'settings', label: 'Ayarlar' },
+  { key: 'system', icon: 'system', label: 'Sistem Durumu' },
+]
+
+const MOBILE_NAV = MAIN_NAV.filter((item) => ['dashboard', 'chat', 'documents', 'history'].includes(item.key))
+const MOBILE_MORE_NAV = [
+  ...MAIN_NAV.filter((item) => item.key === 'analytics'),
+  ...SYSTEM_NAV,
 ]
 
 function NavButton({ item, active, onClick }) {
@@ -55,6 +61,13 @@ function NavButton({ item, active, onClick }) {
 }
 
 export function Sidebar({ tab, onTabChange, tenant, health }) {
+  const [mobileMoreOpen, setMobileMoreOpen] = useState(false)
+  const selectTab = (key) => {
+    onTabChange(key)
+    setMobileMoreOpen(false)
+  }
+  const isMoreActive = MOBILE_MORE_NAV.some((item) => item.key === tab)
+
   return (
     <aside className="app-sidebar">
       <div className="sidebar-brand">
@@ -67,33 +80,67 @@ export function Sidebar({ tab, onTabChange, tenant, health }) {
         </div>
       </div>
 
-      <nav className="sidebar-nav" aria-label="Primary navigation">
+      <nav className="sidebar-nav desktop-nav" aria-label="Primary navigation">
         {MAIN_NAV.map((item) => (
           <NavButton
             key={item.key}
             item={item}
             active={tab === item.key}
-            onClick={() => onTabChange(item.key)}
+            onClick={() => selectTab(item.key)}
           />
         ))}
       </nav>
 
-      <div className="sidebar-section-title">System</div>
-      <nav className="sidebar-nav compact" aria-label="System navigation">
+      <div className="sidebar-section-title">Sistem</div>
+      <nav className="sidebar-nav compact desktop-nav" aria-label="System navigation">
         {SYSTEM_NAV.map((item) => (
           <NavButton
             key={item.key}
             item={item}
             active={tab === item.key}
-            onClick={() => onTabChange(item.key)}
+            onClick={() => selectTab(item.key)}
           />
         ))}
       </nav>
 
+      <nav className="sidebar-nav mobile-nav" aria-label="Mobil gezinme">
+        {MOBILE_NAV.map((item) => (
+          <NavButton
+            key={item.key}
+            item={item}
+            active={tab === item.key}
+            onClick={() => selectTab(item.key)}
+          />
+        ))}
+        <button
+          className={`nav-link ${isMoreActive || mobileMoreOpen ? 'active' : ''}`}
+          type="button"
+          aria-expanded={mobileMoreOpen}
+          aria-controls="mobile-more-navigation"
+          onClick={() => setMobileMoreOpen((value) => !value)}
+        >
+          <span className="nav-link-icon" aria-hidden="true">•••</span>
+          <span>Diğer</span>
+        </button>
+      </nav>
+
+      {mobileMoreOpen && (
+        <div className="mobile-nav-menu" id="mobile-more-navigation" aria-label="Diğer sayfalar">
+          {MOBILE_MORE_NAV.map((item) => (
+            <NavButton
+              key={item.key}
+              item={item}
+              active={tab === item.key}
+              onClick={() => selectTab(item.key)}
+            />
+          ))}
+        </div>
+      )}
+
       <div className="sidebar-status">
         <div>
-          <span>System Status</span>
-          <strong>{health?.status === 'ok' ? 'Operational' : health ? 'Degraded' : 'Checking'}</strong>
+          <span>Sistem Durumu</span>
+          <strong>{health?.status === 'ok' ? 'Çalışıyor' : health ? 'Kısıtlı' : 'Kontrol ediliyor'}</strong>
         </div>
         <div className={`status-spark ${health?.status === 'ok' ? 'ok' : 'warn'}`} aria-hidden="true">
           <i /><i /><i /><i /><i /><i /><i /><i />

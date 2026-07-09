@@ -7,7 +7,7 @@ function FileIcon({ filename }) {
     pdf:  '#ef4444', docx: '#3b82f6', txt: '#10b981',
     xlsx: '#16a34a', xls: '#16a34a',  csv: '#f59e0b',
   }
-  const color = colors[ext] || 'var(--text-3)'
+  const color = colors[ext] || '#647996'
   return (
     <div style={{
       width: 28, height: 28, borderRadius: 6, flexShrink: 0,
@@ -47,9 +47,12 @@ function SourceCard({ citation, index }) {
   const [expanded, setExpanded] = React.useState(false)
 
   return (
-    <div
+    <button
+      type="button"
       className={`source-record ${expanded ? 'expanded' : ''}`}
       onClick={() => setExpanded((v) => !v)}
+      aria-expanded={expanded}
+      aria-label={`${citation.filename} kaynak parçasını ${expanded ? 'daralt' : 'genişlet'}`}
     >
       {/* Top row */}
       <div className="source-record-head">
@@ -70,7 +73,7 @@ function SourceCard({ citation, index }) {
           "{citation.text_preview}{!expanded && citation.text_preview.length >= 119 ? '…' : ''}"
         </div>
       )}
-    </div>
+    </button>
   )
 }
 

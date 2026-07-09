@@ -104,20 +104,20 @@ export function Header({
           ref={searchRef}
           type="search"
           value={searchTerm}
-          placeholder="Search pages and actions..."
+          placeholder="Sayfa ve işlem ara..."
           onChange={(event) => {
             setSearchTerm(event.target.value)
             setSearchOpen(true)
           }}
           onFocus={() => setSearchOpen(true)}
-          aria-label="Search dashboard"
+          aria-label="Panoda ara"
         />
         <kbd>⌘ K</kbd>
         {searchOpen && (
-          <div className="command-menu" role="listbox" aria-label="Command search results">
+          <div className="command-menu" role="listbox" aria-label="Komut arama sonuçları">
             <div className="menu-meta">
-              <strong>Go to</strong>
-              <span>{filteredCommands.length} action{filteredCommands.length === 1 ? '' : 's'}</span>
+              <strong>Git</strong>
+              <span>{filteredCommands.length} işlem</span>
             </div>
             {filteredCommands.length ? filteredCommands.map((command) => (
               <button
@@ -131,24 +131,24 @@ export function Header({
                 <span>{command.detail}</span>
               </button>
             )) : (
-              <div className="topbar-empty">No matching action</div>
+              <div className="topbar-empty">Eşleşen işlem yok</div>
             )}
           </div>
         )}
       </div>
 
       <div className="topbar-actions">
-        <button className="topbar-icon" type="button" onClick={onRefresh} title="Refresh data" aria-label="Refresh data">
+        <button className="topbar-icon refresh-control" type="button" onClick={onRefresh} title="Verileri yenile" aria-label="Verileri yenile">
           <IconRefresh />
         </button>
-        <button className="topbar-icon" type="button" onClick={onThemeToggle} title={theme === 'dark' ? 'Light mode' : 'Dark mode'} aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
+        <button className="topbar-icon" type="button" onClick={onThemeToggle} title={theme === 'dark' ? 'Açık tema' : 'Koyu tema'} aria-label={theme === 'dark' ? 'Açık temaya geç' : 'Koyu temaya geç'}>
           {theme === 'dark' ? <IconSun /> : <IconMoon />}
         </button>
         <button
           className={`topbar-icon ${notifications.length ? 'has-dot' : ''}`}
           type="button"
-          title="Notifications"
-          aria-label="Open notifications"
+          title="Bildirimler"
+          aria-label="Bildirimleri aç"
           onClick={() => {
             setNotificationOpen((value) => !value)
             setSearchOpen(false)
@@ -161,8 +161,8 @@ export function Header({
         {notificationOpen && (
           <div className="topbar-menu notification-menu">
             <div className="menu-meta">
-              <strong>Notifications</strong>
-              <span>{notifications.length ? 'Workspace signals' : 'No updates'}</span>
+              <strong>Bildirimler</strong>
+              <span>{notifications.length ? 'Çalışma alanı uyarıları' : 'Yeni bildirim yok'}</span>
             </div>
             {notifications.length ? notifications.map((item) => (
               <button
@@ -175,13 +175,21 @@ export function Header({
                 <span>{item.detail}</span>
               </button>
             )) : (
-              <div className="topbar-empty">No notifications</div>
+              <div className="topbar-empty">Yeni bildirim yok</div>
             )}
           </div>
         )}
 
         <div className="tenant-control">
-          <button className="tenant-chip" type="button" onClick={() => setTenantOpen((value) => !value)}>
+          <button
+            className="tenant-chip"
+            type="button"
+            onClick={() => tenants.length > 1 && setTenantOpen((value) => !value)}
+            disabled={tenants.length <= 1}
+            aria-haspopup={tenants.length > 1 ? 'menu' : undefined}
+            aria-expanded={tenants.length > 1 ? tenantOpen : undefined}
+            title={tenants.length > 1 ? 'Çalışma alanını değiştir' : 'Geçerli çalışma alanı'}
+          >
             <span className="status-dot" />
             <span>{tenant?.name || tenant?.slug || 'Tenant'}</span>
           </button>
@@ -219,7 +227,7 @@ export function Header({
                 <span>{tenant?.slug}</span>
               </div>
               <button type="button" onClick={onLogout} className="danger">
-                <IconLogout /> Log out
+                <IconLogout /> Çıkış yap
               </button>
             </div>
           )}

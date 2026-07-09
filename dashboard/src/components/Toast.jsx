@@ -55,8 +55,10 @@ function ToastItem({ toast: t, onDismiss }) {
   const icon = { success: '✓', error: '✕', info: 'ℹ' }[t.type]
 
   return (
-    <div
+    <button
+      type="button"
       onClick={onDismiss}
+      aria-label="Bildirimi kapat"
       style={{
         pointerEvents: 'all',
         background: c.bg,
@@ -65,13 +67,13 @@ function ToastItem({ toast: t, onDismiss }) {
         padding: '10px 14px',
         display: 'flex', alignItems: 'center', gap: '10px',
         minWidth: 240, maxWidth: 360,
-        cursor: 'pointer',
+        cursor: 'pointer', textAlign: 'left',
         animation: 'toastIn 0.18s ease both',
         boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
       }}
     >
       <span style={{ color: c.color, fontWeight: 700, flexShrink: 0 }}>{icon}</span>
       <span style={{ fontSize: '13px', color: 'var(--text-1)', flex: 1 }}>{t.message}</span>
-    </div>
+    </button>
   )
 }
