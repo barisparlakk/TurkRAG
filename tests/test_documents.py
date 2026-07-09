@@ -33,6 +33,7 @@ def client():
     worker_module.start_worker = lambda: None
     worker_module.stop_worker = lambda: None
     from api.main import app
+
     with TestClient(app, raise_server_exceptions=True) as c:
         yield c
     main_module._ensure_schema_ready = original
@@ -43,10 +44,13 @@ def client():
 
 
 def _token(client):
-    return client.post("/auth/token", json={
-        "tenant_id": "00000000-0000-0000-0000-000000000001",
-        "user_id": "member-user",
-    }).json()["access_token"]
+    return client.post(
+        "/auth/token",
+        json={
+            "tenant_id": "00000000-0000-0000-0000-000000000001",
+            "user_id": "member-user",
+        },
+    ).json()["access_token"]
 
 
 class _DbState:
@@ -69,7 +73,11 @@ class _Cursor:
             raise RuntimeError("delete failed")
 
     def fetchone(self):
-        if self.state.queries and "SELECT id FROM documents" in self.state.queries[-1][0] and self.state.duplicate:
+        if (
+            self.state.queries
+            and "SELECT id FROM documents" in self.state.queries[-1][0]
+            and self.state.duplicate
+        ):
             return ("existing-doc",)
         return None
 
@@ -343,6 +351,25 @@ def test_upload_filename_sanitizer_requires_usable_basename():
     assert exc.value.detail == "Uploaded file must have a valid filename"
 
 
+def test_positive_int_env_accepts_default_and_override(monkeypatch):
+    from api.config import positive_int_env
+
+    monkeypatch.delenv("MAX_UPLOAD_BYTES", raising=False)
+    assert positive_int_env("MAX_UPLOAD_BYTES", 1024) == 1024
+
+    monkeypatch.setenv("MAX_UPLOAD_BYTES", "2048")
+    assert positive_int_env("MAX_UPLOAD_BYTES", 1024) == 2048
+
+
+@pytest.mark.parametrize("value", ["0", "-1", "not-a-number"])
+def test_positive_int_env_rejects_invalid_values(monkeypatch, value):
+    from api.config import positive_int_env
+
+    monkeypatch.setenv("MAX_UPLOAD_BYTES", value)
+    with pytest.raises(RuntimeError, match="MAX_UPLOAD_BYTES must be a positive integer"):
+        positive_int_env("MAX_UPLOAD_BYTES", 1024)
+
+
 def test_job_status_denies_member_without_document_access():
     from api.routers import documents
 
@@ -361,11 +388,16 @@ def test_job_status_denies_member_without_document_access():
         patch("api.routers.documents.user_has_document_access", return_value=False),
         pytest.raises(HTTPException) as exc,
     ):
-        asyncio.run(documents.get_job_status("job-1", {
-            "id": "member-1",
-            "tenant_id": "tenant-1",
-            "role": "member",
-        }))
+        asyncio.run(
+            documents.get_job_status(
+                "job-1",
+                {
+                    "id": "member-1",
+                    "tenant_id": "tenant-1",
+                    "role": "member",
+                },
+            )
+        )
 
     assert exc.value.status_code == 403
     assert exc.value.detail == "Document access required"
@@ -387,11 +419,16 @@ def test_job_status_allows_admin_without_acl_check():
         patch("ingestion.queue.get_job_status", return_value=job),
         patch("api.routers.documents.user_has_document_access") as user_has_document_access,
     ):
-        result = asyncio.run(documents.get_job_status("job-1", {
-            "id": "admin-1",
-            "tenant_id": "tenant-1",
-            "role": "admin",
-        }))
+        result = asyncio.run(
+            documents.get_job_status(
+                "job-1",
+                {
+                    "id": "admin-1",
+                    "tenant_id": "tenant-1",
+                    "role": "admin",
+                },
+            )
+        )
 
     assert result == job
     user_has_document_access.assert_not_called()
@@ -416,11 +453,16 @@ def test_job_history_filters_member_to_accessible_documents():
         patch("api.routers.documents.get_conn", return_value=JobsConn()),
         patch("api.routers.documents.get_accessible_document_ids", return_value=["doc-1"]),
     ):
-        result = asyncio.run(documents.list_jobs(limit=10, user={
-            "id": "member-1",
-            "tenant_id": "tenant-1",
-            "role": "member",
-        }))
+        result = asyncio.run(
+            documents.list_jobs(
+                limit=10,
+                user={
+                    "id": "member-1",
+                    "tenant_id": "tenant-1",
+                    "role": "member",
+                },
+            )
+        )
 
     assert [job["document_id"] for job in result] == ["doc-1"]
     assert "document_id = ANY(%s)" in state.queries[-1][0]
@@ -436,11 +478,16 @@ def test_job_history_returns_empty_for_member_without_accessible_documents():
         patch("api.routers.documents.get_conn", get_conn),
         patch("api.routers.documents.get_accessible_document_ids", return_value=[]),
     ):
-        result = asyncio.run(documents.list_jobs(limit=10, user={
-            "id": "member-1",
-            "tenant_id": "tenant-1",
-            "role": "member",
-        }))
+        result = asyncio.run(
+            documents.list_jobs(
+                limit=10,
+                user={
+                    "id": "member-1",
+                    "tenant_id": "tenant-1",
+                    "role": "member",
+                },
+            )
+        )
 
     assert result == []
     assert get_conn.return_value.state.queries == []

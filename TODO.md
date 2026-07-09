@@ -1,6 +1,6 @@
 # TurkRAG TODO
 
-Last reviewed: 2026-07-08
+Last reviewed: 2026-07-09
 
 ## Requirement analysis
 
@@ -60,6 +60,7 @@ Last reviewed: 2026-07-08
 - [x] 2026-07-07 source review: no additional safe local implementation gap found; remaining work requires deployment-specific CORS origins or live indexed tenant baselines.
 - [x] `README.md`, `.env.example`, and `tests/test_env_example.py`: keep the sample environment file aligned with the documented runtime configuration surface so fresh installs can discover the current DB pool, rate-limit, parser, retrieval, cache, health, and evaluation knobs.
 - [x] `.env.example`, `README.md`, and `tests/test_env_example.py`: document and guard `INGESTION_HEARTBEAT_INTERVAL_SECONDS` so stale-job recovery tuning is visible with the rest of the ingestion knobs.
+- [x] `api/routers/documents.py` and `tests/test_documents.py`: validate `MAX_UPLOAD_BYTES` as a positive integer so bad upload-limit configuration fails fast with a clear error.
 
 ## Deferred work
 

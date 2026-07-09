@@ -9,6 +9,7 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile, status
 
 from api.auth import get_current_user
+from api.config import positive_int_env
 from api.db import get_conn
 from api.limits import UPLOAD_RATE_LIMIT, limiter
 from api.rbac import (
@@ -25,7 +26,7 @@ router = APIRouter(prefix="/documents", tags=["documents"])
 UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", "/tmp/uploads"))
 ALLOWED_EXTENSIONS = {".pdf", ".docx", ".txt", ".xlsx", ".xls", ".csv"}
 UPLOAD_CHUNK_BYTES = 1024 * 1024
-MAX_UPLOAD_BYTES = int(os.getenv("MAX_UPLOAD_BYTES", str(50 * 1024 * 1024)))
+MAX_UPLOAD_BYTES = positive_int_env("MAX_UPLOAD_BYTES", 50 * 1024 * 1024)
 
 
 def _sanitize_upload_filename(filename: str | None) -> tuple[str, str]:
@@ -33,8 +34,11 @@ def _sanitize_upload_filename(filename: str | None) -> tuple[str, str]:
     safe_filename = Path(filename or "").name.strip()
     suffix = Path(safe_filename).suffix.lower()
     stem = Path(safe_filename).stem.strip()
-    if not safe_filename or not stem or safe_filename in {".", ".."} or (
-        safe_filename.startswith(".") and not suffix
+    if (
+        not safe_filename
+        or not stem
+        or safe_filename in {".", ".."}
+        or (safe_filename.startswith(".") and not suffix)
     ):
         raise HTTPException(status_code=422, detail="Uploaded file must have a valid filename")
     if suffix not in ALLOWED_EXTENSIONS:
@@ -116,7 +120,15 @@ async def upload_document(
                     """INSERT INTO documents
                        (id, tenant_id, filename, file_hash, status, collection_id, file_type, size_bytes)
                        VALUES (%s, %s, %s, %s, 'processing', %s, %s, %s)""",
-                    (document_id, tenant_id, safe_filename, file_hash, collection_id, suffix.lstrip("."), total_bytes),
+                    (
+                        document_id,
+                        tenant_id,
+                        safe_filename,
+                        file_hash,
+                        collection_id,
+                        suffix.lstrip("."),
+                        total_bytes,
+                    ),
                 )
                 document_inserted = True
             grant_access(document_id, user["id"], "owner", user["id"], conn)
@@ -130,6 +142,7 @@ async def upload_document(
         # Invalidate semantic cache for this tenant
         try:
             from retrieval.semantic_cache import get_cache
+
             get_cache().invalidate(tenant_id)
         except Exception as exc:
             logger.warning("Cache invalidation failed: %s", exc)
@@ -151,7 +164,9 @@ async def upload_document(
             raise
         raise HTTPException(status_code=500, detail="Document upload failed") from exc
 
-    return DocumentUploadResponse(document_id=document_id, job_id=job_id, filename=safe_filename, status="processing")
+    return DocumentUploadResponse(
+        document_id=document_id, job_id=job_id, filename=safe_filename, status="processing"
+    )
 
 
 def _delete_document_row(document_id: str) -> None:
@@ -247,7 +262,9 @@ async def delete_document(doc_id: str, user: dict = Depends(get_current_user)):
             if str(row[1]) != tenant_id:
                 raise HTTPException(status_code=403, detail="Access denied")
             if not user_has_document_management_access(user, doc_id, conn, required_level="editor"):
-                raise HTTPException(status_code=403, detail="Document editor or admin access required")
+                raise HTTPException(
+                    status_code=403, detail="Document editor or admin access required"
+                )
             tenant_slug = row[2]
             cur.execute("DELETE FROM documents WHERE id=%s", (doc_id,))
     finally:
@@ -255,6 +272,7 @@ async def delete_document(doc_id: str, user: dict = Depends(get_current_user)):
 
     if tenant_slug:
         from ingestion.indexer import delete_document_vectors
+
         try:
             delete_document_vectors(doc_id, tenant_slug)
         except Exception as exc:
@@ -341,7 +359,9 @@ async def list_jobs(limit: int = 30, user: dict = Depends(get_current_user)):
     ]
 
 
-def _ingest_document(document_id: str, file_path: str, filename: str, tenant_id: str, job_id: str | None = None):
+def _ingest_document(
+    document_id: str, file_path: str, filename: str, tenant_id: str, job_id: str | None = None
+):
     """Background task: parse → chunk → embed → index."""
     logger.info("Background ingestion started: doc=%s file=%s", document_id, file_path)
 
@@ -385,6 +405,7 @@ def _ingest_document(document_id: str, file_path: str, filename: str, tenant_id:
             conn = get_conn()
             try:
                 from ingestion.queue import complete_job
+
                 complete_job(job_id, conn)
             finally:
                 conn.close()
@@ -397,6 +418,7 @@ def _ingest_document(document_id: str, file_path: str, filename: str, tenant_id:
                 cur.execute("UPDATE documents SET status='error' WHERE id=%s", (document_id,))
             if job_id:
                 from ingestion.queue import fail_job
+
                 fail_job(job_id, str(exc), conn)
         finally:
             conn.close()
