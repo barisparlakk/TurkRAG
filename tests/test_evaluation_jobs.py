@@ -1,4 +1,5 @@
 import asyncio
+import importlib
 import json
 from unittest.mock import MagicMock, patch
 
@@ -219,6 +220,26 @@ def test_eval_history_handles_decoded_jsonb_and_exposes_lifecycle():
     assert history[0]["metrics"] == {"faithfulness": 0.0}
     assert history[0]["per_query"] == []
     conn.close.assert_called_once_with()
+
+
+@pytest.mark.parametrize(
+    ("env_name", "attr_name", "valid_value"),
+    [
+        ("EVAL_TOP_K", "EVAL_TOP_K", "30"),
+        ("EVAL_FINAL_K", "EVAL_FINAL_K", "7"),
+        ("EVAL_STALE_JOB_TIMEOUT_SECONDS", "EVAL_STALE_JOB_TIMEOUT_SECONDS", "1800"),
+    ],
+)
+def test_eval_numeric_env_limits_fail_fast(monkeypatch, env_name, attr_name, valid_value):
+    import eval.auto_eval as auto_eval
+
+    monkeypatch.setenv(env_name, "0")
+    with pytest.raises(RuntimeError, match=f"{env_name} must be a positive integer"):
+        importlib.reload(auto_eval)
+
+    monkeypatch.setenv(env_name, valid_value)
+    reloaded = importlib.reload(auto_eval)
+    assert getattr(reloaded, attr_name) == int(valid_value)
 
 
 def test_get_eval_job_returns_tenant_scoped_run_payload():

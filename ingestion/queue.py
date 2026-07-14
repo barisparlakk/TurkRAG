@@ -1,13 +1,14 @@
 """PostgreSQL-based async ingestion job queue."""
 
 import logging
-import os
+
+from api.config import positive_int_env
 
 logger = logging.getLogger(__name__)
 
-MAX_JOB_ATTEMPTS = int(os.getenv("INGESTION_MAX_JOB_ATTEMPTS", "3"))
-RETRY_DELAY_SECONDS = int(os.getenv("INGESTION_RETRY_DELAY_SECONDS", "60"))
-STALE_JOB_TIMEOUT_SECONDS = int(os.getenv("INGESTION_STALE_JOB_TIMEOUT_SECONDS", "900"))
+MAX_JOB_ATTEMPTS = positive_int_env("INGESTION_MAX_JOB_ATTEMPTS", 3)
+RETRY_DELAY_SECONDS = positive_int_env("INGESTION_RETRY_DELAY_SECONDS", 60)
+STALE_JOB_TIMEOUT_SECONDS = positive_int_env("INGESTION_STALE_JOB_TIMEOUT_SECONDS", 900)
 ERROR_MESSAGE_MAX_LENGTH = 500
 
 

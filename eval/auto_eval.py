@@ -6,15 +6,16 @@ import os
 import uuid
 from datetime import UTC, datetime
 
+from api.config import positive_int_env
 from api.db import get_conn
 
 logger = logging.getLogger(__name__)
 
 EVAL_QUERIES_PATH = os.getenv("EVAL_QUERIES_PATH", "eval/test_queries.json")
 EVAL_RETRIEVAL_MODE = os.getenv("EVAL_RETRIEVAL_MODE", "hybrid+rerank")
-EVAL_TOP_K = int(os.getenv("EVAL_TOP_K", "20"))
-EVAL_FINAL_K = int(os.getenv("EVAL_FINAL_K", "5"))
-EVAL_STALE_JOB_TIMEOUT_SECONDS = int(os.getenv("EVAL_STALE_JOB_TIMEOUT_SECONDS", "3600"))
+EVAL_TOP_K = positive_int_env("EVAL_TOP_K", 20)
+EVAL_FINAL_K = positive_int_env("EVAL_FINAL_K", 5)
+EVAL_STALE_JOB_TIMEOUT_SECONDS = positive_int_env("EVAL_STALE_JOB_TIMEOUT_SECONDS", 3600)
 
 
 class EvalJobAlreadyRunning(Exception):

@@ -1,17 +1,18 @@
 """Document text extraction for PDF, DOCX, TXT, XLSX, and CSV files."""
 
 import logging
-import os
 import re
 from pathlib import Path
 
+from api.config import positive_int_env
+
 logger = logging.getLogger(__name__)
 
-MAX_PARSED_CHARS = int(os.getenv("MAX_PARSED_CHARS", "2000000"))
-MAX_PDF_PAGES = int(os.getenv("MAX_PDF_PAGES", "250"))
-MAX_SPREADSHEET_ROWS = int(os.getenv("MAX_SPREADSHEET_ROWS", "100000"))
-MAX_SPREADSHEET_CELLS = int(os.getenv("MAX_SPREADSHEET_CELLS", "1000000"))
-MAX_CSV_FIELD_SIZE = int(os.getenv("MAX_CSV_FIELD_SIZE", str(1024 * 1024)))
+MAX_PARSED_CHARS = positive_int_env("MAX_PARSED_CHARS", 2_000_000)
+MAX_PDF_PAGES = positive_int_env("MAX_PDF_PAGES", 250)
+MAX_SPREADSHEET_ROWS = positive_int_env("MAX_SPREADSHEET_ROWS", 100_000)
+MAX_SPREADSHEET_CELLS = positive_int_env("MAX_SPREADSHEET_CELLS", 1_000_000)
+MAX_CSV_FIELD_SIZE = positive_int_env("MAX_CSV_FIELD_SIZE", 1024 * 1024)
 
 
 def _append_with_limit(parts: list[str], text: str, total_chars: int) -> int:

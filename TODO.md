@@ -1,6 +1,6 @@
 # TurkRAG TODO
 
-Last reviewed: 2026-07-09
+Last reviewed: 2026-07-14
 
 ## Requirement analysis
 
@@ -61,6 +61,10 @@ Last reviewed: 2026-07-09
 - [x] `README.md`, `.env.example`, and `tests/test_env_example.py`: keep the sample environment file aligned with the documented runtime configuration surface so fresh installs can discover the current DB pool, rate-limit, parser, retrieval, cache, health, and evaluation knobs.
 - [x] `.env.example`, `README.md`, and `tests/test_env_example.py`: document and guard `INGESTION_HEARTBEAT_INTERVAL_SECONDS` so stale-job recovery tuning is visible with the rest of the ingestion knobs.
 - [x] `api/routers/documents.py` and `tests/test_documents.py`: validate `MAX_UPLOAD_BYTES` as a positive integer so bad upload-limit configuration fails fast with a clear error.
+- [x] `generation/attribution.py` and `tests/test_attribution.py`: keep `cited_docs` limited to the per-sentence sources actually selected after relevance ranking and `max_sources` truncation.
+- [x] `api/routers/permissions.py` and `tests/test_permissions.py`: require granted document-permission targets to be active users in the same tenant so cross-tenant user IDs cannot receive ACL rows.
+- [x] `api/middleware.py`, `api/limits.py`, and `tests/test_runtime_limit_config.py`: validate `MAX_REQUEST_BODY_BYTES` and `WS_RATE_LIMIT_PER_MINUTE` as positive integers at startup so malformed runtime limits fail clearly instead of crashing later.
+- [x] `ingestion/parser.py`, `ingestion/queue.py`, `ingestion/worker.py`, `eval/auto_eval.py`, and `tests/test_runtime_limit_config.py`: validate documented parser, ingestion, and API evaluation numeric knobs as positive integers at import/startup.
 
 ## Deferred work
 

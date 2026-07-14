@@ -1,6 +1,7 @@
 """Tests for document parser — TXT and CSV (no binary deps required)."""
 
 import csv
+import importlib
 
 import pytest
 
@@ -164,3 +165,23 @@ class TestExcelParsing:
 
         with pytest.raises(ValueError, match="size limits"):
             parse_document(path)
+
+
+@pytest.mark.parametrize(
+    ("env_name", "attr_name", "valid_value"),
+    [
+        ("MAX_PARSED_CHARS", "MAX_PARSED_CHARS", "4096"),
+        ("MAX_PDF_PAGES", "MAX_PDF_PAGES", "12"),
+        ("MAX_SPREADSHEET_ROWS", "MAX_SPREADSHEET_ROWS", "100"),
+        ("MAX_SPREADSHEET_CELLS", "MAX_SPREADSHEET_CELLS", "500"),
+        ("MAX_CSV_FIELD_SIZE", "MAX_CSV_FIELD_SIZE", "2048"),
+    ],
+)
+def test_parser_numeric_env_limits_fail_fast(monkeypatch, env_name, attr_name, valid_value):
+    monkeypatch.setenv(env_name, "0")
+    with pytest.raises(RuntimeError, match=f"{env_name} must be a positive integer"):
+        importlib.reload(parser)
+
+    monkeypatch.setenv(env_name, valid_value)
+    reloaded = importlib.reload(parser)
+    assert getattr(reloaded, attr_name) == int(valid_value)

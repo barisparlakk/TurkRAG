@@ -1,9 +1,10 @@
 """Background ingestion worker that polls for pending jobs."""
 
 import logging
-import os
 import threading
 from contextlib import contextmanager
+
+from api.config import positive_int_env
 
 logger = logging.getLogger(__name__)
 
@@ -11,7 +12,7 @@ _worker_thread: threading.Thread | None = None
 _stop_event = threading.Event()
 
 POLL_INTERVAL = 5
-HEARTBEAT_INTERVAL_SECONDS = int(os.getenv("INGESTION_HEARTBEAT_INTERVAL_SECONDS", "30"))
+HEARTBEAT_INTERVAL_SECONDS = positive_int_env("INGESTION_HEARTBEAT_INTERVAL_SECONDS", 30)
 
 
 def _mark_document_error(document_id: str | None):

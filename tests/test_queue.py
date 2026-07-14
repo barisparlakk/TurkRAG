@@ -1,6 +1,9 @@
 """Regression tests for ingestion queue durability and recovery."""
 
+import importlib
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 
 class _Cursor:
@@ -271,3 +274,24 @@ def test_heartbeat_update_errors_do_not_fail_ingestion_job():
     logger.warning.assert_called()
     complete_job.assert_called_once()
     fail_job.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    ("env_name", "module_name", "attr_name", "valid_value"),
+    [
+        ("INGESTION_MAX_JOB_ATTEMPTS", "ingestion.queue", "MAX_JOB_ATTEMPTS", "4"),
+        ("INGESTION_RETRY_DELAY_SECONDS", "ingestion.queue", "RETRY_DELAY_SECONDS", "15"),
+        ("INGESTION_STALE_JOB_TIMEOUT_SECONDS", "ingestion.queue", "STALE_JOB_TIMEOUT_SECONDS", "120"),
+        ("INGESTION_HEARTBEAT_INTERVAL_SECONDS", "ingestion.worker", "HEARTBEAT_INTERVAL_SECONDS", "10"),
+    ],
+)
+def test_ingestion_numeric_env_limits_fail_fast(monkeypatch, env_name, module_name, attr_name, valid_value):
+    module = importlib.import_module(module_name)
+
+    monkeypatch.setenv(env_name, "0")
+    with pytest.raises(RuntimeError, match=f"{env_name} must be a positive integer"):
+        importlib.reload(module)
+
+    monkeypatch.setenv(env_name, valid_value)
+    reloaded = importlib.reload(module)
+    assert getattr(reloaded, attr_name) == int(valid_value)
