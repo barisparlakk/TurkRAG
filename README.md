@@ -274,6 +274,7 @@ bounds and still match their declared query counts.
 | `INGESTION_MAX_JOB_ATTEMPTS` | `3` | Maximum attempts before an ingestion job is marked failed |
 | `INGESTION_RETRY_DELAY_SECONDS` | `60` | Delay before retrying a failed ingestion attempt |
 | `INGESTION_STALE_JOB_TIMEOUT_SECONDS` | `900` | Processing heartbeat timeout before a job is recovered |
+| `INGESTION_POLL_INTERVAL_SECONDS` | `5` | Delay between ingestion worker queue polls when no job is available |
 | `INGESTION_HEARTBEAT_INTERVAL_SECONDS` | `30` | Interval for refreshing the active ingestion job heartbeat |
 | `EVAL_QUERIES_PATH` | `eval/test_queries.json` | Ground-truth query set used by API-triggered evaluations |
 | `EVAL_RETRIEVAL_MODE` | `hybrid+rerank` | Retrieval mode used by API-triggered evaluations |

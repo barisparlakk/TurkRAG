@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 _worker_thread: threading.Thread | None = None
 _stop_event = threading.Event()
 
-POLL_INTERVAL = 5
+POLL_INTERVAL_SECONDS = positive_int_env("INGESTION_POLL_INTERVAL_SECONDS", 5)
 HEARTBEAT_INTERVAL_SECONDS = positive_int_env("INGESTION_HEARTBEAT_INTERVAL_SECONDS", 30)
 
 
@@ -139,11 +139,11 @@ def _process_job(job: dict):
 
 
 def _worker_loop():
-    """Main worker loop: poll for jobs every POLL_INTERVAL seconds."""
+    """Main worker loop: poll for jobs every configured interval."""
     from api.db import get_conn
     from ingestion.queue import pick_next_job, recover_stale_jobs
 
-    logger.info("Ingestion worker started (poll every %ds)", POLL_INTERVAL)
+    logger.info("Ingestion worker started (poll every %ds)", POLL_INTERVAL_SECONDS)
 
     while not _stop_event.is_set():
         try:
@@ -168,10 +168,10 @@ def _worker_loop():
                 logger.info("Processing job %s: %s", job["id"], job["filename"])
                 _process_job(job)
             else:
-                _stop_event.wait(timeout=POLL_INTERVAL)
+                _stop_event.wait(timeout=POLL_INTERVAL_SECONDS)
         except Exception as exc:
             logger.error("Worker loop error: %s", exc)
-            _stop_event.wait(timeout=POLL_INTERVAL)
+            _stop_event.wait(timeout=POLL_INTERVAL_SECONDS)
 
 
 def start_worker():

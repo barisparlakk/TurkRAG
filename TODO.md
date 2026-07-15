@@ -1,6 +1,6 @@
 # TurkRAG TODO
 
-Last reviewed: 2026-07-14
+Last reviewed: 2026-07-15
 
 ## Requirement analysis
 
@@ -65,6 +65,7 @@ Last reviewed: 2026-07-14
 - [x] `api/routers/permissions.py` and `tests/test_permissions.py`: require granted document-permission targets to be active users in the same tenant so cross-tenant user IDs cannot receive ACL rows.
 - [x] `api/middleware.py`, `api/limits.py`, and `tests/test_runtime_limit_config.py`: validate `MAX_REQUEST_BODY_BYTES` and `WS_RATE_LIMIT_PER_MINUTE` as positive integers at startup so malformed runtime limits fail clearly instead of crashing later.
 - [x] `ingestion/parser.py`, `ingestion/queue.py`, `ingestion/worker.py`, `eval/auto_eval.py`, and `tests/test_runtime_limit_config.py`: validate documented parser, ingestion, and API evaluation numeric knobs as positive integers at import/startup.
+- [x] `ingestion/worker.py`, `.env.example`, `README.md`, and `tests/test_queue.py`: expose `INGESTION_POLL_INTERVAL_SECONDS` so the ingestion worker poll cadence is documented, configurable, and validated like the rest of the ingestion timing knobs.
 
 ## Deferred work
 

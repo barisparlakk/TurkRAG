@@ -282,6 +282,7 @@ def test_heartbeat_update_errors_do_not_fail_ingestion_job():
         ("INGESTION_MAX_JOB_ATTEMPTS", "ingestion.queue", "MAX_JOB_ATTEMPTS", "4"),
         ("INGESTION_RETRY_DELAY_SECONDS", "ingestion.queue", "RETRY_DELAY_SECONDS", "15"),
         ("INGESTION_STALE_JOB_TIMEOUT_SECONDS", "ingestion.queue", "STALE_JOB_TIMEOUT_SECONDS", "120"),
+        ("INGESTION_POLL_INTERVAL_SECONDS", "ingestion.worker", "POLL_INTERVAL_SECONDS", "2"),
         ("INGESTION_HEARTBEAT_INTERVAL_SECONDS", "ingestion.worker", "HEARTBEAT_INTERVAL_SECONDS", "10"),
     ],
 )
