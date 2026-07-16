@@ -1,6 +1,6 @@
 # TurkRAG TODO
 
-Last reviewed: 2026-07-15
+Last reviewed: 2026-07-16
 
 ## Requirement analysis
 
@@ -24,6 +24,7 @@ Last reviewed: 2026-07-15
 - [x] `migrations/versions/0003_backfill_document_permissions.py` and `scripts/backfill_document_permissions.py`: backfill ACL rows for legacy documents by granting active tenant admins owner access and active members viewer access.
 - [x] `scripts/bootstrap_admin.py`, `tests/test_bootstrap_admin.py`, and `README.md`: add an idempotent first-admin bootstrap path for existing tenants before disabling dev auth in production.
 - [x] `tests/test_experiment_scripts.py`: add lightweight CLI coverage for `chunking_experiments`, `embedder_experiments`, and `hyperparameter_sweep` so roadmap/script drift is caught automatically.
+- [x] `api/config.py` and `tests/test_runtime_limit_config.py`: add shared positive-float environment validation coverage so fractional runtime knobs can fail fast with the same clear startup errors as integer limits.
 
 ## Current gaps
 
